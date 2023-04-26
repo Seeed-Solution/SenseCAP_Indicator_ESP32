@@ -1,9 +1,12 @@
-# console
+# LoRa examples
 
-It's a lora test program, nothing is displayed.
+It's a lora test program, nothing is displayed. This demo can only run in the SenseCAP Indicator with lora.
+
 
 
 ## How to use example
+
+Choose one, the others require comment masking.
 
 ```
 demo_lora_cw();  // Tx lora Continuous Wave.

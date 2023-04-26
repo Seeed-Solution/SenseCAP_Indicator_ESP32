@@ -60,7 +60,6 @@ void demo_lora_rx(void)
     Radio.Rx( 0 );
     while(1) {
         printf("cnt: %d\n", cnt++);
-        //Radio.IrqProcess();
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
 }

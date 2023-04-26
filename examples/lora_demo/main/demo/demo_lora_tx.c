@@ -6,7 +6,7 @@
 #include "radio.h"
 #include "bsp_board.h"
 
-#define RF_FREQUENCY                                862000000 // Hz
+#define RF_FREQUENCY                                868000000 // Hz
 #define LORA_BANDWIDTH                              0         // [0: 125 kHz,
                                                               //  1: 250 kHz,
                                                               //  2: 500 kHz,
