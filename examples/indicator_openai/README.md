@@ -14,7 +14,8 @@ This demo mainly implements time, sensor data display, and some configuration fu
 - [x] Wifi config.
 - [x] Display config.
 - [x] time config.
-
+- [x] chatGPT
+- [x] DALL E2
 
 ## How to use example
 
