@@ -1,16 +1,15 @@
-# Factory Bin
-
-This is the first version of bin for factory firmware which is programmed by [terminal_demo](../terminal_demo/).
 
 # IDF Patch
 
-The patch is intended to achieve best perfermance of RGB LCD by using Octal PSRAM 120MHz feature. Therefore, the examples can work normally under the default LCD PCLK of 18 MHz.
-The patch can be applied in IDF master **(commit id:f3159)** by following commands:
+The [patch](./patch/release5.0_psram_octal_120m.patch) is intended to achieve the best performance of RGB LCD by using the **PSRAM Octal 120 MHz** feature. The patch is only used for the **release/v5.0** branch of ESP-IDF. For the **master** branch, the PSRAM Octal 120 MHz feature can be directly used by enabling the `IDF_EXPERIMENTAL_FEATURES` option.
+
+**Note: The PSRAM Octal 120 MHz feature has temperature risks and cannot guarantee normal functioning with a temperature higher than 65 degrees Celsius.**
+
+Please make sure your IDF project is clean (use `git status` to check), then the patch can be applied by following commands:
+
 ```
 cd <root directory of IDF>
-git checkout --recurse-submodules master
-git checkout --recurse-submodules f3159
-git apply <path of the patch>/idf_psram_120m.patch
+git apply --whitespace=fix <path of the patch>/release5.0_psram_octal_120m.patch # Nothing return if success
 git status      # Check whether the operation is successful, the output should look like below:
 
 HEAD detached at f315986401
@@ -29,4 +28,11 @@ Untracked files:
   (use "git add <file>..." to include in what will be committed)
         tools/test_apps/system/flash_psram/sdkconfig.ci.f8r8_120ddr
         tools/test_apps/system/flash_psram/sdkconfig.ci.f8r8_120ddr_120ddr
+```
+
+These uncommitted modifications can be cleared by the following commands and **the other uncommitted modifications will be cleared too**.
+
+```
+git reset --hard
+git clean -xdf
 ```
