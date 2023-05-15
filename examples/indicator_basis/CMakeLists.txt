@@ -8,4 +8,4 @@ set(EXTRA_COMPONENT_DIRS  ../../components)
 
 add_compile_options(-fdiagnostics-color=always -w)
 
-project(indicator_demo)
+project(indicator_basis)
