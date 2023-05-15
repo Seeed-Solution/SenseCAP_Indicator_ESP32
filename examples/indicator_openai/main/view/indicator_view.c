@@ -841,7 +841,7 @@ void ui_event_chatgpt_btn( lv_event_t * e) {
     lv_obj_t * cur_screen = lv_scr_act();
 if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_openai ) {
     if(openai_is_ready()){
-        _ui_screen_change( ui_screen_chartgpt_1, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 300, 0);
+        _ui_screen_change( ui_screen_chartgpt_1, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 200, 0);
     }
 }
 }
@@ -866,9 +866,8 @@ if ( event_code == LV_EVENT_CLICKED) {
 void ui_event_openai_back( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
 if ( event_code == LV_EVENT_CLICKED) {
-      _ui_screen_change( ui_screen_openai, LV_SCR_LOAD_ANIM_OVER_TOP, 300, 0);
-      lv_textarea_set_text(ui_text_edit_gpt_request, "");
-      // 键盘隐藏
+    _ui_screen_change( ui_screen_openai, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0);
+    lv_textarea_set_text(ui_text_edit_gpt_request, "");
     lv_obj_add_flag(ui_Keyboard_chatgpt, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_Keyboard_dalle, LV_OBJ_FLAG_HIDDEN);
 }
@@ -1003,7 +1002,6 @@ void ui_event_generate_answer_btn(lv_event_t *e)
         if( ui_request_wait ==NULL) {
             ui_request_wait = ui_openai_request_wait_create(ui_screen_chartgpt_2);
         }
-        // 先复制文本过去
         lv_label_set_text(ui_text_readonly_gpt_request, question);
         lv_textarea_set_text(ui_text_readonly_gpt_response, "");
         _ui_screen_change( ui_screen_chartgpt_2, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0);
@@ -1484,7 +1482,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             if(response.ret) {
                 lv_textarea_set_text(ui_text_readonly_gpt_response, response.p_answer);
             } else {
-                lv_textarea_set_text(ui_text_readonly_gpt_response, response.err_msg);
+                openai_show_msgbox(response.err_msg);
             }
 
             if( ui_request_wait != NULL ) {
@@ -1509,6 +1507,8 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                 img_png.data = response.p_answer;
                 ESP_LOGI(TAG, "display dalle img: %d", response.len);
                 lv_img_set_src(ui_dall_image, &img_png); 
+            } else {
+                openai_show_msgbox(response.err_msg);
             }
 
             if( ui_request_wait != NULL ) {

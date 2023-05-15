@@ -100,7 +100,7 @@ lv_obj_set_x( ui_dalle_title, 0 );
 lv_obj_set_y( ui_dalle_title, -2 );
 lv_obj_set_align( ui_dalle_title, LV_ALIGN_CENTER );
 lv_label_set_text(ui_dalle_title,"DALL•E");
-lv_obj_set_style_text_font(ui_dalle_title, &ui_font_font1, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_dalle_title, &lv_font_montserrat_26, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 
 lv_obj_t *ui_scrolldots4 = lv_obj_create(ui_screen_openai);

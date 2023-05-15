@@ -55,12 +55,13 @@ lv_obj_set_height( ui_dalle_text, 288);
 lv_obj_set_x( ui_dalle_text, 2 );
 lv_obj_set_y( ui_dalle_text, -2 );
 lv_obj_set_align( ui_dalle_text, LV_ALIGN_CENTER );
-lv_textarea_set_max_length(ui_dalle_text,2000);
+lv_textarea_set_max_length(ui_dalle_text,200);
 lv_textarea_set_placeholder_text(ui_dalle_text,"Astronaut riding a horse in space.");
 lv_obj_set_style_text_color(ui_dalle_text, lv_color_hex(0x0E0E0E), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_dalle_text, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_bg_color(ui_dalle_text, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_dalle_text, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_textarea_set_cursor_click_pos(ui_dalle_text, true);
 
 ui_Keyboard_dalle = lv_keyboard_create(ui_screen_dalle_1);
 lv_obj_set_width( ui_Keyboard_dalle, 480);

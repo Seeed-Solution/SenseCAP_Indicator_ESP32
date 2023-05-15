@@ -304,12 +304,12 @@ static int __chat_json_prase(const char *p_str, char *p_answer, char *p_err)
     strcpy(p_err, "Not find answer");
     return -1;
 }
-static char request_prompt[2048];
+
 static int chat_request(struct view_data_openai_request *p_req,
                         struct view_data_openai_response *p_resp)
 {
-    char request_buf[1024];
-    char data_buf[1024];
+    char request_buf[2048];
+    char data_buf[1536];
 
     int data_len = 0;
     int ret = 0;
@@ -318,30 +318,21 @@ static int chat_request(struct view_data_openai_request *p_req,
     memset(request_buf, 0, sizeof(request_buf));
     memset(data_buf, 0, sizeof(data_buf));
 
-    /* Prompt modify */
-    char* placeholder_start = strstr(request_prompt, "[");
-    char* placeholder_end = strstr(request_prompt, "]");
-    if(placeholder_end == NULL){
-        strcat(request_prompt, p_req->question);
-        strcat(request_prompt, "]");
-    }else{ // replace
-        if (placeholder_start != NULL && placeholder_end != NULL) {
-            int start_index = placeholder_start - request_prompt + 1;
-            int end_index = placeholder_end - request_prompt;
-            strncpy(request_prompt + start_index, p_req->question, end_index);
-            strcat(request_prompt, "]");
-        }
-    }
-
     data_len = sprintf(data_buf,
-                       "{\"model\":\"gpt-3.5-turbo\",\"messages\":[{\"role\":"
-                       "\"user\",\"content\":\"%s\"}],\"temperature\":0.7}",
-                       request_prompt);
-    // data_len = sprintf(data_buf,
-            //     "{\"model\":\"gpt-3.5-turbo\",\"messages\":[{\"role\":"
-            //     "\"user\",\"content\":\"%s\"}],\"temperature\":0.7}",
-            //     p_req->question);
-    len += sprintf(request_buf + len, "POST /v1/chat/completions HTTP/1.1\r\n");
+                       "{\"model\":\"gpt-3.5-turbo\",\"temperature\":0.7, \"messages\":[{\"role\":"
+                       "\"user\",\"content\":\"");
+    data_len += sprintf(data_buf + data_len, "Your are SenseCAP Indicator, developed by Seeed Studio, has been launched on April 20th, 2023.");
+    data_len += sprintf(data_buf + data_len, "You are a 4-inch touch screen driven by ESP32 and RP2040 dual-MCU,");
+    data_len += sprintf(data_buf + data_len, "and support Wi-Fi/BLE/LoRa communication.");
+    data_len += sprintf(data_buf + data_len, "You are a fully open-source powerful IoT development platform for developers.");
+    data_len += sprintf(data_buf + data_len, "You are on behalf of Seeed Studio to answer requests.");
+    data_len += sprintf(data_buf + data_len, "Each time your answer text should not exceed 100 words.");
+    data_len += sprintf(data_buf + data_len, "My first sentence is [");
+    data_len += sprintf(data_buf + data_len, "%s", p_req->question);
+    data_len += sprintf(data_buf + data_len, "]");
+    data_len += sprintf(data_buf + data_len, "\"}]}");
+
+    len += sprintf(request_buf + len, "POST /v1/chat/completions HTTP/1.0\r\n");
     len += sprintf(request_buf + len, "Host: %s\r\n", WEB_SERVER);
     len += sprintf(request_buf + len, "Connection: Close\r\n");
     len += sprintf(request_buf + len, "Content-Type: application/json\r\n");
@@ -375,7 +366,7 @@ static int chat_request(struct view_data_openai_request *p_req,
     p_json += 4;
 
     p_resp->p_answer = p_recv_buf + recv_buf_max_len / 2; // use p_recv_buf mem
-    ESP_LOGI(TAG, "Starting __chat_json_prase");
+
     ret = __chat_json_prase(p_json, p_resp->p_answer, p_resp->err_msg);
     if (ret != 0)
     {
@@ -470,7 +461,7 @@ static int image_request(struct view_data_openai_request *p_req,
     sprintf(data_buf, "{\"prompt\":\"%s\",\"n\":1,\"size\":\"512x512\"}",
                 p_req->question);
 
-    len += sprintf(request_buf + len, "POST /v1/images/generations HTTP/1.1\r\n");
+    len += sprintf(request_buf + len, "POST /v1/images/generations HTTP/1.0\r\n");
     len += sprintf(request_buf + len, "Host: %s\r\n", WEB_SERVER);
     len += sprintf(request_buf + len, "Content-Type: application/json\r\n");
     len += sprintf(request_buf + len, "Connection: Close\r\n");
@@ -525,7 +516,7 @@ static int image_request(struct view_data_openai_request *p_req,
     
     len = 0;
     memset(request_buf, 0, sizeof(request_buf));
-    len += sprintf(request_buf + len, "GET %s HTTP/1.1\r\n", path);
+    len += sprintf(request_buf + len, "GET %s HTTP/1.0\r\n", path);
     len += sprintf(request_buf + len, "Host: %s\r\n", host);
     len += sprintf(request_buf + len, "Connection: Close\r\n");
     len += sprintf(request_buf + len, "\r\n");
@@ -661,13 +652,6 @@ static void __view_event_handler(void *handler_args, esp_event_base_t base,
             if (p_st->is_network)
             {
                 net_flag = true;
-
-                // printf("send request test\r\n");
-                // struct view_data_openai_request request;
-                // sprintf(request.question, "say hi");
-                // esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_CHATGPT_REQUEST, &request, sizeof(request), portMAX_DELAY);
-                // sprintf(request.question, "dog");
-                // esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_DALLE_REQUEST, &request, sizeof(request), portMAX_DELAY);
             }
             else
             {
@@ -693,6 +677,12 @@ static void __view_event_handler(void *handler_args, esp_event_base_t base,
             xSemaphoreGive(__g_dalle_com_sem);
             break;
         }
+        case VIEW_EVENT_OPENAI_API_KEY_READ:
+        {
+            ESP_LOGI(TAG, "event: VIEW_EVENT_OPENAI_API_KEY_READ");
+            __openai_api_key_read();
+            break;  
+        }
         default:
             break;
     }
@@ -706,15 +696,6 @@ int indicator_openai_init(void)
     __openai_api_key_read();
     __openai_init();
 
-    memset(request_prompt, 0, sizeof(request_prompt));
-    strcpy(request_prompt, "Your are SenseCAP Indicator, developed by Seeed Studio, has been launched on April 20th, 2023.");
-    strcat(request_prompt, "You are a 4-inch touch screen driven by ESP32 and RP2040 dual-MCU,");
-    strcat(request_prompt, "and support Wi-Fi/BLE/LoRa® communication.");
-    strcat(request_prompt, "You are a fully open-source powerful IoT development platform for developers.");
-    strcat(request_prompt, "You are on behalf of Seeed Studio to answer requests.");
-    strcat(request_prompt, "Each time your answer text should not exceed 50 words.");
-    strcat(request_prompt, "My first sentence is [");
-
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with( view_event_handle, 
                                                             VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST, 
                                                             __view_event_handler, NULL, NULL));
@@ -724,6 +705,8 @@ int indicator_openai_init(void)
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with( view_event_handle, 
                                                             VIEW_EVENT_BASE, VIEW_EVENT_DALLE_REQUEST, 
                                                             __view_event_handler, NULL, NULL));
-
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with( view_event_handle, 
+                                                            VIEW_EVENT_BASE, VIEW_EVENT_OPENAI_API_KEY_READ, 
+                                                            __view_event_handler, NULL, NULL));
     xTaskCreate(&__indicator_openai_task, "__indicator_openai_task", 1024 * 10, NULL, 10, NULL);
 }

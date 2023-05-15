@@ -188,6 +188,8 @@ enum {
     VIEW_EVENT_DALLE_RESPONSE, // struct view_data_openai_response
         
     VIEW_EVENT_OPENAI_REQUEST_ST, // struct view_data_openai_request_st
+
+    VIEW_EVENT_OPENAI_API_KEY_READ,
     VIEW_EVENT_ALL,
 };
 

@@ -38,6 +38,7 @@ static int openai_api_key_set(int argc, char **argv)
 
         ESP_LOGI(TAG,"wirte openai api key:%s", key_buf);
         indicator_storage_write(OPENAI_API_KEY_STORAGE, (void *)key_buf, sizeof(key_buf));
+        esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_OPENAI_API_KEY_READ, NULL, 0, portMAX_DELAY);
     }
    
     len=sizeof(key_buf);

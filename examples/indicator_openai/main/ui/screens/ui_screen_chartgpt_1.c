@@ -69,7 +69,7 @@ lv_obj_set_width(ui_text_edit_gpt_request, 345);
 lv_obj_set_height(ui_text_edit_gpt_request, 154);
 lv_obj_set_x(ui_text_edit_gpt_request, 28);
 lv_obj_set_y(ui_text_edit_gpt_request, 31);
-lv_textarea_set_max_length(ui_text_edit_gpt_request,2000);
+lv_textarea_set_max_length(ui_text_edit_gpt_request,200);
 lv_textarea_set_placeholder_text(ui_text_edit_gpt_request,"Enter your question here to get answer from ChatGPT...");
 lv_obj_set_style_bg_color(ui_text_edit_gpt_request, lv_color_hex(0x444654), LV_PART_MAIN | LV_STATE_DEFAULT);
 lv_obj_set_style_bg_opa(ui_text_edit_gpt_request, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
