@@ -1,3 +1,51 @@
-# SenseCAP Indicator
 
-This is the SDK for SenseCAP Indicator esp32 MCU.
+
+# **SenseCAP Indicator ESP32**
+
+This project is developed based on ESP32-IDF, and Using C/C++ language development. There are some examples to teach you how to use some functions of ESP32. The firmware of the example is burned into the ESP32 MCU.
+
+
+> Relevant: [SenseCAP Indicator RP2040](https://github.com/Seeed-Solution/SenseCAP_Indicator_RP2040)
+
+## Example Layout
+
+- `button`  Demonstrates how to use the configurable buttons in SenseCAP Indicator.
+- `console` Demonstrates how to use of command line functions.
+- `esp32_rp2040_comm` Demonstration showcases the communication between ESP32 and RP2040.
+- `indicator_basis`  This is a comprehensive demo,mainly implements time, sensor data display, and some configuration functions.
+- `indicator_openai` This is a comprehensive demo,mainly based on the indicator_basis demo with added chartGPT and DALL•E functions.
+- `lora_demo`  Demonstrates how to communicate using lora in SenseCAP Indicator.
+- `lvgl_demos` Demonstrated some demos of lvgl.
+- `photo_demo` Demonstrates how to display a photo of yourself.
+- `squareline_demo` Demonstrates how to display the UI file exported by the squareline project.
+
+## **SenseCAP Indicator Abstract**
+
+SenseCAP Indicator is a 4-inch touch screen driven by ESP32-S3 and RP2040 Dual-MCU and supports Wi-Fi/Bluetooth/LoRa communication. 
+
+The device comes two Grove interfaces, which supports ADC and I2C transmission protocols, and two USB Type-C ports with GPIO expantion pins inside, so user can easily expand external accessories via USB port.
+
+SenseCAP Indicator is a fully open source powerful IoT development platform for developers. One-stop ODM Fusion service is also available for customization and quick scale-up.
+
+<div align="center"><img width={480} src="https://files.seeedstudio.com/wiki/SenseCAP/SenseCAP_Indicator/SenseCAP_Indicator_1.png"/></div>
+
+
+<p style={{textAlign: 'center'}}><a href="https://www.seeedstudio.com/SenseCAP-Indicator-D1-p-5643.html?" target="_blank"><img src="https://files.seeedstudio.com/wiki/RS485_500cm%20ultrasonic_sensor/image%202.png" border="0" /></a></p>
+
+
+
+### **Features**
+
+
+
+- **Dual MCUs and Rich GPIOs** 
+Equipped with powerful ESP32S3 and RP2040 dual MCUs and over 400 Grove-compatible GPIOs for flexible expansion options.
+- **Real-time Air Quality Monitoring** 
+Built-in tVOC and CO2 sensors, and an external Grove AHT20 TH sensor for more precise temperature and humidity readings.
+- **Local LoRa Hub for IoT Connectivity** 
+Integrated Semtech SX1262 LoRa chip (optional) for connecting LoRa devices to popular IoT platforms such as Matter via Wi-Fi, without the need for additional compatible devices.
+- **Fully Open Source Platform** 
+Leverage the extensive ESP32 and Raspberry Pi open source ecosystem for infinite application possibilities.
+- **Fusion ODM Service Available** 
+Seeed Studio also provides one-stop ODM service for quick customization and scale-up to meet various needs.(please contact iot@seeed.cc)
+
