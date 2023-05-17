@@ -457,6 +457,10 @@ static int image_request(struct view_data_openai_request *p_req,
     memset(request_buf, 0, sizeof(request_buf));
     memset(data_buf, 0, sizeof(data_buf));
 
+    if( strlen(request.question) == 0) {
+        strcpy(request.question, "Astronaut riding a horse in space.");
+    }
+
     data_len =
     sprintf(data_buf, "{\"prompt\":\"%s\",\"n\":1,\"size\":\"512x512\"}",
                 p_req->question);

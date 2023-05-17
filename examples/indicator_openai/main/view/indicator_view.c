@@ -809,10 +809,16 @@ static state_t openai_run_state = {
 
 void openai_show_msgbox(const char *message)
 {
-    lv_obj_t* openai_msg_tip = lv_msgbox_create(lv_scr_act(), "Warning", message, "close", true);
+    lv_obj_t* openai_msg_tip = lv_msgbox_create(lv_scr_act(), "Error", message, "close", true);
     lv_obj_set_size(openai_msg_tip, 360, 200);
     lv_obj_center(openai_msg_tip);
-    // lv_obj_set_style_text_font(openai_msg_tip, &ui_font_font0, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+    lv_obj_t * close_btn = lv_msgbox_get_close_btn(openai_msg_tip);
+    lv_obj_set_style_bg_color(close_btn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN | LV_STATE_DEFAULT );
+
+    lv_obj_t * msg = lv_msgbox_get_content(openai_msg_tip);
+    // lv_obj_set_align( msg, LV_ALIGN_CENTER );
+    lv_obj_set_style_text_font(msg, &ui_font_font0, LV_PART_MAIN| LV_STATE_DEFAULT);
 }
 
 bool openai_is_ready(void)
@@ -1091,6 +1097,20 @@ void ui_event_dall_image( lv_event_t * e) {
     }
 }
 
+void ui_event_screen_chartgpt_1( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
+if ( event_code == LV_EVENT_SCREEN_LOAD_START) {
+    lv_textarea_set_text(ui_text_edit_gpt_request, "");
+}
+}
+
+void ui_event_screen_dalle_1( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
+if ( event_code == LV_EVENT_SCREEN_LOAD_START) {
+    lv_textarea_set_text(ui_dalle_text, "");
+}
+}
+
 void openai_event_init(void)
 {
 
@@ -1118,6 +1138,9 @@ lv_obj_add_event_cb(ui_Keyboard_chatgpt, ui_event_keyboard_hide, LV_EVENT_READY,
 lv_obj_add_event_cb(ui_Keyboard_dalle, ui_event_keyboard_hide, LV_EVENT_READY, NULL);
 
 lv_obj_add_event_cb(ui_dall_image, ui_event_dall_image, LV_EVENT_CLICKED, NULL);
+
+lv_obj_add_event_cb(ui_screen_chartgpt_1, ui_event_screen_chartgpt_1, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(ui_screen_dalle_1, ui_event_screen_dalle_1, LV_EVENT_ALL, NULL);
 
 }
 /**************** END of OpenAI **********/
