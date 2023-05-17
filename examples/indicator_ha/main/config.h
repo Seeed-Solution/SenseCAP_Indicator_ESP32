@@ -15,6 +15,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "ha_config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

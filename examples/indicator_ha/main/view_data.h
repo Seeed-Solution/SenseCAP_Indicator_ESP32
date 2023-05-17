@@ -116,6 +116,19 @@ struct view_data_sensor_history_data
     float week_max;
 };
 
+struct view_data_ha_sensor_data
+{
+    uint8_t index;
+    char value[32];
+};
+
+struct view_data_ha_switch_data
+{
+    uint8_t index;
+    int value;
+};
+
+
 enum {
     VIEW_EVENT_SCREEN_START = 0,  // uint8_t, enum start_screen, which screen when start
 
@@ -125,11 +138,6 @@ enum {
     VIEW_EVENT_CITY,      // char city[32], max display 24 char
 
     VIEW_EVENT_SENSOR_DATA, // struct view_data_sensor_data
-
-    VIEW_EVENT_SENSOR_TEMP,  
-    VIEW_EVENT_SENSOR_HUMIDITY,
-    VIEW_EVENT_SENSOR_TVOC,
-    VIEW_EVENT_SENSOR_CO2,
 
     VIEW_EVENT_SENSOR_TEMP_HISTORY,
     VIEW_EVENT_SENSOR_HUMIDITY_HISTORY,
@@ -160,6 +168,12 @@ enum {
     VIEW_EVENT_SHUTDOWN,      //NULL
     VIEW_EVENT_FACTORY_RESET, //NULL
     VIEW_EVENT_SCREEN_CTRL,   // bool  0:disable , 1:enable
+
+
+    VIEW_EVENT_HA_MQTT_CONNECTED,
+    VIEW_EVENT_HA_SENSOR, // struct view_data_ha_sensor_data
+    VIEW_EVENT_HA_SWITCH_ST,  // struct view_data_ha_switch_data
+    VIEW_EVENT_HA_SWITCH_SET,  // struct view_data_ha_switch_data
 
     VIEW_EVENT_ALL,
 };

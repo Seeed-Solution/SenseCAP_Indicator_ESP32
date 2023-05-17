@@ -805,13 +805,14 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             if( screen == SCREEN_WIFI_CONFIG) {
                 lv_disp_load_scr( ui_screen_wifi);
             }
+            break;
         }
         case VIEW_EVENT_TIME: {
             ESP_LOGI(TAG, "event: VIEW_EVENT_TIME");
             bool time_format_24 = true;
             if( event_data) {
                 time_format_24 = *( bool *)event_data;
-            } 
+            }
             
             time_t now = 0;
             struct tm timeinfo = { 0 };
@@ -1128,6 +1129,8 @@ int indicator_view_init(void)
 
     wifi_list_event_init();
     sensor_chart_event_init();
+
+    indicator_view_ha_init();
 
     int i  = 0;
     for( i = 0; i < VIEW_EVENT_ALL; i++ ) {

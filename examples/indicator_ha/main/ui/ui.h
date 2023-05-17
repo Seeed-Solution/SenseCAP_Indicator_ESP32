@@ -10,7 +10,8 @@
 extern "C" {
 #endif
 
-    #include "lvgl/lvgl.h"
+#include "lvgl/lvgl.h"
+#include "home_assistant/ui.h"
 
 void up_Animation( lv_obj_t *TargetObject, int delay);
 void ui_event_screen_time( lv_event_t * e);

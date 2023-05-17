@@ -303,5 +303,6 @@ int indicator_controller_init(void)
     __display_cfg_event_init();
     __sensor_chart_event_init();
 
+    indicator_controller_ha_init();
     return 0;
 }

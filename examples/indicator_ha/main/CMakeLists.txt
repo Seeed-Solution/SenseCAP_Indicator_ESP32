@@ -1,5 +1,5 @@
 set(UI_DIR ./ui)
-file(GLOB_RECURSE UI_SOURCES ${UI_DIR}/*.c)
+file(GLOB_RECURSE UI_SOURCES ${UI_DIR}/*.c ${UI_DIR}/home_assistant/*.c ${UI_DIR}/home_assistant/images/*.c ${UI_DIR}/home_assistant/screens/*.c)
 
 set(MODEL_DIR ./model)
 file(GLOB_RECURSE MODEL_SOURCES ${MODEL_DIR}/*.c)

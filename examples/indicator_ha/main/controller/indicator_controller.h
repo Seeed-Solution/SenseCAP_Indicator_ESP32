@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "view_data.h"
+#include "indicator_controller_ha.h"
 
 #ifdef __cplusplus
 extern "C" {
