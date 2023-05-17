@@ -18,6 +18,9 @@ extern "C" {
 // SCREEN: ui_screen_ha_data
 void ui_screen_ha_data_screen_init(void);
 extern lv_obj_t *ui_screen_ha_data;
+extern lv_obj_t *ui_ha_data_wifi_btn;
+extern lv_obj_t *ui_ha_data_wifi_st;
+extern lv_obj_t *ui_ha_data_time;
 extern lv_obj_t *ui_screen_home_data_label;
 extern lv_obj_t *ui_sensor1_btn;
 extern lv_obj_t *ui_sensor1_logo;
@@ -42,6 +45,9 @@ extern lv_obj_t *ui_sensor4_unit;
 // SCREEN: ui_screen_ha
 void ui_screen_ha_screen_init(void);
 extern lv_obj_t *ui_screen_ha;
+extern lv_obj_t *ui_ha_wifi_btn;
+extern lv_obj_t *ui_ha_wifi_st;
+extern lv_obj_t *ui_ha_time;
 extern lv_obj_t *ui_screen_home_none_lable;
 extern lv_obj_t *ui_sensor5_btn;
 extern lv_obj_t *ui_sensor5_logo;
@@ -65,6 +71,9 @@ extern lv_obj_t *ui_switch3_switch;
 // SCREEN: ui_screen_ha_ctrl
 void ui_screen_ha_ctrl_screen_init(void);
 extern lv_obj_t *ui_screen_ha_ctrl;
+extern lv_obj_t *ui_ha_ctrl_wifi_btn;
+extern lv_obj_t *ui_ha_ctrl_wifi_st;
+extern lv_obj_t *ui_ha_ctrl_time;
 extern lv_obj_t *ui_screen_home_ctrl_lable;
 extern lv_obj_t *ui_switch4;
 extern lv_obj_t *ui_switch4_logo;

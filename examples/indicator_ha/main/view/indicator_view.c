@@ -839,6 +839,10 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             lv_label_set_text(ui_time2, buf);
             lv_label_set_text(ui_time3, buf);
 
+            lv_label_set_text(ui_ha_time, buf);
+            lv_label_set_text(ui_ha_data_time, buf);
+            lv_label_set_text(ui_ha_ctrl_time, buf);
+
             switch (timeinfo.tm_wday)
             {
                 case 0: p_wday_str="Sunday";break;
@@ -969,6 +973,10 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             lv_img_set_src(ui_wifi_st_5 , (void *)p_src);
             lv_img_set_src(ui_wifi_st_6 , (void *)p_src);
             lv_img_set_src(ui_wifi_st_7 , (void *)p_src);
+
+            lv_img_set_src(ui_ha_wifi_st , (void *)p_src);
+            lv_img_set_src(ui_ha_data_wifi_st , (void *)p_src);
+            lv_img_set_src(ui_ha_ctrl_wifi_st , (void *)p_src);
             break;
         }
         case VIEW_EVENT_WIFI_LIST: {
