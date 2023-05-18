@@ -67,16 +67,17 @@ void ui_event_screen_ha_ctrl(lv_event_t *e)
     {
         _ui_screen_change(ui_screen_ha, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0);
     }
-    // if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP  ) {
-    //     _ui_screen_change( ui_screen_time, LV_SCR_LOAD_ANIM_MOVE_TOP, 200, 0);
-    // }
+    if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP  ) {
+        _ui_screen_change( ui_screen_time, LV_SCR_LOAD_ANIM_MOVE_TOP, 200, 0);
+    }
 }
 
 void ui_event_switch1(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if ( event_code == LV_EVENT_CLICKED) {
+    lv_obj_t * cur_screen = lv_scr_act();
+    if ( event_code == LV_EVENT_CLICKED  &&  cur_screen == ui_screen_ha) {
         struct view_data_ha_switch_data switch_data;
         switch_data.index = 0;
         if( lv_obj_has_state(ui_switch1, LV_STATE_CHECKED) ) {
@@ -95,7 +96,8 @@ void ui_event_switch2(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if ( event_code == LV_EVENT_CLICKED) {
+    lv_obj_t * cur_screen = lv_scr_act();
+    if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_ha) {
         struct view_data_ha_switch_data switch_data;
         switch_data.index = 1;
         if( lv_obj_has_state(ui_switch2, LV_STATE_CHECKED) ) {
@@ -112,7 +114,8 @@ void ui_event_switch3(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if ( event_code == LV_EVENT_CLICKED) {
+    lv_obj_t * cur_screen = lv_scr_act();
+    if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_ha ) {
         struct view_data_ha_switch_data switch_data;
         switch_data.index = 2;
         if( lv_obj_has_state(target, LV_STATE_CHECKED) ) {
@@ -132,7 +135,8 @@ void ui_event_switch4(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if ( event_code == LV_EVENT_CLICKED) {
+    lv_obj_t * cur_screen = lv_scr_act();
+    if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_ha_ctrl) {
         struct view_data_ha_switch_data switch_data;
         switch_data.index = 3;
         if( lv_obj_has_state(ui_switch4, LV_STATE_CHECKED) ) {
@@ -150,7 +154,8 @@ void ui_event_switch5_arc(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if ( event_code == LV_EVENT_VALUE_CHANGED) {
+    lv_obj_t * cur_screen = lv_scr_act();
+    if ( event_code == LV_EVENT_VALUE_CHANGED &&  cur_screen == ui_screen_ha_ctrl) {
         int32_t vaule = lv_arc_get_value(ui_switch5_arc);
         char buf[16];
         sprintf(buf,"%d",vaule );
@@ -168,7 +173,8 @@ void ui_event_switch6(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if ( event_code == LV_EVENT_CLICKED) {
+    lv_obj_t * cur_screen = lv_scr_act();
+    if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_ha_ctrl ) {
         struct view_data_ha_switch_data switch_data;
         switch_data.index = 5;
         if( lv_obj_has_state(ui_switch6, LV_STATE_CHECKED) ) {
@@ -186,7 +192,8 @@ void ui_event_switch7(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if ( event_code == LV_EVENT_CLICKED) {
+    lv_obj_t * cur_screen = lv_scr_act(); 
+    if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_ha_ctrl) {
         struct view_data_ha_switch_data switch_data;
         switch_data.index = 6;
         if( lv_obj_has_state(target, LV_STATE_CHECKED) ) {
@@ -206,7 +213,8 @@ void ui_event_switch8_slider(lv_event_t *e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t *target = lv_event_get_target(e);
-    if ( event_code == LV_EVENT_VALUE_CHANGED) {  
+    lv_obj_t * cur_screen = lv_scr_act();
+    if ( event_code == LV_EVENT_VALUE_CHANGED &&  cur_screen == ui_screen_ha_ctrl) {  
         int32_t vaule = lv_slider_get_value(ui_switch8_slider);
         struct view_data_ha_switch_data switch_data;
         switch_data.index = 7;
