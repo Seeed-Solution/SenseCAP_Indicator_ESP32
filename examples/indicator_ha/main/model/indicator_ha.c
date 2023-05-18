@@ -1,5 +1,6 @@
 #include "indicator_ha.h"
 #include "cJSON.h"
+#include "nvs.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -16,6 +17,7 @@
 #include "ha_config.h"
 
 
+#define HA_CFG_STORAGE  "ha-cfg"
 
 static const char *TAG = "HA";
 static bool net_flag = false;
@@ -135,7 +137,37 @@ static void ha_entites_init(void)
 
 }
 
+int switch_state[CONFIG_HA_SWITCH_ENTITY_NUM];
 
+static void ha_ctrl_cfg_restore(void)
+{
+    esp_err_t ret = 0;
+    size_t len = sizeof(switch_state);
+    ret = indicator_storage_read(HA_CFG_STORAGE, (void *)switch_state,&len);
+
+    if( ret == ESP_OK  && len== (sizeof(switch_state)) ) {
+        ESP_LOGI(TAG, "cfg read successful");
+    } else {
+        // err or not find
+        if( ret == ESP_ERR_NVS_NOT_FOUND) {
+            ESP_LOGI(TAG, "cfg not find");
+        }else {
+            ESP_LOGI(TAG, "cfg read err:%d", ret);
+        }
+        memset(switch_state, 0, sizeof(switch_state));
+    }
+}
+
+static void ha_ctrl_cfg_save(void)
+{
+    esp_err_t ret = 0;
+    ret = indicator_storage_write(HA_CFG_STORAGE, (void *)switch_state, sizeof(switch_state));
+    if( ret != ESP_OK ) {
+        ESP_LOGI(TAG, "cfg write err:%d", ret);
+    } else {
+        ESP_LOGI(TAG, "cfg write successful");
+    }
+}
 
 static void log_error_if_nonzero(const char *message, int error_code)
 {
@@ -203,7 +235,16 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
                 msg_id = esp_mqtt_client_subscribe(client, ha_switch_entites[i].topic_set, ha_switch_entites[i].qos);
                 ESP_LOGI(TAG, "subscribe:%s, msg_id=%d", ha_switch_entites[i].topic_set,  msg_id);
             }
-            
+
+
+            //  restore switch state for UI and HA.
+            struct view_data_ha_switch_data switch_data;
+            for(int i ; i < CONFIG_HA_SWITCH_ENTITY_NUM; i++ ) {
+                switch_data.index = i;
+                switch_data.value = switch_state[i];
+                esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_HA_SWITCH_SET,  &switch_data, sizeof(switch_data), portMAX_DELAY);
+            }
+
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_HA_MQTT_CONNECTED, NULL, 0, portMAX_DELAY);
 
             break;
@@ -372,6 +413,11 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                 default:
                     break;
             }
+
+            if( p_data->value <  CONFIG_HA_SWITCH_ENTITY_NUM ) {
+                switch_state[p_data->index] =  p_data->value;
+            }
+            ha_ctrl_cfg_save(); //save switch state to flash
             break;
         }
         default:
@@ -382,6 +428,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
 int indicator_ha_init(void)
 {
 
+    ha_ctrl_cfg_restore();
     ha_entites_init();
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
