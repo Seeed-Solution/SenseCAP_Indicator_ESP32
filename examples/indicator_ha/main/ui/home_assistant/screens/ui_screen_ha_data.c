@@ -128,7 +128,7 @@ lv_obj_set_style_text_font(ui_sensor2_label, &lv_font_montserrat_18, LV_PART_MAI
 ui_sensor2_data = lv_label_create(ui_sensor2_btn);
 lv_obj_set_width( ui_sensor2_data, 100);
 lv_obj_set_height( ui_sensor2_data, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_sensor2_data, 16 );
+lv_obj_set_x( ui_sensor2_data, 12 );
 lv_obj_set_y( ui_sensor2_data, 83 );
 lv_label_set_text(ui_sensor2_data,"N/A");
 lv_obj_set_style_text_color(ui_sensor2_data, lv_color_hex(0x52AAE5), LV_PART_MAIN | LV_STATE_DEFAULT );
