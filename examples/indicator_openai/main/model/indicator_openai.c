@@ -272,13 +272,27 @@ static int __chat_json_prase(const char *p_str, char *p_answer, char *p_err)
         return -1;
     }
 
+    // {
+    //     "error": {
+    //         "message": "",
+    //         "type": "invalid_request_error",
+    //         "param": null,
+    //         "code": "invalid_api_key"
+    //     }
+    // }
     cjson_item = cJSON_GetObjectItem(root, "error");
     if (cjson_item != NULL)
     {
         cjson_item1 = cJSON_GetObjectItem(cjson_item, "message");
-        if (cjson_item1 != NULL && cjson_item1->valuestring != NULL)
+        if (cjson_item1 != NULL && cjson_item1->valuestring != NULL && strlen(cjson_item1->valuestring) > 0)
         {
-            strcpy(p_err, cjson_item1->valuestring);
+            strncpy(p_err, cjson_item1->valuestring, 63);
+        } else {
+            cjson_item1 = cJSON_GetObjectItem(cjson_item, "code");
+            if (cjson_item1 != NULL && cjson_item1->valuestring != NULL)
+            {
+                strncpy(p_err, cjson_item1->valuestring, 63);
+            }
         }
         cJSON_Delete(root);
         return -1;
@@ -350,7 +364,7 @@ static int chat_request(struct view_data_openai_request *p_req,
     {
         ESP_LOGE(TAG, "mbedtls request fail");
         p_resp->ret = 0;
-        strcpy(p_resp->err_msg, "Request fail");
+        strcpy(p_resp->err_msg, "Connect 'api.openai.com' fail");
         return -1;
     }
     ESP_LOGI(TAG, "Starting using strstr");
