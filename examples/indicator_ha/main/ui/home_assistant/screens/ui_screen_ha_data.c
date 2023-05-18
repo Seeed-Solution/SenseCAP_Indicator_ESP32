@@ -251,4 +251,5 @@ lv_obj_set_style_text_color(ui_sensor4_unit, lv_color_hex(0x4F9E52), LV_PART_MAI
 lv_obj_set_style_text_opa(ui_sensor4_unit, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_font(ui_sensor4_unit, &lv_font_montserrat_24, LV_PART_MAIN| LV_STATE_DEFAULT);
 
+creat_scrolldots(ui_screen_ha_data, 2);
 }

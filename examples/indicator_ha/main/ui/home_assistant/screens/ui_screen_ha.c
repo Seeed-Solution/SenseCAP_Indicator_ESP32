@@ -254,4 +254,5 @@ lv_obj_set_style_bg_opa(ui_switch3_switch, 255, LV_PART_INDICATOR| LV_STATE_CHEC
 lv_obj_set_style_bg_color(ui_switch3_switch, lv_color_hex(0xFFFFFF), LV_PART_KNOB | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_switch3_switch, 255, LV_PART_KNOB| LV_STATE_DEFAULT);
 
+creat_scrolldots(ui_screen_ha, 3);
 }
