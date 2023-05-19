@@ -1,10 +1,12 @@
-# Indicator Basis Demo
+# Indicator Home Assistant Demo
 
-This demo mainly implements time, sensor data display, and some configuration functions.  
+This demo is mainly based on the indicator_basis demo with added Home Assistant functions.  
 
 <figure class="third">
-    <img src="./docs/page1.png" width="480"/> <img src="./docs/page2.png" width="480"/>
-    <img src="./docs/page3.png" width="480"/> <img src="./docs/page4.png" width="480"/>
+    <img src="./docs/Home Assistant Data.png" width="480"/> 
+    <img src="./docs/Home Assistant.png" width="480"/>
+    <img src="./docs/Home Assistant Control(ON).png" width="480"/> 
+    <img src="./docs/Home Assistant Control(OFF).png" width="480"/>
 </figure>
 
 ## Function
@@ -14,12 +16,16 @@ This demo mainly implements time, sensor data display, and some configuration fu
 - [x] Wifi config.
 - [x] Display config.
 - [x] time config.
-
+- [x] Home Assistant data.
+- [x] Home Assistant control.
 
 ## How to use example
 
 Please first read the [User Guide](https://wiki.seeedstudio.com/Sensor/SenseCAP/SenseCAP_Indicator/Get_started_with_SenseCAP_Indicator) of the SenseCAP Indicator Board to learn about its software and hardware information.
 
+
+Here are some simple steps to use.
+//todo
 
 ### Build and Flash
 
