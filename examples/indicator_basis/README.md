@@ -18,7 +18,7 @@ This demo mainly implements time, sensor data display, and some configuration fu
 
 ## How to use example
 
-Please first read the [User Guide](https://wiki.seeedstudio.com/Sensor/SenseCAP/SenseCAP_Indicator/Get_started_with_SenseCAP_Indicator) of the SenseCAP Indicator Board to learn about its software and hardware information.
+Please first read the [User Guide](https://wiki.seeedstudio.com/Get_Started_with_SenseCAP_Indicator_Introduction) of the SenseCAP Indicator Board to learn about its software and hardware information.
 
 
 ### Build and Flash

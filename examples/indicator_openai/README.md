@@ -22,7 +22,7 @@ This demo is mainly based on the indicator_basis demo with added chartGPT and DA
 
 ## How to use example
 
-Please first read the [User Guide](https://wiki.seeedstudio.com/Sensor/SenseCAP/SenseCAP_Indicator/Get_started_with_SenseCAP_Indicator) of the SenseCAP Indicator Board to learn about its software and hardware information.
+Please first read the [User Guide](https://wiki.seeedstudio.com/Get_Started_with_SenseCAP_Indicator_Introduction) of the SenseCAP Indicator Board to learn about its software and hardware information.
 
 When using openai-related functions, you must first set the openai api key through the esp32 serial port.
 
