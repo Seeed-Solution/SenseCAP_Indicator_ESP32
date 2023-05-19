@@ -1,5 +1,5 @@
-#ifndef TERMINAL_HA_H
-#define TERMINAL_HA_H
+#ifndef INDICATOR_HA_H
+#define INDICATOR_HA_H
 
 #include "config.h"
 #include "view_data.h"
@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-int terminal_ha_init(void);
+int indicator_ha_init(void);
 
 #ifdef __cplusplus
 }
