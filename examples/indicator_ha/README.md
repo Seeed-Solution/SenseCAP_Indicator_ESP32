@@ -25,7 +25,157 @@ Please first read the [User Guide](https://wiki.seeedstudio.com/Get_Started_with
 
 
 Here are some simple steps to use.
-//todo
+
+- Step 1: [Install Home Assistant](https://www.home-assistant.io/installation/)
+- Step 2: Install MQTT Broker
+- Step 3: Add MQTT  integration and config 
+- Step 4: Modify "configuration.yaml" to add Indicator entity
+- Step 5: Edit Dashboard
+
+
+Add the following to your "configuration.yaml" file
+```
+# Example configuration.yaml entry
+mqtt:
+  sensor:
+    - unique_id: indicator_temperature
+      name: "Indicator Temperature"
+      state_topic: "indicator/sensor"
+      suggested_display_precision: 1
+      unit_of_measurement: "°C"
+      value_template: "{{ value_json.temp }}"
+    - unique_id: indicator_humidity
+      name: "Indicator Humidity"
+      state_topic: "indicator/sensor"
+      unit_of_measurement: "%"
+      value_template: "{{ value_json.humidity }}"
+    - unique_id: indicator_co2
+      name: "Indicator CO2"
+      state_topic: "indicator/sensor"
+      unit_of_measurement: "ppm"
+      value_template: "{{ value_json.co2 }}"
+    - unique_id: indicator_tvoc
+      name: "Indicator tVOC"
+      state_topic: "indicator/sensor"
+      unit_of_measurement: ""
+      value_template: "{{ value_json.tvoc }}"
+  switch:
+    - unique_id: indicator_switch1
+      name: "Indicator Switch1"
+      state_topic: "indicator/switch/state"
+      command_topic: "indicator/switch/set"
+      value_template: "{{ value_json.switch1 }}"
+      payload_on: '{"switch1":1}'
+      payload_off: '{"switch1":0}'
+      state_on: 1
+      state_off: 0
+    - unique_id: indicator_switch2
+      name: "Indicator Switch2"
+      state_topic: "indicator/switch/state"
+      command_topic: "indicator/switch/set"
+      value_template: "{{ value_json.switch2 }}"
+      payload_on: '{"switch2":1}'
+      payload_off: '{"switch2":0}'
+      state_on: 1
+      state_off: 0
+    - unique_id: indicator_switch3
+      name: "Indicator Switch3"
+      state_topic: "indicator/switch/state"
+      command_topic: "indicator/switch/set"
+      value_template: "{{ value_json.switch3 }}"
+      payload_on: '{"switch3":1}'
+      payload_off: '{"switch3":0}'
+      state_on: 1
+      state_off: 0
+    - unique_id: indicator_switch4
+      name: "Indicator Switch4"
+      state_topic: "indicator/switch/state"
+      command_topic: "indicator/switch/set"
+      value_template: "{{ value_json.switch4 }}"
+      payload_on: '{"switch4":1}'
+      payload_off: '{"switch4":0}'
+      state_on: 1
+      state_off: 0
+    - unique_id: indicator_switch6
+      name: "Indicator Switch6"
+      state_topic: "indicator/switch/state"
+      command_topic: "indicator/switch/set"
+      value_template: "{{ value_json.switch6 }}"
+      payload_on: '{"switch6":1}'
+      payload_off: '{"switch6":0}'
+      state_on: 1
+      state_off: 0
+    - unique_id: indicator_switch7
+      name: "Indicator Switch7"
+      state_topic: "indicator/switch/state"
+      command_topic: "indicator/switch/set"
+      value_template: "{{ value_json.switch7 }}"
+      payload_on: '{"switch7":1}'
+      payload_off: '{"switch7":0}'
+      state_on: 1
+      state_off: 0
+  number:
+    - unique_id: indicator_switch5
+      name: "Indicator Switch5"
+      state_topic: "indicator/switch/state"
+      command_topic: "indicator/switch/set"
+      command_template: '{"switch5": {{ value }} }'
+      value_template: "{{ value_json.switch5 }}"
+    - unique_id: indicator_switch8
+      name: "Indicator Switch8"
+      state_topic: "indicator/switch/state"
+      command_topic: "indicator/switch/set"
+      command_template: '{"switch8": {{ value }} }'
+      value_template: "{{ value_json.switch8 }}"
+```
+
+
+Add the following to the raw configuration editor of the dashboard.
+
+```
+views:
+  - title: Indicator device
+    icon: ''
+    badges: []
+    cards:
+      - graph: line
+        type: sensor
+        detail: 1
+        icon: mdi:molecule-co2
+        unit: ppm
+        entity: sensor.indicator_co2
+      - graph: line
+        type: sensor
+        entity: sensor.indicator_temperature
+        detail: 1
+        icon: mdi:coolant-temperature
+      - graph: line
+        type: sensor
+        detail: 1
+        entity: sensor.indicator_humidity
+      - graph: line
+        type: sensor
+        entity: sensor.indicator_tvoc
+        detail: 1
+        icon: mdi:air-filter
+      - type: entities
+        entities:
+          - entity: switch.indicator_switch1
+          - entity: switch.indicator_switch2
+          - entity: switch.indicator_switch3
+          - entity: switch.indicator_switch4
+          - entity: number.indicator_switch5
+          - entity: switch.indicator_switch6
+          - entity: switch.indicator_switch7
+          - entity: number.indicator_switch8
+        title: Indicator control
+        show_header_toggle: false
+        state_color: true
+
+```
+
+ <img src="./docs/Home Assistant Dashboard.png" />
+ 
 
 ### Build and Flash
 
