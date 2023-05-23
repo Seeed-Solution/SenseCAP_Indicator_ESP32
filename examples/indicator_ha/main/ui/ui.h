@@ -177,6 +177,8 @@ LV_FONT_DECLARE( ui_font_font2);
 LV_FONT_DECLARE( ui_font_font3);
 LV_FONT_DECLARE( ui_font_font4);
 
+
+extern lv_obj_t *ui_screen_last;
 void creat_scrolldots(lv_obj_t * parent, int screen_index);
 
 void ui_init(void);

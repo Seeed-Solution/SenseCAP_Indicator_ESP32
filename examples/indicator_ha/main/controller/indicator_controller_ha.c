@@ -223,6 +223,33 @@ void ui_event_switch8_slider(lv_event_t *e)
     }
 }
 
+void ui_event_ha_data_wifi_btn( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if ( event_code == LV_EVENT_CLICKED) {
+        ui_screen_last = ui_screen_ha_data;
+        _ui_screen_change( ui_screen_wifi, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0);
+    }
+}
+
+void ui_event_ha_wifi_btn( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if ( event_code == LV_EVENT_CLICKED) {
+        ui_screen_last = ui_screen_ha;
+        _ui_screen_change( ui_screen_wifi, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0);
+    }
+}
+
+void ui_event_ha_ctrl_wifi_btn( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if ( event_code == LV_EVENT_CLICKED) {
+        ui_screen_last = ui_screen_ha_ctrl;
+        _ui_screen_change( ui_screen_wifi, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0);
+    }
+}
+
 void ui_event_ha_init(void)
 {
     lv_obj_add_event_cb(ui_screen_ha_data, ui_event_screen_ha_data, LV_EVENT_ALL, NULL);
@@ -239,6 +266,10 @@ void ui_event_ha_init(void)
     lv_obj_add_event_cb(ui_switch7, ui_event_switch7, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_switch7_switch, ui_event_switch7, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_switch8_slider, ui_event_switch8_slider, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_obj_add_event_cb(ui_ha_data_wifi_btn, ui_event_ha_data_wifi_btn, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_ha_wifi_btn, ui_event_ha_wifi_btn, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_ha_ctrl_wifi_btn, ui_event_ha_ctrl_wifi_btn, LV_EVENT_ALL, NULL);
 }
 
 int indicator_controller_ha_init(void)

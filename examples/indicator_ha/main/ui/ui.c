@@ -148,7 +148,7 @@ lv_chart_series_t * ui_sensor_chart_week_series_hight;
 lv_chart_series_t * ui_sensor_chart_week_series_low;
 
 
-static lv_obj_t *ui_screen_last;
+lv_obj_t *ui_screen_last;
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
     #error "LV_COLOR_DEPTH should be 16bit to match SquareLine Studio's settings"
@@ -1542,5 +1542,5 @@ ui_screen_factory_screen_init();
 ui_screen_sensor_chart_screen_init();
 
 ui_ha_init();
-lv_disp_load_scr( ui_screen_ha);
+lv_disp_load_scr( ui_screen_time);
 }

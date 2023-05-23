@@ -11,6 +11,7 @@
 // SCREEN: ui_screen_ha_data
 void ui_screen_ha_data_screen_init(void);
 lv_obj_t *ui_screen_ha_data;
+lv_obj_t *ui_ha_data_wifi_btn;
 lv_obj_t *ui_ha_data_wifi_st;
 lv_obj_t *ui_ha_data_time;
 lv_obj_t *ui_screen_home_data_label;
@@ -38,6 +39,7 @@ lv_obj_t *ui_sensor4_unit;
 // SCREEN: ui_screen_ha
 void ui_screen_ha_screen_init(void);
 lv_obj_t *ui_screen_ha;
+lv_obj_t *ui_ha_wifi_btn;
 lv_obj_t *ui_ha_wifi_st;
 lv_obj_t *ui_ha_time;
 lv_obj_t *ui_screen_home_none_lable;
@@ -64,6 +66,7 @@ lv_obj_t *ui_switch3_switch;
 // SCREEN: ui_screen_ha_ctrl
 void ui_screen_ha_ctrl_screen_init(void);
 lv_obj_t *ui_screen_ha_ctrl;
+lv_obj_t *ui_ha_ctrl_wifi_btn;
 lv_obj_t *ui_ha_ctrl_wifi_st;
 lv_obj_t *ui_ha_ctrl_time;
 lv_obj_t *ui_screen_home_ctrl_lable;
