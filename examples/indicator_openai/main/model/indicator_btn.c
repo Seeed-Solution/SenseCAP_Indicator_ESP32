@@ -10,8 +10,6 @@ static esp_timer_handle_t   factory_reset_timer_handle;
 
 static void __factory_reset_callback(void* arg)
 {
-    indicator_display_on();
-    vTaskDelay(pdMS_TO_TICKS(3000));
     ESP_ERROR_CHECK(nvs_flash_erase());
     fflush(stdout);
     esp_restart();
@@ -78,6 +76,10 @@ static void __btn_long_press_hold_callback(void* arg)
         ESP_LOGI("btn", "factory reset");
         factory_reset_flag = true;
         esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_FACTORY_RESET, NULL, 0, portMAX_DELAY);
+        
+        bool st = 1;
+        esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_CTRL, &st, sizeof(st), portMAX_DELAY);
+        indicator_display_on();
 
         const esp_timer_create_args_t timer_args = {
             .callback = &__factory_reset_callback,
@@ -86,8 +88,8 @@ static void __btn_long_press_hold_callback(void* arg)
             .name = "factory_reset"
         };
         ESP_ERROR_CHECK( esp_timer_create(&timer_args, &factory_reset_timer_handle));
-        ESP_ERROR_CHECK(esp_timer_start_once(factory_reset_timer_handle, 1000000*1)); //1s
-
+        ESP_ERROR_CHECK(esp_timer_start_once(factory_reset_timer_handle, 1000000*3)); //3s
+        
     }
 }
 
