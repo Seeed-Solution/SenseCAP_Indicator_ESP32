@@ -137,7 +137,7 @@ lv_obj_t *ui_screen_factory;
 lv_obj_t *ui_factory_resetting_title;
 
 lv_obj_t *ui_screen_sensor_chart;
-lv_obj_t *ui_wifi_st_7;
+lv_obj_t *ui_wifi_st_chart;
 lv_obj_t *ui_back4;
 lv_obj_t *ui_sensor_data_title;
 lv_obj_t * ui_sensor_chart_day;
@@ -1550,15 +1550,15 @@ void ui_screen_sensor_chart_screen_init()
 	ui_screen_sensor_chart = lv_obj_create(NULL);
 	//lv_obj_clear_flag( ui_screen_sensor_chart, LV_OBJ_FLAG_SCROLLABLE );
 
-	ui_wifi_st_7 = lv_img_create(ui_screen_sensor_chart);
-	lv_img_set_src(ui_wifi_st_7, &ui_img_wifi_disconet_png);
-	lv_obj_set_width( ui_wifi_st_7, LV_SIZE_CONTENT);  /// 1
-	lv_obj_set_height( ui_wifi_st_7, LV_SIZE_CONTENT);   /// 1
-	lv_obj_set_x( ui_wifi_st_7, -20 );
-	lv_obj_set_y( ui_wifi_st_7, 20 );
-	lv_obj_set_align( ui_wifi_st_7, LV_ALIGN_TOP_RIGHT );
-	lv_obj_add_flag( ui_wifi_st_7, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
-	lv_obj_clear_flag( ui_wifi_st_7, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+	ui_wifi_st_chart = lv_img_create(ui_screen_sensor_chart);
+	lv_img_set_src(ui_wifi_st_chart, &ui_img_wifi_disconet_png);
+	lv_obj_set_width( ui_wifi_st_chart, LV_SIZE_CONTENT);  /// 1
+	lv_obj_set_height( ui_wifi_st_chart, LV_SIZE_CONTENT);   /// 1
+	lv_obj_set_x( ui_wifi_st_chart, -20 );
+	lv_obj_set_y( ui_wifi_st_chart, 20 );
+	lv_obj_set_align( ui_wifi_st_chart, LV_ALIGN_TOP_RIGHT );
+	lv_obj_add_flag( ui_wifi_st_chart, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
+	lv_obj_clear_flag( ui_wifi_st_chart, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
 	ui_back4 = lv_btn_create(ui_screen_sensor_chart);
 	lv_obj_set_width( ui_back4, 100);

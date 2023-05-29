@@ -142,7 +142,7 @@ extern lv_obj_t *ui_screen_factory;
 extern lv_obj_t *ui_factory_resetting_title;
 
 extern lv_obj_t *ui_screen_sensor_chart;
-extern lv_obj_t *ui_wifi_st_7;
+extern lv_obj_t *ui_wifi_st_chart;
 extern lv_obj_t *ui_back4;
 extern lv_obj_t *ui_sensor_data_title;
 extern lv_obj_t * ui_sensor_chart_day;
