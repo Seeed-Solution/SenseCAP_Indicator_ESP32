@@ -5,7 +5,7 @@ bin
 *.pyc
 sdkconfig
 sdkconfig.old
-
+dependencies.lock
 # emacs
 .dir-locals.el
 

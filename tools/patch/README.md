@@ -1,16 +1,20 @@
 
 # IDF Patch
-
 The [patch](./patch/release5.0_psram_octal_120m.patch) is intended to achieve the best performance of RGB LCD by using the **PSRAM Octal 120 MHz** feature. The patch is only used for the **release/v5.0** branch of ESP-IDF. For the **master** branch, the PSRAM Octal 120 MHz feature can be directly used by enabling the `IDF_EXPERIMENTAL_FEATURES` option.
 
 **Note: The PSRAM Octal 120 MHz feature has temperature risks and cannot guarantee normal functioning with a temperature higher than 65 degrees Celsius.**
 
 Please make sure your IDF project is clean (use `git status` to check), then the patch can be applied by following commands:
 
-```
+### Manual
+```sh
 cd <root directory of IDF>
+
 git apply --whitespace=fix <path of the patch>/release5.0_psram_octal_120m.patch # Nothing return if success
-git status      # Check whether the operation is successful, the output should look like below:
+```
+
+```sh
+git status  # Check whether the operation is successful, the output should look like below:
 
 HEAD detached at f315986401
 Changes not staged for commit:
@@ -36,3 +40,16 @@ These uncommitted modifications can be cleared by the following commands and **t
 git reset --hard
 git clean -xdf
 ```
+
+---
+### Script
+Also, this patch has been tested on ESP-IDF versions v5.0 and v5.0.1.
+We have provided a shell script to quickly apply the patch:
+
+1. Set up your ESP-IDF virtual environment in a shell.
+2. Navigate to the folder and execute `./install_patch.sh`.
+3. Verify that the patch has been applied correctly, as described above.
+
+
+## Q/A
+If you have any questions or concerns, please don't hesitate to reach out to us. You can open an issue on the relevant repository or contact us through our support channels.
