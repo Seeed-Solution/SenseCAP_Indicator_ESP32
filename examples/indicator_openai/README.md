@@ -22,7 +22,7 @@ This demo is mainly based on the indicator_basis demo with added chartGPT and DA
 
 ## How to use example
 
-Please first read the [User Guide](https://wiki.seeedstudio.com/Get_Started_with_SenseCAP_Indicator_Introduction) of the SenseCAP Indicator Board to learn about its software and hardware information.
+Please first read the [User Guide](https://wiki.seeedstudio.com/SenseCAP_Indicator_Get_Started) of the SenseCAP Indicator Board to learn about its software and hardware information.
 
 When using openai-related functions, you must first set the openai api key through the esp32 serial port.
 
@@ -33,7 +33,7 @@ openai_api -k <your key>
 
 ### Build and Flash
 
-1. The project configure PSRAM with Octal 120M by default. please see [here](../../tools/patch/README.md#idf-patch) to enable `PSRAM Octal 120M` feature. 
+1. The project configure PSRAM with Octal 120M by default. please see [here](../../tools/patch/README.md#idf-patch) to enable `PSRAM Octal 120M` feature.
 2. Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
 
 (To exit the serial monitor, type ``Ctrl-]``.)

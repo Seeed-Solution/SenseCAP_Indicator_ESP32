@@ -1,6 +1,6 @@
 # Indicator Basis Demo
 
-This demo mainly implements time, sensor data display, and some configuration functions.  
+This demo mainly implements time, sensor data display, and some configuration functions.
 
 <figure class="third">
     <img src="./docs/page1.png" width="480"/> <img src="./docs/page2.png" width="480"/>
@@ -18,12 +18,12 @@ This demo mainly implements time, sensor data display, and some configuration fu
 
 ## How to use example
 
-Please first read the [User Guide](https://wiki.seeedstudio.com/Get_Started_with_SenseCAP_Indicator_Introduction) of the SenseCAP Indicator Board to learn about its software and hardware information.
+Please first read the [User Guide](https://wiki.seeedstudio.com/SenseCAP_Indicator_Get_Started) of the SenseCAP Indicator Board to learn about its software and hardware information.
 
 
 ### Build and Flash
 
-1. The project configure PSRAM with Octal 120M by default. please see [here](../../tools/patch/README.md#idf-patch) to enable `PSRAM Octal 120M` feature. 
+1. The project configure PSRAM with Octal 120M by default. please see [here](../../tools/patch/README.md#idf-patch) to enable `PSRAM Octal 120M` feature.
 2. Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
 
 (To exit the serial monitor, type ``Ctrl-]``.)
