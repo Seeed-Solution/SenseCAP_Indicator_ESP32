@@ -1,11 +1,11 @@
 # Indicator Home Assistant Demo
 
-This demo is mainly based on the indicator_basis demo with added Home Assistant functions.  
+This demo is mainly based on the indicator_basis demo with added Home Assistant functions.
 
 <figure class="third">
-    <img src="./docs/Home Assistant Data.png" width="480"/> 
+    <img src="./docs/Home Assistant Data.png" width="480"/>
     <img src="./docs/Home Assistant.png" width="480"/>
-    <img src="./docs/Home Assistant Control(ON).png" width="480"/> 
+    <img src="./docs/Home Assistant Control(ON).png" width="480"/>
     <img src="./docs/Home Assistant Control(OFF).png" width="480"/>
 </figure>
 
@@ -21,14 +21,14 @@ This demo is mainly based on the indicator_basis demo with added Home Assistant 
 
 ## How to use example
 
-Please first read the [User Guide](https://wiki.seeedstudio.com/Get_Started_with_SenseCAP_Indicator_Introduction) of the SenseCAP Indicator Board to learn about its software and hardware information.
+Please first read the [User Guide](https://wiki.seeedstudio.com/SenseCAP_Indicator_Get_Started) of the SenseCAP Indicator Board to learn about its software and hardware information.
 
 
 Here are some simple steps to use.
 
 - Step 1: [Install Home Assistant](https://www.home-assistant.io/installation/)
 - Step 2: Install MQTT Broker
-- Step 3: Add MQTT  integration and config 
+- Step 3: Add MQTT  integration and config
 - Step 4: Modify "configuration.yaml" to add Indicator entity
 - Step 5: Edit Dashboard
 
@@ -175,11 +175,11 @@ views:
 ```
 
  <img src="./docs/Home Assistant Dashboard.png" />
- 
+
 
 ### Build and Flash
 
-1. The project configure PSRAM with Octal 120M by default. please see [here](../../tools/patch/README.md#idf-patch) to enable `PSRAM Octal 120M` feature. 
+1. The project configure PSRAM with Octal 120M by default. please see [here](../../tools/patch/README.md#idf-patch) to enable `PSRAM Octal 120M` feature.
 2. Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
 
 (To exit the serial monitor, type ``Ctrl-]``.)
