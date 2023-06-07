@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#define CONFIG_BROKER_URL    "mqtt://192.168.121.16"
+#define CONFIG_BROKER_URL    "mqtt://homeassistant.local"
 
 #define CONFIG_HA_SENSOR_ENTITY_NUM     6
 #define CONFIG_HA_SWITCH_ENTITY_NUM     8
