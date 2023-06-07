@@ -1,6 +1,7 @@
 #!/bin/bash
 # Record the path of the release5.0_psram_octal_120m.patch file
-PATCH_PATH="$(pwd)/release5.0_psram_octal_120m.patch"
+script_path=$(dirname "$(realpath "$0")")
+PATCH_PATH=$(realpath "$script_path/release5.0_psram_octal_120m.patch")
 
 # Check if the IDF_PATH environment variable is set
 if [[ -z "$IDF_PATH" ]]; then
