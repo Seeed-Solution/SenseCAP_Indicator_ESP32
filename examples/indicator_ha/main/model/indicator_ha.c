@@ -55,7 +55,7 @@ static bool mqtt_connected_flag =  false;
 
 static void ha_entites_init(void)
 {
-    //snesor entites init   
+    //snesor entites init
     ha_sensor_entites[0].index = 0;
     ha_sensor_entites[0].key   = CONFIG_SENSOR1_VALUE_KEY;
     ha_sensor_entites[0].topic = CONFIG_SENSOR1_TOPIC_DATA;
@@ -197,7 +197,7 @@ static int mqtt_msg_handler(const char *p_topic, int topic_len, const char *p_da
             sensor_data.index = i;
             strncpy(sensor_data.value, cjson_item->valuestring, sizeof(sensor_data.value) - 1);
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_HA_SENSOR, &sensor_data, sizeof(sensor_data), portMAX_DELAY);
-            // return 0;            
+            // return 0;
         }
     }
 
@@ -208,7 +208,7 @@ static int mqtt_msg_handler(const char *p_topic, int topic_len, const char *p_da
             switch_data.value = cjson_item->valueint;
             printf("valueint :%d", cjson_item->valueint);
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_HA_SWITCH_SET,  &switch_data, sizeof(switch_data), portMAX_DELAY);
-            // return 0;            
+            // return 0;
         }
     }
 prase_end:
@@ -294,6 +294,8 @@ static void mqtt_start(void)
     init_flag = true;
     esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = CONFIG_BROKER_URL,
+        .credentials.username = "MQTT_Indicator_1", // Your Home Assistant user
+        .credentials.authentication.password = "kjdf", // Your Home Assistant user's password
     };
 
     mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
@@ -322,7 +324,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                 break;
             }
             ESP_LOGI(TAG, "event: VIEW_EVENT_SENSOR_DATA");
-            
+
             struct view_data_sensor_data  *p_data = (struct view_data_sensor_data *) event_data;
 
             char data_buf[64];
@@ -340,7 +342,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\":\"%d\"}", CONFIG_SENSOR_BUILDIN_TVOC_VALUE_KEY, (int)p_data->vaule);
                     esp_mqtt_client_publish(mqtt_client, CONFIG_SENSOR_BUILDIN_TOPIC_DATA, data_buf, len, 0, 0);
                     break;
-                }           
+                }
                 case SENSOR_DATA_TEMP: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\":\"%.1f\"}", CONFIG_SENSOR_BUILDIN_TEMP_VALUE_KEY, p_data->vaule);
                     esp_mqtt_client_publish(mqtt_client, CONFIG_SENSOR_BUILDIN_TOPIC_DATA, data_buf, len, 0, 0);
@@ -361,7 +363,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                 break;
             }
             ESP_LOGI(TAG, "event: VIEW_EVENT_HA_SWITCH_ST");
-            
+
             struct view_data_ha_switch_data  *p_data = (struct view_data_ha_switch_data *) event_data;
 
             char data_buf[64];
@@ -431,18 +433,18 @@ int indicator_ha_init(void)
     ha_ctrl_cfg_restore();
     ha_entites_init();
 
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
-                                                        VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST, 
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                        VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST,
                                                         __view_event_handler, NULL, NULL));
 
 
     //buildin sensor
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
-                                                        VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_DATA, 
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                        VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_DATA,
                                                         __view_event_handler, NULL, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
-                                                        VIEW_EVENT_BASE, VIEW_EVENT_HA_SWITCH_ST, 
-                                                        __view_event_handler, NULL, NULL)); 
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                        VIEW_EVENT_BASE, VIEW_EVENT_HA_SWITCH_ST,
+                                                        __view_event_handler, NULL, NULL));
 
 }
 
