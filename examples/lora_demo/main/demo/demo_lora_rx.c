@@ -40,7 +40,7 @@ void demo_lora_rx(void)
     int cnt = 0;
     ESP_LOGI(TAG, "system start");
     ESP_LOGI(TAG, "demo lora rx continue");
-    bsp_sx126x_init();
+    ESP_ERROR_CHECK(bsp_board_init());
     
     RadioEvents.RxDone = OnRxDone;
     Radio.Init( &RadioEvents );
