@@ -35,7 +35,7 @@ The project includes various examples that demonstrate how to effectively use ES
 - `esp32_rp2040_comm` Demonstration showcases the communication between ESP32 and RP2040.
 - `indicator_basis`  This is a comprehensive demo,mainly implements time, sensor data display, and some configuration functions.
 - `indicator_openai` This is a comprehensive demo,mainly based on the indicator_basis demo with added chartGPT and DALL•E functions.
-- `lora_demo`  Demonstrates how to communicate using lora in SenseCAP Indicator.
+- `indicator_lora`  Demonstrates how to communicate using lora in SenseCAP Indicator.
 - `lvgl_demos` Demonstrated some demos of lvgl.
 - `photo_demo` Demonstrates how to display a photo of yourself.
 - `squareline_demo` Demonstrates how to display the UI file exported by the squareline project.
