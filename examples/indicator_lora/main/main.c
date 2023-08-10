@@ -26,6 +26,8 @@ void app_main( void ) {
 #error "Please define one marco to run an example."
 #endif
 
-    for ( ;; )
-        ;
+    for ( ;; ){
+        vTaskDelay( 1000 / portTICK_PERIOD_MS );
+    }
+
 }
