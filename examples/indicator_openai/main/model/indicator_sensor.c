@@ -20,15 +20,15 @@
 #define ESP32_RP2040_COMM_TASK_STACK_SIZE    (1024*4)
 #define BUF_SIZE (512)
 
-uint8_t buf[BUF_SIZE];   //recv 
+uint8_t buf[BUF_SIZE];   //recv
 uint8_t data[BUF_SIZE];  //decode
 
 enum  pkt_type {
 
-    PKT_TYPE_CMD_COLLECT_INTERVAL = 0xA0, //uin32_t 
-    PKT_TYPE_CMD_BEEP_ON  = 0xA1,  //uin32_t  ms: on time 
+    PKT_TYPE_CMD_COLLECT_INTERVAL = 0xA0, //uin32_t
+    PKT_TYPE_CMD_BEEP_ON  = 0xA1,  //uin32_t  ms: on time
     PKT_TYPE_CMD_BEEP_OFF = 0xA2,
-    PKT_TYPE_CMD_SHUTDOWN = 0xA3, //uin32_t 
+    PKT_TYPE_CMD_SHUTDOWN = 0xA3, //uin32_t
     PKT_TYPE_CMD_POWER_ON = 0xA4,
 
     PKT_TYPE_SENSOR_SCD41_TEMP  = 0xB0, // float
@@ -101,15 +101,15 @@ static QueueHandle_t updata_queue_handle = NULL;
 static void __sensor_history_data_get( struct sensor_history_data  *p_history, struct view_data_sensor_history_data *p_data)
 {
     xSemaphoreTake(__g_data_mutex, portMAX_DELAY);
-    
+
     struct sensor_data_average *p_data_day = &p_history->data_day[0];
     struct sensor_data_minmax  *p_data_week = &p_history->data_week[0];
 
     memcpy(p_data->data_day, (uint8_t *)p_data_day, sizeof( struct sensor_data_average) * 24);
     memcpy(p_data->data_week, (uint8_t *)p_data_week, sizeof( struct sensor_data_minmax) * 7);
-    
 
-    //calculate max and min 
+
+    //calculate max and min
     float min=10000;
     float max=-10000;
 
@@ -122,7 +122,7 @@ static void __sensor_history_data_get( struct sensor_history_data  *p_history, s
             if( max < p_item->data ){
                 max = p_item->data;
             }
-        }   
+        }
     }
     p_data->day_max = max;
     p_data->day_min = min;
@@ -164,7 +164,7 @@ static void __sensor_history_data_save(void)
         ESP_LOGI(TAG, "sensor history data save err:%d", ret);
     } else {
         ESP_LOGI(TAG, "sensor history data save successful");
-    }   
+    }
 }
 
 static void __sensor_history_data_day_check(struct sensor_data_average p_data_day[], const char *p_sensor_name, time_t now)
@@ -299,7 +299,7 @@ static void __sensor_history_data_day_insert(struct sensor_data_average p_data_d
 
     localtime_r( &now, &timeinfo);
     cur_hour = timeinfo.tm_hour;
-    
+
     localtime_r( &(p_data_day[23].timestamp), &timeinfo);
     history_hour = timeinfo.tm_hour;
 
@@ -311,7 +311,7 @@ static void __sensor_history_data_day_insert(struct sensor_data_average p_data_d
         p_data_day[i].data = p_data_day[i+1].data;
         p_data_day[i].valid = p_data_day[i+1].valid;
         p_data_day[i].timestamp = p_data_day[i+1].timestamp;
-        
+
         if( !p_data_day[i].valid) {
             p_data_day[i].timestamp = now - (23 -i) * 3600;
         }
@@ -320,7 +320,7 @@ static void __sensor_history_data_day_insert(struct sensor_data_average p_data_d
         p_data_day[23].valid = true;
         p_data_day[23].data = p_cur->average;
 
-        //clear present data 
+        //clear present data
         p_cur->per_hour_cnt = 0;
         p_cur->sum = 0.0;
 
@@ -347,7 +347,7 @@ static void __sensor_history_data_week_insert(struct sensor_data_minmax p_data_w
 
     localtime_r( &now, &timeinfo);
     cur_mday = timeinfo.tm_mday;
-    
+
     localtime_r( &(p_data_week[6].timestamp), &timeinfo);
     history_mday= timeinfo.tm_mday;
 
@@ -418,7 +418,7 @@ static void __sensor_history_data_check(time_t now)
 static void __sensor_history_data_day_update(time_t now)
 {
     xSemaphoreTake(__g_data_mutex, portMAX_DELAY);
-    
+
     __sensor_history_data_day_insert( __g_sensor_history_data.temp.data_day, &__g_sensor_present_data.temp, now);
 
     __sensor_history_data_day_insert( __g_sensor_history_data.humidity.data_day, &__g_sensor_present_data.humidity, now);
@@ -441,7 +441,7 @@ static void __sensor_history_data_week_update(time_t now)
     __sensor_history_data_week_insert(__g_sensor_history_data.humidity.data_week, &__g_sensor_present_data.humidity, now);
 
     __sensor_history_data_week_insert(__g_sensor_history_data.co2.data_week, &__g_sensor_present_data.co2, now);
-    
+
     __sensor_history_data_week_insert(__g_sensor_history_data.tvoc.data_week, &__g_sensor_present_data.tvoc, now);
 
     xSemaphoreGive(__g_data_mutex);
@@ -477,23 +477,23 @@ static void __sensor_history_data_update_callback(void* arg)
 
     ESP_LOGI(TAG, "__sensor_history_data_update_callback: %s", strftime_buf);
 
-    //if greater than 2020 year mean time is right 
-    if( timeinfo.tm_year  < 120) { 
+    //if greater than 2020 year mean time is right
+    if( timeinfo.tm_year  < 120) {
         ESP_LOGI(TAG, "The time is not right!!!");
         return;
     }
 
     __sensor_history_data_check( now);
 
-    // Hour change and the duration is greater than 1 hour (to prevent hour change during time zone synchronization) 
+    // Hour change and the duration is greater than 1 hour (to prevent hour change during time zone synchronization)
     // 小时变化并且 时长大于1h （防止在时区同步时, 小时变化的情况）
     if( cur_hour != last_hour  &&  ((now - last_timestamp1) > 3600) ) {
         last_hour = cur_hour;
-        
+
         if( last_timestamp1 == 0) {
             last_timestamp1 = ((now - 3600)/3600) * 3600;
         }
-        
+
         struct updata_queue_msg msg = {
             .flag = 1,
             .time = last_timestamp1,
@@ -519,7 +519,7 @@ static void __sensor_history_data_update_callback(void* arg)
         xQueueSendFromISR(updata_queue_handle, &msg, NULL);
 
         //__sensor_history_data_week_update(last_timestamp2);
-        
+
         last_timestamp2 = ((now) / (3600 * 24)) * (3600 * 24); //Sample at the day
     }
 }
@@ -559,7 +559,7 @@ static void __sensor_history_data_restore(void)
     esp_err_t ret = 0;
 
     size_t len = sizeof(__g_sensor_history_data);
-    
+
     ret = indicator_storage_read(SENSOR_HISTORY_DATA_STORAGE, (void *)&__g_sensor_history_data, &len);
     if( ret == ESP_OK  && len== (sizeof(__g_sensor_history_data)) ) {
         ESP_LOGI(TAG, "sensor history data read successful");
@@ -608,22 +608,22 @@ static int __data_parse_handle(uint8_t *p_data, ssize_t len)
             if( len < (sizeof(data.vaule) +1)) {
                 break;
             }
-    
+
             data.sensor_type = SENSOR_DATA_CO2;
             memcpy(&data.vaule, &p_data[1], sizeof(data.vaule));
             __sensor_present_data_update(&__g_sensor_present_data.co2, data.vaule);
 
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_DATA, \
                            &data, sizeof(struct view_data_sensor_data ), portMAX_DELAY);
-            break; 
-        } 
-        
+            break;
+        }
+
         case PKT_TYPE_SENSOR_SHT41_TEMP: {
             struct view_data_sensor_data data;
             if( len < (sizeof(data.vaule) +1)) {
                 break;
             }
-    
+
             data.sensor_type = SENSOR_DATA_TEMP;
             memcpy(&data.vaule, &p_data[1], sizeof(data.vaule));
             __sensor_present_data_update(&__g_sensor_present_data.temp, data.vaule);
@@ -631,14 +631,14 @@ static int __data_parse_handle(uint8_t *p_data, ssize_t len)
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_DATA, \
                            &data, sizeof(struct view_data_sensor_data ), portMAX_DELAY);
             break;
-        } 
+        }
 
         case PKT_TYPE_SENSOR_SHT41_HUMIDITY: {
             struct view_data_sensor_data data;
             if( len < (sizeof(data.vaule) +1)) {
                 break;
             }
-        
+
             data.sensor_type = SENSOR_DATA_HUMIDITY;
             memcpy(&data.vaule, &p_data[1], sizeof(data.vaule));
             __sensor_present_data_update(&__g_sensor_present_data.humidity, data.vaule);
@@ -646,22 +646,22 @@ static int __data_parse_handle(uint8_t *p_data, ssize_t len)
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_DATA, \
                            &data, sizeof(struct view_data_sensor_data ), portMAX_DELAY);
             break;
-        } 
+        }
 
         case PKT_TYPE_SENSOR_TVOC_INDEX: {
             struct view_data_sensor_data data;
             if( len < (sizeof(data.vaule) +1)) {
                 break;
             }
-    
+
             data.sensor_type = SENSOR_DATA_TVOC;
             memcpy(&data.vaule, &p_data[1], sizeof(data.vaule));
             __sensor_present_data_update(&__g_sensor_present_data.tvoc, data.vaule);
 
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_DATA, \
                            &data, sizeof(struct view_data_sensor_data ), portMAX_DELAY);
-            break; 
-        } 
+            break;
+        }
 
         default:
             break;
@@ -677,7 +677,7 @@ static int __cmd_send(uint8_t cmd, void *p_data, uint8_t len)
     if( len > 31) {
         return -1;
     }
-    
+
     uint8_t index =1;
 
     data[0] = cmd;
@@ -719,12 +719,12 @@ static void esp32_rp2040_comm_task(void *arg)
 
     __cmd_send(PKT_TYPE_CMD_POWER_ON, NULL, 0);
     cobs_decode_result ret;
-    
+
     while (1) {
         int len = uart_read_bytes(ESP32_COMM_PORT_NUM, buf, (BUF_SIZE - 1), 1 / portTICK_PERIOD_MS);
 #if SENSOR_COMM_DEBUG
         ESP_LOGI(TAG, "len:%d",  len);
-#endif 
+#endif
         int index  = 0;
         uint8_t *p_buf_start =  buf;
         uint8_t *p_buf_end = buf;
@@ -736,7 +736,7 @@ static void esp32_rp2040_comm_task(void *arg)
                 printf( "0x%x ", buf[i] );
             }
             printf("\r\n");
-#endif 
+#endif
             while ( p_buf_start < (buf + len)) {
                 uint8_t *p_buf_end = p_buf_start;
                 while( p_buf_end < (buf + len) ) {
@@ -745,7 +745,7 @@ static void esp32_rp2040_comm_task(void *arg)
                     }
                     p_buf_end++;
                 }
-                // decode buf 
+                // decode buf
                 memset(data, 0, sizeof(data));
                 ret = cobs_decode(data, sizeof(data),  p_buf_start, p_buf_end - p_buf_start);
 
@@ -756,7 +756,7 @@ static void esp32_rp2040_comm_task(void *arg)
                     printf( "0x%x ", data[i] );
                 }
                 printf("\r\n");
-#endif 
+#endif
                 if( ret.out_len > 1  &&  ret.status == COBS_DECODE_OK ) { //todo  ret.status
                     __data_parse_handle((uint8_t *)data, ret.out_len);
                 }
@@ -824,7 +824,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             __sensor_shutdown();
             break;
         }
-//debug ui 
+//debug ui
 #if 0
         case VIEW_EVENT_SENSOR_TEMP_HISTORY: {
             ESP_LOGI(TAG, "event: VIEW_EVENT_SENSOR_TEMP_HISTORY");
@@ -835,13 +835,13 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             //test
             float min=100;
             float max=0;
-            
+
             time_t now = 0;
             time(&now);
             time_t time1 = (time_t)(now / 3600) * 3600;
             time_t time2 = (time_t)(now / 3600 / 24) * 3600 * 24;
-            
-            for(i = 0; i < 24; i++) { 
+
+            for(i = 0; i < 24; i++) {
                 data.data_day[i].data = (float)lv_rand(10, 40);
                 data.data_day[i].timestamp = time1 + i *3600;
                 data.data_day[i].valid = true;
@@ -859,12 +859,12 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             min=100;
             max=0;
 
-            for(i = 0; i < 7; i++) { 
+            for(i = 0; i < 7; i++) {
                 data.data_week[i].min = (float)lv_rand(10, 20);
                 data.data_week[i].max = (float)lv_rand(20, 40);
                 data.data_week[i].timestamp =  time2 + i * 3600 * 24;;
                 data.data_week[i].valid = true;
-                
+
                 if( min > data.data_week[i].min) {
                     min = data.data_week[i].min;
                 }
@@ -892,8 +892,8 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             time(&now);
             time_t time1 = (time_t)(now / 3600) * 3600;
             time_t time2 = (time_t)(now / 3600 / 24) * 3600 * 24;
-            
-            for(i = 0; i < 24; i++) { 
+
+            for(i = 0; i < 24; i++) {
                 data.data_day[i].data = (float)lv_rand(30, 50);
                 data.data_day[i].timestamp = time1 + i *3600;
                 data.data_day[i].valid = true;
@@ -909,7 +909,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
 
             min=100;
             max=0;
-            for(i = 0; i < 7; i++) { 
+            for(i = 0; i < 7; i++) {
                 data.data_week[i].max = (float)lv_rand(40, 50);
                 data.data_week[i].min = (float)lv_rand(30, 40);
                 data.data_week[i].timestamp =  time2 + i * 3600 * 24;;
@@ -940,8 +940,8 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             time(&now);
             time_t time1 = (time_t)(now / 3600) * 3600;
             time_t time2 = (time_t)(now / 3600 / 24) * 3600 * 24;
-            
-            for(i = 0; i < 24; i++) { 
+
+            for(i = 0; i < 24; i++) {
                 data.data_day[i].data = (float)lv_rand(100, 120);
                 data.data_day[i].timestamp = time1 + i *3600;
                 data.data_day[i].valid = true;
@@ -957,7 +957,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
 
             min=120;
             max=0;
-            for(i = 0; i < 7; i++) { 
+            for(i = 0; i < 7; i++) {
                 data.data_week[i].max = (float)lv_rand(100, 120);
                 data.data_week[i].min = (float)lv_rand(0, 100);
                 data.data_week[i].timestamp =  time2 + i * 3600 * 24;;
@@ -988,8 +988,8 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             time(&now);
             time_t time1 = (time_t)(now / 3600) * 3600;
             time_t time2 = (time_t)(now / 3600 / 24) * 3600 * 24;
-            
-            for(i = 0; i < 24; i++) { 
+
+            for(i = 0; i < 24; i++) {
                 data.data_day[i].data = (float)lv_rand(500, 600);
                 data.data_day[i].timestamp = time1 + i *3600;
                 data.data_day[i].valid = true;
@@ -1005,7 +1005,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
 
             min=700;
             max=0;
-            for(i = 0; i < 7; i++) { 
+            for(i = 0; i < 7; i++) {
                 data.data_week[i].min = (float)lv_rand(500, 600);
                 data.data_week[i].max = (float)lv_rand(600, 700);
                 data.data_week[i].timestamp =  time2 + i * 3600 * 24;;
@@ -1036,27 +1036,27 @@ int indicator_sensor_init(void)
     updata_queue_handle = xQueueCreate(4, sizeof( struct updata_queue_msg));
 
     __sensor_history_data_restore();
-    
+
     __sensor_history_data_update_init();
 
     xTaskCreate(esp32_rp2040_comm_task, "esp32_rp2040_comm_task", ESP32_RP2040_COMM_TASK_STACK_SIZE, NULL, 2, NULL);
 
     xTaskCreate(sensor_history_data_updata_task, "sensor_history_data_updata_task", 1024*4, NULL, 6, NULL);
 
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
-                                                            VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_TEMP_HISTORY, 
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                            VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_TEMP_HISTORY,
                                                             __view_event_handler, NULL, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
-                                                            VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_HUMIDITY_HISTORY, 
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                            VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_HUMIDITY_HISTORY,
                                                             __view_event_handler, NULL, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
-                                                            VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_TVOC_HISTORY, 
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                            VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_TVOC_HISTORY,
                                                             __view_event_handler, NULL, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
-                                                            VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_CO2_HISTORY, 
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                            VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_CO2_HISTORY,
                                                             __view_event_handler, NULL, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
-                                                            VIEW_EVENT_BASE, VIEW_EVENT_SHUTDOWN, 
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                            VIEW_EVENT_BASE, VIEW_EVENT_SHUTDOWN,
                                                             __view_event_handler, NULL, NULL));
 }
 

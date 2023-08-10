@@ -41,10 +41,10 @@ void demo_lora_rx(void)
     ESP_LOGI(TAG, "system start");
     ESP_LOGI(TAG, "demo lora rx continue");
     ESP_ERROR_CHECK(bsp_board_init());
-    
+
     RadioEvents.RxDone = OnRxDone;
     Radio.Init( &RadioEvents );
-    
+
     Radio.SetChannel( RF_FREQUENCY );
     Radio.SetTxConfig( MODEM_LORA,22, 0, LORA_BANDWIDTH,
                                    LORA_SPREADING_FACTOR, LORA_CODINGRATE,
