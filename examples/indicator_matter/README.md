@@ -8,7 +8,7 @@ This demo mainly implements time, sensor data display, and some configuration fu
 
 <figure class="third">
     <img src="./docs/page1.png" width="480"/> <img src="./docs/page2.png" width="480"/>
-    <img src="./docs/page3.png" width="480"/> <img src="./docs/page4.png" width="480"/>
+    <img src="./docs/page3.png" width="480"/>
 </figure>
 
 ## Function
