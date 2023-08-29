@@ -4,7 +4,6 @@
 #include "freertos/semphr.h"
 
 #define MATTER_DASHBOARD_STORAGE  "md"
-
 static const char *TAG = "virtual_dashboard";
 
 static SemaphoreHandle_t       __g_matter_virtual_dashboard_mutex;

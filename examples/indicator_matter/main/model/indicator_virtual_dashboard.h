@@ -4,7 +4,6 @@
 #include "config.h"
 #include "view_data.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
