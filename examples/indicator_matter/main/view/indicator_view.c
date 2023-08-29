@@ -332,6 +332,50 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
     lv_port_sem_take();
     switch (id)
     {
+        case VIEW_EVENT_MATTER_SET_DASHBOARD_DATA: {
+            struct view_data_matter_dashboard_data  *p_data = (struct view_data_matter_dashboard_data *) event_data;
+            ESP_LOGI(TAG, "event: VIEW_EVENT_MATTER_SET_DASHBOARD_DATA %d", p_data->value);
+
+            switch (p_data->dashboard_data_type)
+            {
+                case DASHBOARD_DATA_ARC: {
+                    lv_arc_set_value( ui_arc, p_data->value ); 
+                    lv_event_send(ui_arc, LV_EVENT_VALUE_CHANGED, NULL);              
+                    break;
+                }
+                case DASHBOARD_DATA_SWITCH: {
+                    if ((bool)p_data->value) {
+                        lv_obj_add_state(ui_switch1, LV_STATE_CHECKED);
+                    } else {
+                        lv_obj_clear_state(ui_switch1, LV_STATE_CHECKED);
+                    }
+                    break;
+                }
+                case DASHBOARD_DATA_SLIDER: {
+                    lv_slider_set_value( ui_slider1, p_data->value, LV_ANIM_OFF ); 
+                    break;
+                }
+                case DASHBOARD_DATA_BUTTON1: {
+                    if ((bool)p_data->value) {
+                        lv_obj_add_state(ui_toggle_button1, LV_STATE_CHECKED);
+                    } else {
+                        lv_obj_clear_state(ui_toggle_button1, LV_STATE_CHECKED);
+                    }                    
+                    break;
+                }
+                case DASHBOARD_DATA_BUTTON2: {
+                    if ((bool)p_data->value) {
+                        lv_obj_add_state(ui_toggle_button2, LV_STATE_CHECKED);
+                    } else {
+                        lv_obj_clear_state(ui_toggle_button2, LV_STATE_CHECKED);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
         case VIEW_EVENT_SCREEN_START: {
             uint8_t screen = *( uint8_t *)event_data;
             if( screen == SCREEN_MATTER_CONFIG) {

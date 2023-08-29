@@ -21,13 +21,11 @@ uint16_t humidity_endpoint_id = 0;
 uint16_t dimmable_plugin_unit_endpoint_id = 0;
 uint16_t door_lock_endpoint_id = 0;
 uint16_t dimmable_plugin_unit_endpoint2_id = 0;
-
 static bool __g_matter_connected_flag = false;
 static bool __g_ip_connected_flag = false;
-
 static int __g_humidity = 0;
 static int __g_temperature = 0;
-static struct view_data_wifi_st __g_wifi_st;
+constexpr auto k_timeout_seconds = 300;
 static SemaphoreHandle_t       __g_matter_mutex;
 static esp_timer_handle_t   matter_humidity_timer_handle;
 static esp_timer_handle_t   matter_temperature_timer_handle; 
@@ -38,21 +36,7 @@ using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
 using namespace esp_matter::cluster::basic_information::attribute;
 
-constexpr auto k_timeout_seconds = 300;
 
-static void __wifi_st_set( struct view_data_wifi_st *p_st )
-{
-    xSemaphoreTake(__g_matter_mutex, portMAX_DELAY);
-    memcpy( &__g_wifi_st, p_st, sizeof(struct view_data_wifi_st));
-    xSemaphoreGive(__g_matter_mutex);
-}
-
-static void __wifi_st_get(struct view_data_wifi_st *p_st )
-{
-    xSemaphoreTake(__g_matter_mutex, portMAX_DELAY);
-    memcpy(p_st, &__g_wifi_st, sizeof(struct view_data_wifi_st));
-    xSemaphoreGive(__g_matter_mutex);
-}
 
 static void __humidity_value_set( int h )
 {
@@ -93,11 +77,8 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         __g_matter_connected_flag = true;
         if (__g_matter_connected_flag) {
             struct view_data_wifi_st st;
-            __wifi_st_get(&st);
             st.rssi = -50;
             st.is_connected = true;
-            
-            __wifi_st_set(&st);
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST, &st, sizeof(struct view_data_wifi_st ), portMAX_DELAY);
 
             uint8_t screen = SCREEN_DASHBOARD;
@@ -252,9 +233,7 @@ static void __matter_temperature_reporter(void* arg) {
         attribute::get_val(attribute, &val);
         val.val.i16 = (int16_t) __temperature_value_get();
 
-        ESP_LOGI(TAG, "Temperature: esp_matter_attr_val_t value is %d", val.val.i16);
-
-        
+        ESP_LOGI(TAG, "Temperature: esp_matter_attr_val_t value is %d", val.val.i16);        
         attribute::update(endpoint_id, cluster_id, attribute_id, &val);
         
     } else {
@@ -277,9 +256,7 @@ static void __matter_humidity_reporter(void* arg) {
         val.val.i16 = (int16_t) __humidity_value_get();
 
         ESP_LOGI(TAG, "Humidity: esp_matter_attr_val_t value is %d", val.val.i);
-        
         attribute::update(endpoint_id, cluster_id, attribute_id, &val);
-        
     } else {
         int value = (int)(__humidity_value_get() / 1000.0);
         ESP_LOGI(TAG, "Matter humidity not logging: esp_matter_attr_val_t value is %d", value);   
@@ -296,7 +273,6 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
         }
         case VIEW_EVENT_MATTER_DASHBOARD_DATA: {
             ESP_LOGI(TAG, "event: VIEW_EVENT_MATTER_DASHBOARD_DATA");
-
             if (!__g_matter_connected_flag) {
                 return;
             }
@@ -333,10 +309,8 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     esp_matter_attr_val_t val = esp_matter_invalid(NULL);
                     attribute::get_val(attribute, &val);
                     val.val.b = (bool)p_data->value;
-                    ESP_LOGI(TAG, "Door lock: esp_matter_attr_val_t value is %d", (int)val.val.b);
-                    
+                    ESP_LOGI(TAG, "Door lock: esp_matter_attr_val_t value is %d", (int)val.val.b);    
                     attribute::update(endpoint_id, cluster_id, attribute_id, &val);
-                    
                     break;
                 }
                 case DASHBOARD_DATA_SLIDER: {
@@ -353,10 +327,8 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     attribute::get_val(attribute, &val);
                     val.val.i = p_data->value;
 
-                    ESP_LOGI(TAG, "Dimmer switch: esp_matter_attr_val_t value is %d", val.val.i);
-                    
+                    ESP_LOGI(TAG, "Dimmer switch: esp_matter_attr_val_t value is %d", val.val.i);    
                     attribute::update(endpoint_id, cluster_id, attribute_id, &val);
-                    
                     break;
                 }
                 case DASHBOARD_DATA_BUTTON1: {
@@ -374,9 +346,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     val.val.b = (bool)p_data->value;
 
                     ESP_LOGI(TAG, "Dimmer switch: esp_matter_attr_val_t value is %d", (int)val.val.b);
-                    
                     attribute::update(endpoint_id, cluster_id, attribute_id, &val);
-                    
                     break;
                 }
                 case DASHBOARD_DATA_BUTTON2: {
@@ -394,9 +364,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     val.val.b = (bool)p_data->value;
 
                     ESP_LOGI(TAG, "Dimmer on/off: esp_matter_attr_val_t value is %d", (int)val.val.b);
-                    
                     attribute::update(endpoint_id, cluster_id, attribute_id, &val);
-                    
                     break;
                 }
                 default:
@@ -440,7 +408,6 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
 int indicator_matter_setup(void) {
     esp_err_t err = ESP_OK;
     __g_matter_connected_flag = chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned();
-    memset(&__g_wifi_st, 0, sizeof(__g_wifi_st));
     __g_matter_mutex  =  xSemaphoreCreateMutex();  
     node::config_t node_config;
     node_t *node = node::create(&node_config, app_attribute_update_cb, app_identification_cb);
@@ -448,37 +415,22 @@ int indicator_matter_setup(void) {
     // Create the temperature endpoint
     temperature_sensor::config_t temperature_config;
     endpoint_t *temperature_endpoint = temperature_sensor::create(node, &temperature_config, ENDPOINT_FLAG_NONE, NULL);
-    char temperature_name[]  = "SenseCAP Indicator Temperature";
-    cluster_t *temperature_cluster = cluster::get(temperature_endpoint, BasicInformation::Id);
-    create_product_name(temperature_cluster, temperature_name, strlen(temperature_name));
 
     // Create the humidity endpoint
     humidity_sensor::config_t humidity_config;
     endpoint_t *humidity_endpoint = humidity_sensor::create(node, &humidity_config, ENDPOINT_FLAG_NONE, NULL);
-    char humidity_name[]  = "SenseCAP Indicator Humidity";
-    cluster_t *humidity_cluster = cluster::get(temperature_endpoint, BasicInformation::Id);
-    create_product_name(humidity_cluster, humidity_name, strlen(humidity_name));
 
     // Create the dimmable light endpoint
     dimmable_plugin_unit::config_t dimmable_plugin_unit_config;
     dimmable_plugin_unit_config.level_control.lighting.min_level = 0;
     dimmable_plugin_unit_config.level_control.lighting.max_level = 100;
     endpoint_t *dimmable_plugin_unit_endpoint = dimmable_plugin_unit::create(node, &dimmable_plugin_unit_config, ENDPOINT_FLAG_NONE, NULL);
-    char dimmable_plugin_1_name[]  = "Dimmable Light";
-    cluster_t *dimmable_plugin_1_cluster = cluster::get(dimmable_plugin_unit_endpoint, BasicInformation::Id);
-    create_product_name(dimmable_plugin_1_cluster, dimmable_plugin_1_name, strlen(dimmable_plugin_1_name));
 
     // Create the contact sensor endpoint
     door_lock::config_t door_lock_config;
     endpoint_t *door_lock_endpoint = door_lock::create(node, &door_lock_config, ENDPOINT_FLAG_NONE, NULL);
-    char door_lock_name[]  = "Virtual Lockbox";
-    cluster_t *door_lock_cluster = cluster::get(door_lock_endpoint, BasicInformation::Id);
-    create_product_name(door_lock_cluster, door_lock_name, strlen(door_lock_name));
 
     dimmable_plugin_unit::config_t dimmable_plugin_unit_config2;
-    char dimmable_plugin_2_name[]  = "Dimmable Light 2";
-    cluster_t *dimmable_plugin_2_cluster = cluster::get(door_lock_endpoint, BasicInformation::Id);
-    create_product_name(dimmable_plugin_2_cluster, dimmable_plugin_2_name, strlen(dimmable_plugin_2_name));
     dimmable_plugin_unit_config2.level_control.lighting.min_level = 0;
     dimmable_plugin_unit_config2.level_control.lighting.max_level = 100;
     endpoint_t *dimmable_plugin_unit_endpoint2 = dimmable_plugin_unit::create(node, &dimmable_plugin_unit_config2, ENDPOINT_FLAG_NONE, NULL);
