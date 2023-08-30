@@ -72,19 +72,6 @@ static int __temperature_value_get(void)
 static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
 {
     switch (event->Type) {
-    case chip::DeviceLayer::DeviceEventType::kServerReady:
-        ESP_LOGI(TAG, "Server Ready");
-        __g_matter_connected_flag = true;
-        if (__g_matter_connected_flag) {
-            struct view_data_wifi_st st;
-            st.rssi = -50;
-            st.is_connected = true;
-            esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST, &st, sizeof(struct view_data_wifi_st ), portMAX_DELAY);
-
-            uint8_t screen = SCREEN_DASHBOARD;
-            ESP_ERROR_CHECK(esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_START, &screen, sizeof(screen), portMAX_DELAY));
-        }
-        break;
     case chip::DeviceLayer::DeviceEventType::kInterfaceIpAddressChanged:
         ESP_LOGI(TAG, "IP Interface Address Changed");
         if (event->InterfaceIpAddressChanged.Type == chip::DeviceLayer::InterfaceIpChangeType::kIpV6_Assigned ||
@@ -121,19 +108,21 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
     case chip::DeviceLayer::DeviceEventType::kFabricRemoved:
     {
             ESP_LOGI(TAG, "Fabric removed successfully");
-            if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+            __g_matter_connected_flag = false;
+            chip::CommissioningWindowManager & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
+            constexpr auto kTimeoutSeconds = chip::System::Clock::Seconds16(k_timeout_seconds);
+            if (!commissionMgr.IsCommissioningWindowOpen())
             {
-                chip::CommissioningWindowManager & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
-                constexpr auto kTimeoutSeconds = chip::System::Clock::Seconds16(k_timeout_seconds);
-                if (!commissionMgr.IsCommissioningWindowOpen())
+                CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds,
+                                                chip::CommissioningWindowAdvertisement::kDnssdOnly);
+                if (err != CHIP_NO_ERROR)
                 {
-                    CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds,
-                                                    chip::CommissioningWindowAdvertisement::kDnssdOnly);
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ESP_LOGE(TAG, "Failed to open commissioning window, err:%" CHIP_ERROR_FORMAT, err.Format());
-                    }
+                    ESP_LOGE(TAG, "Failed to open commissioning window, err:%" CHIP_ERROR_FORMAT, err.Format());
                 }
+
+                ESP_LOGI(TAG, "Beginning Matter Provisioning");
+                uint8_t screen = SCREEN_MATTER_CONFIG;
+                ESP_ERROR_CHECK(esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_START, &screen, sizeof(screen), portMAX_DELAY));
             }
         break;
     }
@@ -147,6 +136,17 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
 
     case chip::DeviceLayer::DeviceEventType::kFabricCommitted:
         ESP_LOGI(TAG, "Fabric is committed");
+
+        __g_matter_connected_flag = true;
+        if (__g_matter_connected_flag) {
+            struct view_data_wifi_st st;
+            st.rssi = -50;
+            st.is_connected = true;
+            esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST, &st, sizeof(struct view_data_wifi_st ), portMAX_DELAY);
+
+            uint8_t screen = SCREEN_DASHBOARD;
+            ESP_ERROR_CHECK(esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_START, &screen, sizeof(screen), portMAX_DELAY));
+        }
         break;
     default:
         break;
