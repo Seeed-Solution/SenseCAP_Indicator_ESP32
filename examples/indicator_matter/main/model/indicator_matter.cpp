@@ -18,9 +18,9 @@
 static const char *TAG = "matter";
 uint16_t temperature_endpoint_id = 0;
 uint16_t humidity_endpoint_id = 0;
-uint16_t dimmable_plugin_unit_endpoint_id = 0;
+uint16_t color_temperature_light_endpoint_id = 0;
 uint16_t door_lock_endpoint_id = 0;
-uint16_t dimmable_plugin_unit_endpoint2_id = 0;
+uint16_t color_temperature_light_endpoint2_id = 0;
 static bool __g_matter_connected_flag = false;
 static bool __g_ip_connected_flag = false;
 static int __g_humidity = 0;
@@ -166,7 +166,7 @@ static esp_err_t app_attribute_update_cb(attribute::callback_type_t type, uint16
     esp_err_t err = ESP_OK;
     if (type == PRE_UPDATE) {
         esp_err_t err = ESP_OK;     
-        if (endpoint_id == dimmable_plugin_unit_endpoint_id) {
+        if (endpoint_id == color_temperature_light_endpoint_id) {
             if (cluster_id == OnOff::Id) {
                 if (attribute_id == OnOff::Attributes::OnOff::Id) {
                     struct view_data_matter_dashboard_data data;
@@ -184,7 +184,7 @@ static esp_err_t app_attribute_update_cb(attribute::callback_type_t type, uint16
                         &data, sizeof(struct view_data_matter_dashboard_data ), portMAX_DELAY);                    
                 }
             }
-        } else if (endpoint_id == dimmable_plugin_unit_endpoint2_id) {
+        } else if (endpoint_id == color_temperature_light_endpoint2_id) {
             if (cluster_id == OnOff::Id) {
                 if (attribute_id == OnOff::Attributes::OnOff::Id) {
                     struct view_data_matter_dashboard_data data;
@@ -281,7 +281,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             switch (p_data->dashboard_data_type)
             {
                 case DASHBOARD_DATA_ARC: {
-                    uint16_t endpoint_id = dimmable_plugin_unit_endpoint_id;
+                    uint16_t endpoint_id = color_temperature_light_endpoint_id;
                     uint32_t cluster_id = LevelControl::Id;
                     uint32_t attribute_id = LevelControl::Attributes::CurrentLevel::Id;
 
@@ -314,7 +314,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     break;
                 }
                 case DASHBOARD_DATA_SLIDER: {
-                    uint16_t endpoint_id = dimmable_plugin_unit_endpoint2_id;
+                    uint16_t endpoint_id = color_temperature_light_endpoint2_id;
                     uint32_t cluster_id = LevelControl::Id;
                     uint32_t attribute_id = LevelControl::Attributes::CurrentLevel::Id;
 
@@ -332,7 +332,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     break;
                 }
                 case DASHBOARD_DATA_BUTTON1: {
-                    uint16_t endpoint_id = dimmable_plugin_unit_endpoint_id;
+                    uint16_t endpoint_id = color_temperature_light_endpoint_id;
                     uint32_t cluster_id = OnOff::Id;
                     uint32_t attribute_id = OnOff::Attributes::OnOff::Id;
 
@@ -350,7 +350,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     break;
                 }
                 case DASHBOARD_DATA_BUTTON2: {
-                    uint16_t endpoint_id = dimmable_plugin_unit_endpoint2_id;
+                    uint16_t endpoint_id = color_temperature_light_endpoint2_id;
                     uint32_t cluster_id = OnOff::Id;
                     uint32_t attribute_id = OnOff::Attributes::OnOff::Id;
 
@@ -421,26 +421,26 @@ int indicator_matter_setup(void) {
     endpoint_t *humidity_endpoint = humidity_sensor::create(node, &humidity_config, ENDPOINT_FLAG_NONE, NULL);
 
     // Create the dimmable light endpoint
-    dimmable_plugin_unit::config_t dimmable_plugin_unit_config;
-    dimmable_plugin_unit_config.level_control.lighting.min_level = 1;
-    dimmable_plugin_unit_config.level_control.lighting.max_level = 100;
-    endpoint_t *dimmable_plugin_unit_endpoint = dimmable_plugin_unit::create(node, &dimmable_plugin_unit_config, ENDPOINT_FLAG_NONE, NULL);
+    color_temperature_light::config_t color_temperature_light_config;
+    color_temperature_light_config.level_control.lighting.min_level = 1;
+    color_temperature_light_config.level_control.lighting.max_level = 100;
+    endpoint_t *color_temperature_light_endpoint = color_temperature_light::create(node, &color_temperature_light_config, ENDPOINT_FLAG_NONE, NULL);
 
     // Create the contact sensor endpoint
     door_lock::config_t door_lock_config;
     endpoint_t *door_lock_endpoint = door_lock::create(node, &door_lock_config, ENDPOINT_FLAG_NONE, NULL);
 
-    dimmable_plugin_unit::config_t dimmable_plugin_unit_config2;
-    dimmable_plugin_unit_config2.level_control.lighting.min_level = 1;
-    dimmable_plugin_unit_config2.level_control.lighting.max_level = 100;
-    endpoint_t *dimmable_plugin_unit_endpoint2 = dimmable_plugin_unit::create(node, &dimmable_plugin_unit_config2, ENDPOINT_FLAG_NONE, NULL);
+    color_temperature_light::config_t color_temperature_light_config2;
+    color_temperature_light_config2.level_control.lighting.min_level = 1;
+    color_temperature_light_config2.level_control.lighting.max_level = 100;
+    endpoint_t *color_temperature_light_endpoint2 = color_temperature_light::create(node, &color_temperature_light_config2, ENDPOINT_FLAG_NONE, NULL);
 
     if (!node || 
         !temperature_endpoint || 
         !humidity_endpoint ||
-        !dimmable_plugin_unit_endpoint ||
+        !color_temperature_light_endpoint ||
         !door_lock_endpoint ||
-        !dimmable_plugin_unit_endpoint2
+        !color_temperature_light_endpoint2
     ) {
         ESP_LOGE(TAG, "Matter node creation failed");
     }
@@ -451,14 +451,14 @@ int indicator_matter_setup(void) {
     humidity_endpoint_id = endpoint::get_id(humidity_endpoint);
     ESP_LOGI(TAG, "Humidity sensor created with endpoint_id %d", humidity_endpoint_id);
 
-    dimmable_plugin_unit_endpoint_id = endpoint::get_id(dimmable_plugin_unit_endpoint);
-    ESP_LOGI(TAG, "Dimmable light created with endpoint_id %d", dimmable_plugin_unit_endpoint_id);
+    color_temperature_light_endpoint_id = endpoint::get_id(color_temperature_light_endpoint);
+    ESP_LOGI(TAG, "Dimmable light created with endpoint_id %d", color_temperature_light_endpoint_id);
 
     door_lock_endpoint_id = endpoint::get_id(door_lock_endpoint);
     ESP_LOGI(TAG, "Door lock created with endpoint_id %d", door_lock_endpoint_id);
 
-    dimmable_plugin_unit_endpoint2_id = endpoint::get_id(dimmable_plugin_unit_endpoint2);
-    ESP_LOGI(TAG, "Dimmable plugin 2 unit created with endpoint_id %d", dimmable_plugin_unit_endpoint2_id);
+    color_temperature_light_endpoint2_id = endpoint::get_id(color_temperature_light_endpoint2);
+    ESP_LOGI(TAG, "Dimmable plugin 2 unit created with endpoint_id %d", color_temperature_light_endpoint2_id);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     /* Set OpenThread platform config */
