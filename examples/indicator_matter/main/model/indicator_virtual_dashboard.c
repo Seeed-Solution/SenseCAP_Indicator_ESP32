@@ -110,11 +110,11 @@ static void __dashboard_data_restore()
             ESP_LOGI(TAG, "matter dashboard storage read err:%d", ret);
         } 
         
-        dashboard_data.arc_value = 0;
+        dashboard_data.arc_value = 1;
         dashboard_data.switch_state = false;
         dashboard_data.button1 = false;
         dashboard_data.button2 = false;
-        dashboard_data.slider_value = 0;
+        dashboard_data.slider_value = 1;
         __dashboard_data_set(&dashboard_data);
     }  
 }
@@ -125,7 +125,6 @@ int indicator_virtual_dashboard_init(void)
     memset(&__g_virtual_dashboard, 0, sizeof(__g_virtual_dashboard));
     __dashboard_data_restore();
 
-    ESP_LOGI(TAG, "Dimmer switch: esp_matter_attr_val_t value is %d", (int)__g_virtual_dashboard.button1);
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
                                                         VIEW_EVENT_BASE, VIEW_EVENT_MATTER_DASHBOARD_DATA,
                                                         __view_event_handler, NULL, NULL));

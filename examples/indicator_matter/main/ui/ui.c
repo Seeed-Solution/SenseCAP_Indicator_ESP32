@@ -1445,12 +1445,14 @@ void ui_screen_matter_screen_init()
     lv_obj_set_style_bg_opa(ui_slider_with_value_panel, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 
     ui_arc = lv_arc_create(ui_slider_with_value_panel);
+
     lv_obj_set_width( ui_arc, 100);
     lv_obj_set_height( ui_arc, 100);
     lv_obj_set_y( ui_arc, 3 );
     lv_obj_set_x( ui_arc, lv_pct(1) );
     lv_arc_set_value( ui_arc, dashboard_data.arc_value );
     lv_obj_set_align( ui_arc, LV_ALIGN_CENTER );
+    lv_arc_set_range(ui_arc, 1, 100);
     lv_obj_set_style_arc_color(ui_arc, lv_color_hex(0x529D53), LV_PART_INDICATOR | LV_STATE_DEFAULT );
     lv_obj_set_style_arc_opa(ui_arc, 255, LV_PART_INDICATOR| LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_arc, lv_color_hex(0xFFFFFF), LV_PART_KNOB | LV_STATE_DEFAULT );
@@ -1554,10 +1556,10 @@ void ui_screen_matter_screen_init()
     lv_obj_set_style_bg_opa(ui_slider_panel, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 
     ui_slider1 = lv_slider_create(ui_slider_panel);
-    lv_slider_set_range(ui_slider1, 0, 100);
     if (lv_slider_get_mode(ui_slider1)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_slider1, 0, LV_ANIM_OFF);
     lv_obj_set_width( ui_slider1, 391);
     lv_obj_set_height( ui_slider1, 10);
+    lv_slider_set_range(ui_slider1, 1, 100);
     lv_obj_set_x( ui_slider1, 1 );
     lv_obj_set_y( ui_slider1, -5 );
     lv_obj_set_align( ui_slider1, LV_ALIGN_CENTER );

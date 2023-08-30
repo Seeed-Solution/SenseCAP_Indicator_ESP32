@@ -422,7 +422,7 @@ int indicator_matter_setup(void) {
 
     // Create the dimmable light endpoint
     dimmable_plugin_unit::config_t dimmable_plugin_unit_config;
-    dimmable_plugin_unit_config.level_control.lighting.min_level = 0;
+    dimmable_plugin_unit_config.level_control.lighting.min_level = 1;
     dimmable_plugin_unit_config.level_control.lighting.max_level = 100;
     endpoint_t *dimmable_plugin_unit_endpoint = dimmable_plugin_unit::create(node, &dimmable_plugin_unit_config, ENDPOINT_FLAG_NONE, NULL);
 
@@ -431,7 +431,7 @@ int indicator_matter_setup(void) {
     endpoint_t *door_lock_endpoint = door_lock::create(node, &door_lock_config, ENDPOINT_FLAG_NONE, NULL);
 
     dimmable_plugin_unit::config_t dimmable_plugin_unit_config2;
-    dimmable_plugin_unit_config2.level_control.lighting.min_level = 0;
+    dimmable_plugin_unit_config2.level_control.lighting.min_level = 1;
     dimmable_plugin_unit_config2.level_control.lighting.max_level = 100;
     endpoint_t *dimmable_plugin_unit_endpoint2 = dimmable_plugin_unit::create(node, &dimmable_plugin_unit_config2, ENDPOINT_FLAG_NONE, NULL);
 
