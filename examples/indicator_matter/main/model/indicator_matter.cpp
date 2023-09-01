@@ -19,7 +19,7 @@ static const char *TAG = "matter";
 uint16_t temperature_endpoint_id = 0;
 uint16_t humidity_endpoint_id = 0;
 uint16_t color_temperature_light_endpoint_id = 0;
-uint16_t door_lock_endpoint_id = 0;
+uint16_t on_off_light_endpoint_id = 0;
 uint16_t color_temperature_light_endpoint2_id = 0;
 static bool __g_matter_connected_flag = false;
 static bool __g_ip_connected_flag = false;
@@ -77,6 +77,11 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         if (event->InterfaceIpAddressChanged.Type == chip::DeviceLayer::InterfaceIpChangeType::kIpV6_Assigned ||
                         event->InterfaceIpAddressChanged.Type == chip::DeviceLayer::InterfaceIpChangeType::kIpV4_Assigned) {
             __g_ip_connected_flag = true;
+            
+            struct view_data_wifi_st st;
+            st.rssi = -50;
+            st.is_connected = true;
+            esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST, &st, sizeof(struct view_data_wifi_st ), portMAX_DELAY);
         }
         break;
     case chip::DeviceLayer::DeviceEventType::kCommissioningComplete: {
@@ -107,23 +112,23 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
     }
     case chip::DeviceLayer::DeviceEventType::kFabricRemoved:
     {
-            ESP_LOGI(TAG, "Fabric removed successfully");
-            __g_matter_connected_flag = false;
-            chip::CommissioningWindowManager & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
-            constexpr auto kTimeoutSeconds = chip::System::Clock::Seconds16(k_timeout_seconds);
-            if (!commissionMgr.IsCommissioningWindowOpen())
+        ESP_LOGI(TAG, "Fabric removed successfully");
+        __g_matter_connected_flag = false;
+        chip::CommissioningWindowManager & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
+        constexpr auto kTimeoutSeconds = chip::System::Clock::Seconds16(k_timeout_seconds);
+        if (!commissionMgr.IsCommissioningWindowOpen())
+        {
+            CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds,
+                                            chip::CommissioningWindowAdvertisement::kDnssdOnly);
+            if (err != CHIP_NO_ERROR)
             {
-                CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds,
-                                                chip::CommissioningWindowAdvertisement::kDnssdOnly);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ESP_LOGE(TAG, "Failed to open commissioning window, err:%" CHIP_ERROR_FORMAT, err.Format());
-                }
-
-                ESP_LOGI(TAG, "Beginning Matter Provisioning");
-                uint8_t screen = SCREEN_MATTER_CONFIG;
-                ESP_ERROR_CHECK(esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_START, &screen, sizeof(screen), portMAX_DELAY));
+                ESP_LOGE(TAG, "Failed to open commissioning window, err:%" CHIP_ERROR_FORMAT, err.Format());
             }
+        }
+
+        ESP_LOGI(TAG, "Beginning Matter Provisioning");
+        uint8_t screen = SCREEN_MATTER_CONFIG;
+        ESP_ERROR_CHECK(esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_START, &screen, sizeof(screen), portMAX_DELAY));
         break;
     }
     case chip::DeviceLayer::DeviceEventType::kFabricWillBeRemoved:
@@ -135,19 +140,14 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         break;
 
     case chip::DeviceLayer::DeviceEventType::kFabricCommitted:
+    {
         ESP_LOGI(TAG, "Fabric is committed");
 
         __g_matter_connected_flag = true;
-        if (__g_matter_connected_flag) {
-            struct view_data_wifi_st st;
-            st.rssi = -50;
-            st.is_connected = true;
-            esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST, &st, sizeof(struct view_data_wifi_st ), portMAX_DELAY);
-
-            uint8_t screen = SCREEN_DASHBOARD;
-            ESP_ERROR_CHECK(esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_START, &screen, sizeof(screen), portMAX_DELAY));
-        }
+        uint8_t screen = SCREEN_DASHBOARD;
+        ESP_ERROR_CHECK(esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_START, &screen, sizeof(screen), portMAX_DELAY));
         break;
+    }
     default:
         break;
     }
@@ -203,9 +203,9 @@ static esp_err_t app_attribute_update_cb(attribute::callback_type_t type, uint16
                         &data, sizeof(struct view_data_matter_dashboard_data ), portMAX_DELAY);                     
                 }
             }
-        } else if (endpoint_id == door_lock_endpoint_id) {
-            if (cluster_id == DoorLock::Id) {
-                if (attribute_id == DoorLock::Attributes::LockState::Id) {
+        } else if (endpoint_id == on_off_light_endpoint_id) {
+            if (cluster_id == OnOff::Id) {
+                if (attribute_id == OnOff::Attributes::OnOff::Id) {
                     struct view_data_matter_dashboard_data data;
                     data.dashboard_data_type = DASHBOARD_DATA_SWITCH;
                     data.value = (int)val->val.b;
@@ -221,7 +221,7 @@ static esp_err_t app_attribute_update_cb(attribute::callback_type_t type, uint16
 }
 
 static void __matter_temperature_reporter(void* arg) {       
-    if (__g_matter_connected_flag && __g_ip_connected_flag) {       
+    if (__g_matter_connected_flag) {       
         uint16_t endpoint_id = temperature_endpoint_id;
         uint32_t cluster_id = TemperatureMeasurement::Id;
         uint32_t attribute_id = TemperatureMeasurement::Attributes::MeasuredValue::Id;
@@ -243,7 +243,7 @@ static void __matter_temperature_reporter(void* arg) {
 }
 
 static void __matter_humidity_reporter(void* arg) {   
-    if (__g_matter_connected_flag && __g_ip_connected_flag) {       
+    if (__g_matter_connected_flag) {       
         uint16_t endpoint_id = humidity_endpoint_id;
         uint32_t cluster_id = RelativeHumidityMeasurement::Id;
         uint32_t attribute_id = RelativeHumidityMeasurement::Attributes::MeasuredValue::Id;
@@ -298,9 +298,9 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                     break;
                 }
                 case DASHBOARD_DATA_SWITCH: {
-                    uint16_t endpoint_id = door_lock_endpoint_id;
-                    uint32_t cluster_id = DoorLock::Id;
-                    uint32_t attribute_id = DoorLock::Attributes::LockState::Id;
+                    uint16_t endpoint_id = on_off_light_endpoint_id;
+                    uint32_t cluster_id = OnOff::Id;
+                    uint32_t attribute_id = OnOff::Attributes::OnOff::Id;
                     node_t *node = node::get();
                     endpoint_t *endpoint = endpoint::get(node, endpoint_id);
                     cluster_t *cluster = cluster::get(endpoint, cluster_id);
@@ -407,7 +407,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
 
 int indicator_matter_setup(void) {
     esp_err_t err = ESP_OK;
-    __g_matter_connected_flag = chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned();
+    __g_matter_connected_flag = chip::Server::GetInstance().GetFabricTable().FabricCount() > 0;
     __g_matter_mutex  =  xSemaphoreCreateMutex();  
     node::config_t node_config;
     node_t *node = node::create(&node_config, app_attribute_update_cb, app_identification_cb);
@@ -427,8 +427,8 @@ int indicator_matter_setup(void) {
     endpoint_t *color_temperature_light_endpoint = color_temperature_light::create(node, &color_temperature_light_config, ENDPOINT_FLAG_NONE, NULL);
 
     // Create the contact sensor endpoint
-    door_lock::config_t door_lock_config;
-    endpoint_t *door_lock_endpoint = door_lock::create(node, &door_lock_config, ENDPOINT_FLAG_NONE, NULL);
+    on_off_light::config_t on_off_light_config;
+    endpoint_t *on_off_light_endpoint = on_off_light::create(node, &on_off_light_config, ENDPOINT_FLAG_NONE, NULL);
 
     color_temperature_light::config_t color_temperature_light_config2;
     color_temperature_light_config2.level_control.lighting.min_level = 1;
@@ -439,7 +439,7 @@ int indicator_matter_setup(void) {
         !temperature_endpoint || 
         !humidity_endpoint ||
         !color_temperature_light_endpoint ||
-        !door_lock_endpoint ||
+        !on_off_light_endpoint ||
         !color_temperature_light_endpoint2
     ) {
         ESP_LOGE(TAG, "Matter node creation failed");
@@ -454,8 +454,8 @@ int indicator_matter_setup(void) {
     color_temperature_light_endpoint_id = endpoint::get_id(color_temperature_light_endpoint);
     ESP_LOGI(TAG, "Dimmable light created with endpoint_id %d", color_temperature_light_endpoint_id);
 
-    door_lock_endpoint_id = endpoint::get_id(door_lock_endpoint);
-    ESP_LOGI(TAG, "Door lock created with endpoint_id %d", door_lock_endpoint_id);
+    on_off_light_endpoint_id = endpoint::get_id(on_off_light_endpoint);
+    ESP_LOGI(TAG, "Door lock created with endpoint_id %d", on_off_light_endpoint_id);
 
     color_temperature_light_endpoint2_id = endpoint::get_id(color_temperature_light_endpoint2);
     ESP_LOGI(TAG, "Dimmable plugin 2 unit created with endpoint_id %d", color_temperature_light_endpoint2_id);
