@@ -90,20 +90,6 @@ struct view_data_sensor_data
     float  value;
 };
 
-struct view_data_sensor_history_data
-{
-    enum sensor_data_type sensor_type;
-    struct sensor_data_average data_day[24];
-    struct sensor_data_minmax data_week[7];
-    uint8_t resolution;
-    
-    float day_min;
-    float day_max;
-    
-    float week_min;
-    float week_max;
-};
-
 enum {
     VIEW_EVENT_SCREEN_START = 0,  // uint8_t, enum start_screen, which screen when start
 
@@ -121,20 +107,12 @@ enum {
     VIEW_EVENT_SENSOR_TVOC,
     VIEW_EVENT_SENSOR_CO2,
 
-    VIEW_EVENT_SENSOR_TEMP_HISTORY,
-    VIEW_EVENT_SENSOR_HUMIDITY_HISTORY,
-    VIEW_EVENT_SENSOR_TVOC_HISTORY,
-    VIEW_EVENT_SENSOR_CO2_HISTORY,
-
-    VIEW_EVENT_SENSOR_DATA_HISTORY, //struct view_data_sensor_history_data
-
     VIEW_EVENT_TIME_CFG_UPDATE,  //  struct view_data_time_cfg
     VIEW_EVENT_TIME_CFG_APPLY,   //  struct view_data_time_cfg
 
     VIEW_EVENT_DISPLAY_CFG,         // struct view_data_display
     VIEW_EVENT_BRIGHTNESS_UPDATE,   // uint8_t brightness
     VIEW_EVENT_DISPLAY_CFG_APPLY,   // struct view_data_display. will save
-
 
     VIEW_EVENT_SHUTDOWN,      //NULL
     VIEW_EVENT_FACTORY_RESET, //NULL

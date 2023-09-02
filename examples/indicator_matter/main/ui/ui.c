@@ -133,17 +133,6 @@ lv_obj_t *ui_back3;
 lv_obj_t *ui_screen_factory;
 lv_obj_t *ui_factory_resetting_title;
 
-lv_obj_t *ui_screen_sensor_chart;
-lv_obj_t *ui_wifi_st_7;
-lv_obj_t *ui_back4;
-lv_obj_t *ui_sensor_data_title;
-lv_obj_t * ui_sensor_chart_day;
-lv_chart_series_t * ui_sensor_chart_day_series;
-
-lv_obj_t * ui_sensor_chart_week;
-lv_chart_series_t * ui_sensor_chart_week_series_hight;
-lv_chart_series_t * ui_sensor_chart_week_series_low;
-
 lv_obj_t *ui_screen_matter;
 lv_obj_t *ui_screen_matter_setup;
 lv_obj_t *ui_button_panel1;
@@ -1633,121 +1622,6 @@ lv_obj_set_style_text_font(ui_factory_resetting_title, &ui_font_font2, LV_PART_M
 lv_obj_set_style_text_color(ui_factory_resetting_title, lv_color_hex(0xCD3700), LV_PART_MAIN | LV_STATE_DEFAULT );
 }
 
-
-void ui_screen_sensor_chart_screen_init()
-{
-	ui_screen_sensor_chart = lv_obj_create(NULL);
-	//lv_obj_clear_flag( ui_screen_sensor_chart, LV_OBJ_FLAG_SCROLLABLE );
-
-	ui_wifi_st_7 = lv_img_create(ui_screen_sensor_chart);
-	lv_img_set_src(ui_wifi_st_7, &ui_img_wifi_disconet_png);
-	lv_obj_set_width( ui_wifi_st_7, LV_SIZE_CONTENT);  /// 1
-	lv_obj_set_height( ui_wifi_st_7, LV_SIZE_CONTENT);   /// 1
-	lv_obj_set_x( ui_wifi_st_7, -20 );
-	lv_obj_set_y( ui_wifi_st_7, 20 );
-	lv_obj_set_align( ui_wifi_st_7, LV_ALIGN_TOP_RIGHT );
-	lv_obj_add_flag( ui_wifi_st_7, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
-	lv_obj_clear_flag( ui_wifi_st_7, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-
-	ui_back4 = lv_btn_create(ui_screen_sensor_chart);
-	lv_obj_set_width( ui_back4, 100);
-	lv_obj_set_height( ui_back4, 50);
-	lv_obj_set_x( ui_back4, 10 );
-	lv_obj_set_y( ui_back4, 30 );
-	lv_obj_add_flag( ui_back4, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
-	lv_obj_clear_flag( ui_back4, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-	lv_obj_set_style_bg_color(ui_back4, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_bg_opa(ui_back4, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-	lv_obj_set_style_bg_img_src( ui_back4, &ui_img_back_png, LV_PART_MAIN | LV_STATE_DEFAULT );
-
-      lv_obj_add_event_cb(ui_back4, ui_event_back4, LV_EVENT_ALL, NULL);
-
-	ui_sensor_data_title = lv_label_create(ui_screen_sensor_chart);
-	lv_obj_set_width( ui_sensor_data_title, LV_SIZE_CONTENT);  /// 1
-	lv_obj_set_height( ui_sensor_data_title, LV_SIZE_CONTENT);   /// 1
-	lv_obj_set_x( ui_sensor_data_title, 0 );
-	lv_obj_set_y( ui_sensor_data_title, 50 );
-	lv_obj_set_align( ui_sensor_data_title, LV_ALIGN_TOP_MID );
-	lv_label_set_text(ui_sensor_data_title,"Temp"); //modify
-	lv_obj_set_style_text_font(ui_sensor_data_title, &ui_font_font1, LV_PART_MAIN| LV_STATE_DEFAULT);
-
-
-	lv_obj_t * sensor_chat_panel = lv_obj_create(ui_screen_sensor_chart);
-	lv_obj_set_align( sensor_chat_panel, LV_ALIGN_TOP_MID );
-	lv_obj_set_width( sensor_chat_panel, 480);
-	lv_obj_set_height( sensor_chat_panel, 400);
-	lv_obj_set_x( sensor_chat_panel, 0 );
-	lv_obj_set_y( sensor_chat_panel, 75 );
-
-	lv_obj_set_style_bg_color( sensor_chat_panel, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_bg_grad_color( sensor_chat_panel, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_border_color( sensor_chat_panel, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-
-
-	lv_obj_t * tabview = lv_tabview_create( sensor_chat_panel, LV_DIR_TOP, 40);
-    lv_obj_t * ui_tab_day = lv_tabview_add_tab(tabview, "Day");
-    lv_obj_t * ui_tab_week = lv_tabview_add_tab(tabview, "Week");
-
-	lv_obj_set_style_bg_color(tabview, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_bg_grad_color(tabview, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_border_color(tabview, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-
-
-	lv_obj_set_style_bg_color(ui_tab_day, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_bg_grad_color(ui_tab_day, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_border_color(ui_tab_day, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-
-	lv_obj_set_style_bg_color(ui_tab_week, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_bg_grad_color(ui_tab_week, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_border_color(ui_tab_week, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-
-
-    // day chart
-    ui_sensor_chart_day = lv_chart_create( ui_tab_day );
-
-	lv_obj_set_style_bg_color(ui_sensor_chart_day, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_bg_grad_color(ui_sensor_chart_day, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_border_color(ui_sensor_chart_day, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-
-    lv_obj_refresh_ext_draw_size(ui_sensor_chart_day);
-    lv_chart_set_zoom_x(ui_sensor_chart_day, 800);
-
-    //lv_chart_set_axis_tick(ui_sensor_chart_day, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 5, 1, true, 80);
-    lv_chart_set_axis_tick(ui_sensor_chart_day, LV_CHART_AXIS_PRIMARY_X, 0, 0, 24, 1, true, 50);
-    //lv_chart_set_range(ui_sensor_chart_day, LV_CHART_AXIS_PRIMARY_X, 0, 200);
-    lv_chart_set_range(ui_sensor_chart_day, LV_CHART_AXIS_PRIMARY_Y, -200, 600); //modify
-
-    lv_chart_set_div_line_count(ui_sensor_chart_day, 0, 24);
-    lv_chart_set_point_count(ui_sensor_chart_day, 24);
-
-    lv_obj_set_style_border_side(ui_sensor_chart_day, LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_BOTTOM, 0);
-
-    ui_sensor_chart_day_series = lv_chart_add_series(ui_sensor_chart_day, lv_palette_main(LV_PALETTE_YELLOW), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_series_color(ui_sensor_chart_day, ui_sensor_chart_day_series, lv_palette_main(LV_PALETTE_GREEN)); //modify
-
-    // week chart
-    ui_sensor_chart_week = lv_chart_create( ui_tab_week );
-
-	lv_obj_set_style_bg_color(ui_sensor_chart_week, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_bg_grad_color(ui_sensor_chart_week, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-	lv_obj_set_style_border_color(ui_sensor_chart_week, lv_color_hex(0x101418), LV_PART_MAIN | LV_STATE_DEFAULT );
-
-    lv_obj_refresh_ext_draw_size(ui_sensor_chart_week);
-    lv_chart_set_zoom_x(ui_sensor_chart_week, 256);
-
-    //lv_chart_set_axis_tick(ui_sensor_chart_week, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 5, 1, true, 80);
-    lv_chart_set_axis_tick(ui_sensor_chart_week, LV_CHART_AXIS_PRIMARY_X, 0, 0, 7, 1, true, 50);
-    //lv_chart_set_range(ui_sensor_chart_week, LV_CHART_AXIS_PRIMARY_X, 0, 200);
-    lv_chart_set_range(ui_sensor_chart_week, LV_CHART_AXIS_PRIMARY_Y, -200, 600);
-
-    lv_chart_set_div_line_count(ui_sensor_chart_week, 0, 7);
-    lv_chart_set_point_count(ui_sensor_chart_week, 7);
-
-    ui_sensor_chart_week_series_hight = lv_chart_add_series(ui_sensor_chart_week, lv_palette_main(LV_PALETTE_YELLOW), LV_CHART_AXIS_PRIMARY_Y);
-    ui_sensor_chart_week_series_low = lv_chart_add_series(ui_sensor_chart_week, lv_palette_main(LV_PALETTE_YELLOW), LV_CHART_AXIS_PRIMARY_Y);
-
-}
-
 void ui_init( void )
 {
 lv_disp_t *dispp = lv_disp_get_default();
@@ -1761,6 +1635,5 @@ ui_screen_date_time_screen_init();
 ui_screen_matter_setup_screen_init();
 ui_screen_matter_screen_init();
 ui_screen_factory_screen_init();
-ui_screen_sensor_chart_screen_init();
 lv_disp_load_scr( ui_screen_time);
 }

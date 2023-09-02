@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#define STANDARD_BRIGHTNESS 100
+#define MATTER_BRIGHTNESS 254
 
 int indicator_matter_setup(void);
 int indicator_matter_init(void);

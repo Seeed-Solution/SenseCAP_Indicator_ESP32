@@ -251,57 +251,10 @@ static void __display_cfg_event_init(void)
     lv_obj_add_event_cb(ui_back1, __display_cfg_apply_event_cb, LV_EVENT_PRESSED, NULL);
 }
 
-
-/**********************  sensor chart **********************/
-
-static void ui_event_sensor_co2_chart( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
-    lv_obj_t * cur_screen = lv_scr_act();
-if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_sensor ) {
-    esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_CO2_HISTORY, NULL, 0, portMAX_DELAY);
-
-    _ui_screen_change( ui_screen_sensor_chart, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 0);
-}
-}
-
-static void ui_event_sensor_tvoc_chart( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
-    lv_obj_t * cur_screen = lv_scr_act();
-if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_sensor ) {
-    esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_TVOC_HISTORY, NULL, 0, portMAX_DELAY);
-      _ui_screen_change( ui_screen_sensor_chart, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 0);
-}
-}
-static void ui_event_sensor_temp_chart( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
-    lv_obj_t * cur_screen = lv_scr_act();
-if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_sensor ) {
-    esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_TEMP_HISTORY, NULL, 0, portMAX_DELAY);
-      _ui_screen_change( ui_screen_sensor_chart, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 0);
-}
-}
-static void ui_event_sensor_humidity_chart( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
-    lv_obj_t * cur_screen = lv_scr_act();
-if ( event_code == LV_EVENT_CLICKED &&  cur_screen == ui_screen_sensor ) {
-     esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SENSOR_HUMIDITY_HISTORY, NULL, 0, portMAX_DELAY);
-      _ui_screen_change( ui_screen_sensor_chart, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 0);
-}
-}
-
-static void __sensor_chart_event_init(void)
-{
-    lv_obj_add_event_cb(ui_co2, ui_event_sensor_co2_chart, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_tvoc_2, ui_event_sensor_tvoc_chart, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_temp2, ui_event_sensor_temp_chart, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_humidity2, ui_event_sensor_humidity_chart, LV_EVENT_ALL, NULL);
-}
-
 int indicator_controller_init(void)
 {
     __time_cfg_event_init();
     __display_cfg_event_init();
-    __sensor_chart_event_init();
 
     return 0;
 }
