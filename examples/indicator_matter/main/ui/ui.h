@@ -135,17 +135,6 @@ extern lv_obj_t *ui_back3;
 extern lv_obj_t *ui_screen_factory;
 extern lv_obj_t *ui_factory_resetting_title;
 
-extern lv_obj_t *ui_screen_sensor_chart;
-extern lv_obj_t *ui_wifi_st_7;
-extern lv_obj_t *ui_back4;
-extern lv_obj_t *ui_sensor_data_title;
-extern lv_obj_t * ui_sensor_chart_day;
-extern lv_chart_series_t * ui_sensor_chart_day_series;
-
-extern lv_obj_t * ui_sensor_chart_week;
-extern lv_chart_series_t * ui_sensor_chart_week_series_hight;
-extern lv_chart_series_t * ui_sensor_chart_week_series_low;
-
 extern lv_obj_t *ui_screen_matter_setup;
 extern lv_obj_t *ui_screen_matter_settings;
 extern lv_obj_t *ui_screen_matter;
