@@ -52,8 +52,8 @@ static void mqtt_start_interface(const instance_mqtt *instance, enum MQTT_START_
     if (instance->mqtt_connected_flag) {
         switch (flag) {
             case MQTT_RESTART:
-                esp_mqtt_client_stop(instance->mqtt_client);
-                esp_mqtt_client_destroy(instance->mqtt_client);
+                // esp_mqtt_client_stop(instance->mqtt_client);
+                // esp_mqtt_client_destroy(instance->mqtt_client);
                 break;
             case MQTT_START:
                 ESP_LOGW(TAG, "%s is already connected.", instance->mqtt_name);

@@ -217,19 +217,19 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
             instance_ptr->mqtt_connected_flag = true;
 
-            for (int i; i < CONFIG_HA_SENSOR_ENTITY_NUM; i++) {
+            for (int i = 0; i < CONFIG_HA_SENSOR_ENTITY_NUM; i++) {
                 msg_id = esp_mqtt_client_subscribe(client, ha_sensor_entites[i].topic, ha_sensor_entites[i].qos);
                 ESP_LOGI(TAG, "subscribe:%s, msg_id=%d", ha_sensor_entites[i].topic, msg_id);
             }
 
-            for (int i; i < CONFIG_HA_SWITCH_ENTITY_NUM; i++) {
+            for (int i = 0; i < CONFIG_HA_SWITCH_ENTITY_NUM; i++) {
                 msg_id = esp_mqtt_client_subscribe(client, ha_switch_entites[i].topic_set, ha_switch_entites[i].qos);
                 ESP_LOGI(TAG, "subscribe:%s, msg_id=%d", ha_switch_entites[i].topic_set, msg_id);
             }
 
             //  restore switch state for UI and HA.
             struct view_data_ha_switch_data switch_data;
-            for (int i; i < CONFIG_HA_SWITCH_ENTITY_NUM; i++) {
+            for (int i = 0; i < CONFIG_HA_SWITCH_ENTITY_NUM; i++) {
                 switch_data.index = i;
                 switch_data.value = switch_state[i];
                 esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_HA_SWITCH_SET, &switch_data, sizeof(switch_data), portMAX_DELAY);
@@ -241,6 +241,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         case MQTT_EVENT_DISCONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
             instance_ptr->mqtt_connected_flag = false;
+            
             break;
         case MQTT_EVENT_SUBSCRIBED:
             ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
@@ -400,19 +401,19 @@ static void __cfg_event_handler(void *handler_args, esp_event_base_t base, int32
     switch (id) {
         case HA_CFG_SET:
             ESP_LOGI(TAG, "event: HA_CFG_BROKER_SET");
-            p_cfg = (ha_cfg_interface *)event_data;
-            ha_cfg_set(p_cfg);
+            // p_cfg = (ha_cfg_interface *)event_data;
             // ESP_LOGI(TAG, "| Broker Address               | %-40s |", p_cfg->broker_url);
             // ESP_LOGI(TAG, "| Client ID                    | %-40s |", p_cfg->client_id);
             // ESP_LOGI(TAG, "| MQTT username                | %-40s |", p_cfg->username);
             // ESP_LOGI(TAG, "| MQTT password                | %-40s |", p_cfg->password);
-            // restart mqtt
+            // restart will run _mqtt_ha_start, read configuration from nvs
             esp_event_post_to(mqtt_app_event_handle, MQTT_APP_EVENT_BASE, MQTT_APP_RESTART, &instance_ptr, sizeof(instance_mqtt_t), portMAX_DELAY);
             break;
         default:
             break;
     }
 }
+
 static void _mqtt_ha_start(instance_mqtt *instance)
 {
     if (get_mqtt_net_flag() == false) {
@@ -421,6 +422,12 @@ static void _mqtt_ha_start(instance_mqtt *instance)
 
     if (instance->mqtt_cfg != NULL) {
         free(instance->mqtt_cfg);
+    }
+
+    if(instance->mqtt_client != NULL)
+    {
+        esp_mqtt_client_stop(instance->mqtt_client);
+        esp_mqtt_client_destroy(instance->mqtt_client);
     }
 
     // read from nvs
@@ -441,7 +448,7 @@ static void _mqtt_ha_start(instance_mqtt *instance)
     ESP_LOGI(TAG, "| password                     | %-40s |", hf_cfg.password);
 
     instance->mqtt_client = esp_mqtt_client_init(instance->mqtt_cfg);
-    esp_mqtt_client_register_event(instance_ptr->mqtt_client, ESP_EVENT_ANY_ID, instance->mqtt_event_handler, NULL);
+    esp_mqtt_client_register_event(instance->mqtt_client, ESP_EVENT_ANY_ID, instance->mqtt_event_handler, NULL);
     esp_mqtt_client_start(instance->mqtt_client);
 }
 
@@ -465,7 +472,7 @@ void mqtt_ha_init(void)
 {
     mqtt_ha_instance.is_using = true;
     /*instance_ptr = &mqtt_ha_instance;*/
-    __mqtt_ha_init(instance_ptr);
+    __mqtt_ha_init(&mqtt_ha_instance);
 
     ESP_LOGI(TAG, "mqtt_ha_init");
 
@@ -523,5 +530,4 @@ int indicator_ha_init(void)
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
                                                              VIEW_EVENT_BASE, VIEW_EVENT_HA_SWITCH_ST,
                                                              __view_event_handler, NULL, NULL));
-
 }

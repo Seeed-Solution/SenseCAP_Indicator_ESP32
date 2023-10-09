@@ -121,13 +121,14 @@ static int mqtt_config_set(int argc, char **argv)
         strncpy(ha_cfg.client_id, mqtt_args.client_id->sval[0], sizeof(ha_cfg.client_id) - 1);
         ESP_LOGI(TAG, "Set MQTT client ID: %s", ha_cfg.client_id);
     }
-
-    esp_event_post_to(cmd_cfg_event_handle, CMD_CFG_EVENT_BASE, HA_CFG_SET, &ha_cfg, sizeof(ha_cfg_interface), portMAX_DELAY);
+    // Save the updated configuration to NVS, then alert, don't need to transport configuration.
+    ha_cfg_set(&ha_cfg);
+    esp_event_post_to(cmd_cfg_event_handle, CMD_CFG_EVENT_BASE, HA_CFG_SET, NULL, NULL, portMAX_DELAY);
 
     return 0;
 }
 
-// Register MQTT configuration command
+// Register MQTT configuration command  
 static void register_mqtt_config(void)
 {
     mqtt_args.username          = arg_str0("u", "usr", "<username>", "MQTT username");
