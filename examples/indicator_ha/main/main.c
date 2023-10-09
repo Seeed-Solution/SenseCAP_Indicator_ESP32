@@ -28,7 +28,6 @@ static const char *TAG = "app_main";
 ESP_EVENT_DEFINE_BASE(VIEW_EVENT_BASE);
 esp_event_loop_handle_t view_event_handle;
 
-
 void app_main(void)
 {
     ESP_LOGI("", SENSECAP, VERSION, __DATE__, __TIME__);
@@ -55,7 +54,7 @@ void app_main(void)
     indicator_model_init();
     indicator_controller_init();
 
-    static char buffer[128];    /* Make sure buffer is enough for `sprintf` */
+    // static char buffer[128];    /* Make sure buffer is enough for `sprintf` */
     while (1) {
         // sprintf(buffer, "   Biggest /     Free /    Total\n"
         //         "\t  DRAM : [%8d / %8d / %8d]\n"

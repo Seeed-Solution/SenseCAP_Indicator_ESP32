@@ -21,12 +21,8 @@
 extern "C" {
 #endif
 
-
 ESP_EVENT_DECLARE_BASE(VIEW_EVENT_BASE);
-
 extern esp_event_loop_handle_t view_event_handle;
-
-
 
 #ifdef __cplusplus
 }

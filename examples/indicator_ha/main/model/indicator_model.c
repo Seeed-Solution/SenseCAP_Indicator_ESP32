@@ -15,5 +15,7 @@ int indicator_model_init(void)
     indicator_city_init();
     indicator_display_init();  // lcd bl on
     indicator_btn_init();
+    indicator_cmd_init();
+    indicator_mqtt_init();
     indicator_ha_init();
 }
