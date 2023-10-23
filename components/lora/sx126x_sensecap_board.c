@@ -41,13 +41,25 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
     xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
 }
 
+uint32_t SX126xGetDio1PinState( void );
+
 static void expander_io_int(void* arg)
 {
     uint32_t io_num;
+    RadioOperatingModes_t  mode;
     for(;;) {
         if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
             //printf("GPIO[%"PRIu32"] intr, val: %d\n", io_num, gpio_get_level(io_num));
-            (g_dioIrq) (0); //handle irq
+            if( SX126xGetDio1PinState()) { // Only handle DIO1 interrupt
+                xSemaphoreTake(radio_mutex, portMAX_DELAY);
+                mode = SX126xGetOperatingMode();
+                xSemaphoreGive(radio_mutex);
+                if( mode !=  MODE_SLEEP ) { // Filter out sleep mode interrupts
+                    (g_dioIrq) (0); //handle irq
+                } else {
+                    ESP_LOGW(TAG, "Interrupt detected in sleep mode");
+                }
+            }
         }
     }
 }
@@ -282,6 +294,10 @@ void SX126xWriteCommand( RadioCommands_t command, uint8_t *buffer, uint16_t size
     SX126xCheckDeviceReady( );
 
     xSemaphoreTake(radio_mutex, portMAX_DELAY);
+    if(  command == RADIO_SET_SLEEP) {
+        // Update mode in advance to prevent interrupts from being triggered when the device is sleeping
+        SX126xSetOperatingMode( MODE_SLEEP ); 
+    }
     p_io_expander->set_level(EXPANDER_IO_RADIO_NSS, 0);
     spi_write_byte(( uint8_t *)&command, 1);
     spi_write_byte( buffer, size);
