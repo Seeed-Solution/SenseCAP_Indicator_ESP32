@@ -377,10 +377,10 @@ void LmHandlerProcess( void )
     uint16_t size = 0;
 
     // Process Radio IRQ
-    if( Radio.IrqProcess != NULL )
-    {
-        Radio.IrqProcess( );
-    }
+    // if( Radio.IrqProcess != NULL )
+    // {
+    //     Radio.IrqProcess( );
+    // }
 
     // Processes the LoRaMac events
     LoRaMacProcess( );

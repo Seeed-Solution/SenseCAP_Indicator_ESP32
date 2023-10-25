@@ -23,11 +23,11 @@
  * \endcode
  *
  */
-#include "board.h"
+// #include "board.h"
 
 #include "soft-se-hal.h"
 
 void SoftSeHalGetUniqueId( uint8_t *id )
 {
-    BoardGetUniqueId( id );
+    // BoardGetUniqueId( id ); //todo
 }

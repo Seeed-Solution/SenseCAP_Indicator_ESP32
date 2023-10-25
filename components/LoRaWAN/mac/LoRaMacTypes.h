@@ -44,7 +44,7 @@ extern "C"
 #include <stdbool.h>
 #include "timer.h"
 #include "systime.h"
-
+#include "LoRaMacKconfig.h"
 /*!
  * Start value for unicast keys enumeration
  */

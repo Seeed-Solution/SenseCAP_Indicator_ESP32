@@ -149,3 +149,12 @@ uint32_t Crc32Finalize( uint32_t crc )
 {
     return ~crc;
 }
+
+void BoardCriticalSectionBegin( uint32_t *mask )
+{
+}
+
+void BoardCriticalSectionEnd( uint32_t *mask )
+{
+}
+

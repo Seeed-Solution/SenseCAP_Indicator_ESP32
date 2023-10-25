@@ -70,6 +70,8 @@ uint16_t NvmDataMgmtRestore(void );
  */
 bool NvmDataMgmtFactoryReset( void );
 
+int nvm_init(void);
+
 /* \} */
 
 #ifdef __cplusplus

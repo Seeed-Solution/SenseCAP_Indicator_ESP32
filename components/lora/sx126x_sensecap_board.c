@@ -56,9 +56,10 @@ static void expander_io_int(void* arg)
                 xSemaphoreGive(radio_mutex);
                 if( mode !=  MODE_SLEEP ) { // Filter out sleep mode interrupts
                     (g_dioIrq) (0); //handle irq
-                } else {
-                    ESP_LOGW(TAG, "Interrupt detected in sleep mode");
-                }
+                } 
+                // else {
+                //     ESP_LOGW(TAG, "Interrupt detected in sleep mode");
+                // }
             }
         }
     }

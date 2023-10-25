@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "board.h"
+#include "esp_system.h" //#include "board.h"
 #include "NvmDataMgmt.h"
 #include "LoRaMacTest.h"
 #include "LmHandler.h"
@@ -287,7 +287,8 @@ static void LmhpComplianceProcess( void )
         ComplianceTestState.IsResetCmdPending = false;
 
         // Call platform MCU reset API
-        BoardResetMcu( );
+        //BoardResetMcu( );
+        esp_restart();
     }
 }
 
