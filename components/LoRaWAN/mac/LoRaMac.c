@@ -48,6 +48,9 @@
 
 #include "LoRaMac.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+
 /*!
  * Maximum PHY layer payload size
  */
@@ -277,6 +280,8 @@ static LoRaMacNvmData_t Nvm;
 
 static Band_t RegionBands[REGION_NVM_MAX_NB_BANDS];
 
+
+
 /*!
  * Defines the LoRaMac radio events status
  */
@@ -298,6 +303,8 @@ typedef union uLoRaMacRadioEvents
  * LoRaMac radio events status
  */
 LoRaMacRadioEvents_t LoRaMacRadioEvents = { .Value = 0 };
+
+static SemaphoreHandle_t  LoRaMacRadioEventsMutex;
 
 /*!
  * \brief Function to be executed on Radio Tx Done event
@@ -751,7 +758,9 @@ static void OnRadioTxDone( void )
 
     MacCtx.LastTxSysTime = SysTimeGet( );
 
+    xSemaphoreTake(LoRaMacRadioEventsMutex, portMAX_DELAY);
     LoRaMacRadioEvents.Events.TxDone = 1;
+    xSemaphoreGive(LoRaMacRadioEventsMutex);
 
     OnMacProcessNotify( );
 }
@@ -764,30 +773,36 @@ static void OnRadioRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t
     RxDoneParams.Rssi = rssi;
     RxDoneParams.Snr = snr;
 
+    xSemaphoreTake(LoRaMacRadioEventsMutex, portMAX_DELAY);
     LoRaMacRadioEvents.Events.RxDone = 1;
     LoRaMacRadioEvents.Events.RxProcessPending = 1;
+    xSemaphoreGive(LoRaMacRadioEventsMutex);
 
     OnMacProcessNotify( );
 }
 
 static void OnRadioTxTimeout( void )
 {
+    xSemaphoreTake(LoRaMacRadioEventsMutex, portMAX_DELAY);
     LoRaMacRadioEvents.Events.TxTimeout = 1;
+    xSemaphoreGive(LoRaMacRadioEventsMutex);
 
     OnMacProcessNotify( );
 }
 
 static void OnRadioRxError( void )
 {
+    xSemaphoreTake(LoRaMacRadioEventsMutex, portMAX_DELAY);
     LoRaMacRadioEvents.Events.RxError = 1;
-
+    xSemaphoreGive(LoRaMacRadioEventsMutex);
     OnMacProcessNotify( );
 }
 
 static void OnRadioRxTimeout( void )
 {
+    xSemaphoreTake(LoRaMacRadioEventsMutex, portMAX_DELAY);
     LoRaMacRadioEvents.Events.RxTimeout = 1;
-
+    xSemaphoreGive(LoRaMacRadioEventsMutex);
     OnMacProcessNotify( );
 }
 
@@ -893,7 +908,9 @@ static void ProcessRadioRxDone( void )
     uint8_t macCmdPayload[2] = { 0 };
     Mlme_t joinType = MLME_JOIN;
 
+    xSemaphoreTake(LoRaMacRadioEventsMutex, portMAX_DELAY);
     LoRaMacRadioEvents.Events.RxProcessPending = 0;
+    xSemaphoreGive(LoRaMacRadioEventsMutex);
 
     MacCtx.McpsConfirm.AckReceived = false;
     MacCtx.McpsIndication.Rssi = rssi;
@@ -1533,10 +1550,13 @@ static void LoRaMacHandleIrqEvents( void )
 {
     LoRaMacRadioEvents_t events;
 
-    CRITICAL_SECTION_BEGIN( );
+    // CRITICAL_SECTION_BEGIN( );
+    xSemaphoreTake(LoRaMacRadioEventsMutex, portMAX_DELAY);
     events = LoRaMacRadioEvents;
     LoRaMacRadioEvents.Value = 0;
-    CRITICAL_SECTION_END( );
+    // CRITICAL_SECTION_END( );
+    xSemaphoreGive(LoRaMacRadioEventsMutex);
+
 
     if( events.Value != 0 )
     {
@@ -3916,6 +3936,7 @@ LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t* primitives, LoRaMacC
 
     // Initialize MAC radio events
     LoRaMacRadioEvents.Value = 0;
+    LoRaMacRadioEventsMutex = xSemaphoreCreateMutex();
 
     // Initialize Radio driver
     MacCtx.RadioEvents.TxDone = OnRadioTxDone;
