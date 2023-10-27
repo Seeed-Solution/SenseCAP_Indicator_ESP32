@@ -748,13 +748,17 @@ struct
     int8_t Snr;
 }RxDoneParams;
 
+extern TimerTime_t g_lora_irq_time;
+
 static void OnRadioTxDone( void )
 {
-    extern TimerTime_t g_lora_irq_time;
+
     if( g_lora_irq_time != 0) {
         TxDoneParams.CurTime = g_lora_irq_time;  //It takes 27ms from the start of the interrupt to the execution here.
+    } else {
+        TxDoneParams.CurTime = TimerGetCurrentTime();
     }
-    //printf("OnRadioTxDone : %d, %d\r\n",  TxDoneParams.CurTime, TimerGetCurrentTime() - TxDoneParams.CurTime);
+    // printf("OnRadioTxDone : %d, %d\r\n",  TxDoneParams.CurTime, TimerGetCurrentTime() - TxDoneParams.CurTime);
 
     MacCtx.LastTxSysTime = SysTimeGet( );
 
@@ -767,7 +771,11 @@ static void OnRadioTxDone( void )
 
 static void OnRadioRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
 {
-    RxDoneParams.LastRxDone = TimerGetCurrentTime( );
+    if( g_lora_irq_time != 0) {
+        RxDoneParams.LastRxDone = g_lora_irq_time;
+    } else {
+        RxDoneParams.LastRxDone = TimerGetCurrentTime();
+    }
     RxDoneParams.Payload = payload;
     RxDoneParams.Size = size;
     RxDoneParams.Rssi = rssi;
