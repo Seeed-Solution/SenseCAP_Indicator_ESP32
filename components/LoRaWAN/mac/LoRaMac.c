@@ -743,7 +743,12 @@ struct
 
 static void OnRadioTxDone( void )
 {
-    TxDoneParams.CurTime = TimerGetCurrentTime( );
+    extern TimerTime_t g_lora_irq_time;
+    if( g_lora_irq_time != 0) {
+        TxDoneParams.CurTime = g_lora_irq_time;  //It takes 27ms from the start of the interrupt to the execution here.
+    }
+    //printf("OnRadioTxDone : %d, %d\r\n",  TxDoneParams.CurTime, TimerGetCurrentTime() - TxDoneParams.CurTime);
+
     MacCtx.LastTxSysTime = SysTimeGet( );
 
     LoRaMacRadioEvents.Events.TxDone = 1;
@@ -3263,6 +3268,7 @@ static void RxWindowSetup( TimerEvent_t* rxTimer, RxConfigParams_t* rxConfig )
 
     if( RegionRxConfig( Nvm.MacGroup2.Region, rxConfig, ( int8_t* )&MacCtx.McpsIndication.RxDatarate ) == true )
     {
+        //printf("Rx max Window: %d ms,  windowtimeout: %d ms, WindowOffset: %d ms\r\n", Nvm.MacGroup2.MacParams.MaxRxWindow, rxConfig->WindowTimeout,  rxConfig->WindowOffset);
         Radio.Rx( Nvm.MacGroup2.MacParams.MaxRxWindow );
         MacCtx.RxSlot = rxConfig->RxSlot;
     }
