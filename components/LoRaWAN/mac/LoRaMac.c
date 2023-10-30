@@ -51,6 +51,15 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 
+#define TAG "loramac"
+
+#define LORA_MAC_MUTEX_TAKE(mutex) if (!xSemaphoreTake(mutex, pdMS_TO_TICKS(5000))) { \
+        ESP_LOGE(TAG,"loramac take mutex timeout %s:%d (%s)", __FILE__, __LINE__, __FUNCTION__); \
+    }
+
+#define LORA_MAC_MUTEX_GIVE(mutex) if (!xSemaphoreGive(mutex)) { \
+        ESP_LOGE(TAG, "loramac give mutex failed"); \
+    }
 /*!
  * Maximum PHY layer payload size
  */
@@ -280,6 +289,8 @@ static LoRaMacNvmData_t Nvm;
 
 static Band_t RegionBands[REGION_NVM_MAX_NB_BANDS];
 
+static SemaphoreHandle_t  LoRaMacMutex; // Operation protection for timer tasks and interrupt tasks
+
 
 
 /*!
@@ -341,6 +352,7 @@ static void OnRadioRxTimeout( void );
  * \brief Function executed on duty cycle delayed Tx  timer event
  */
 static void OnTxDelayedTimerEvent( void* context );
+static void OnTxDelayedTimerEvent1( void* context );
 
 /*!
  * \brief Function executed on first Rx window timer event
@@ -367,12 +379,12 @@ static void OnRejoin1CycleTimerEvent( void* context );
  *        which was requested by a ForceRejoinReq MAC command.
  */
 static void OnForceRejoinReqCycleTimerEvent( void* context );
-
+static void OnForceRejoinReqCycleTimerEvent1( void* context );
 /*!
  * \brief Function executed on AckTimeout timer event
  */
 static void OnRetransmitTimeoutTimerEvent( void* context );
-
+static void OnRetransmitTimeoutTimerEvent1( void* context );
 /*!
  * Computes next 32 bit downlink counter value and determines the frame counter ID.
  *
@@ -752,7 +764,7 @@ extern TimerTime_t g_lora_irq_time;
 
 static void OnRadioTxDone( void )
 {
-
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex)
     if( g_lora_irq_time != 0) {
         TxDoneParams.CurTime = g_lora_irq_time;  //It takes 27ms from the start of the interrupt to the execution here.
     } else {
@@ -767,10 +779,13 @@ static void OnRadioTxDone( void )
     xSemaphoreGive(LoRaMacRadioEventsMutex);
 
     OnMacProcessNotify( );
+
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
 static void OnRadioRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
 {
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex)
     if( g_lora_irq_time != 0) {
         RxDoneParams.LastRxDone = g_lora_irq_time;
     } else {
@@ -787,6 +802,7 @@ static void OnRadioRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t
     xSemaphoreGive(LoRaMacRadioEventsMutex);
 
     OnMacProcessNotify( );
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
 static void OnRadioTxTimeout( void )
@@ -1904,6 +1920,7 @@ static bool LoRaMacHandleResponseTimeout( TimerTime_t timeoutInMs, TimerTime_t s
 void LoRaMacProcess( void )
 {
     uint8_t noTx = false;
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex)
 
     LoRaMacHandleIrqEvents( );
     LoRaMacClassBProcess( );
@@ -1941,6 +1958,7 @@ void LoRaMacProcess( void )
         MacCtx.MacFlags.Bits.NvmHandle = 0;
         LoRaMacHandleNvm( &Nvm );
     }
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
 static void OnTxDelayedTimerEvent( void* context )
@@ -1975,9 +1993,16 @@ static void OnTxDelayedTimerEvent( void* context )
         }
     }
 }
+static void OnTxDelayedTimerEvent1( void* context )
+{
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex);
+    OnTxDelayedTimerEvent(context);
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
+}
 
 static void OnRxWindow1TimerEvent( void* context )
 {
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex)
     MacCtx.RxWindow1Config.Channel = MacCtx.Channel;
     MacCtx.RxWindow1Config.DrOffset = Nvm.MacGroup2.MacParams.Rx1DrOffset;
     MacCtx.RxWindow1Config.DownlinkDwellTime = Nvm.MacGroup2.MacParams.DownlinkDwellTime;
@@ -1986,6 +2011,7 @@ static void OnRxWindow1TimerEvent( void* context )
     MacCtx.RxWindow1Config.NetworkActivation = Nvm.MacGroup2.NetworkActivation;
 
     RxWindowSetup( &MacCtx.RxWindowTimer1, &MacCtx.RxWindow1Config );
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
 static void OnRxWindow2TimerEvent( void* context )
@@ -1996,6 +2022,7 @@ static void OnRxWindow2TimerEvent( void* context )
     {
         return;
     }
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex);
     MacCtx.RxWindow2Config.Channel = MacCtx.Channel;
     MacCtx.RxWindow2Config.Frequency = Nvm.MacGroup2.MacParams.Rx2Channel.Frequency;
     MacCtx.RxWindow2Config.DownlinkDwellTime = Nvm.MacGroup2.MacParams.DownlinkDwellTime;
@@ -2004,6 +2031,7 @@ static void OnRxWindow2TimerEvent( void* context )
     MacCtx.RxWindow2Config.NetworkActivation = Nvm.MacGroup2.NetworkActivation;
 
     RxWindowSetup( &MacCtx.RxWindowTimer2, &MacCtx.RxWindow2Config );
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
 static void OnRetransmitTimeoutTimerEvent( void* context )
@@ -2015,6 +2043,12 @@ static void OnRetransmitTimeoutTimerEvent( void* context )
         MacCtx.RetransmitTimeoutRetry = true;
     }
     OnMacProcessNotify( );
+}
+static void OnRetransmitTimeoutTimerEvent1( void* context )
+{
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex);
+    OnRetransmitTimeoutTimerEvent(context);
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
 static LoRaMacCryptoStatus_t GetFCntDown( AddressIdentifier_t addrID, FType_t fType, LoRaMacMessageData_t* macMsg, Version_t lrWanVersion,
@@ -3808,6 +3842,8 @@ LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t* primitives, LoRaMacC
         return LORAMAC_STATUS_REGION_NOT_SUPPORTED;
     }
 
+    LoRaMacMutex = xSemaphoreCreateMutex();
+
     // Confirm queue reset
     LoRaMacConfirmQueueInit( primitives );
 
@@ -3931,13 +3967,13 @@ LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t* primitives, LoRaMacC
     Nvm.MacGroup1.AggregatedTimeOff = 0;
 
     // Initialize timers
-    TimerInit( &MacCtx.TxDelayedTimer, OnTxDelayedTimerEvent );
+    TimerInit( &MacCtx.TxDelayedTimer, OnTxDelayedTimerEvent1 );
     TimerInit( &MacCtx.RxWindowTimer1, OnRxWindow1TimerEvent );
     TimerInit( &MacCtx.RxWindowTimer2, OnRxWindow2TimerEvent );
-    TimerInit( &MacCtx.RetransmitTimeoutTimer, OnRetransmitTimeoutTimerEvent );
+    TimerInit( &MacCtx.RetransmitTimeoutTimer, OnRetransmitTimeoutTimerEvent1 );
     TimerInit( &MacCtx.Rejoin0CycleTimer, OnRejoin0CycleTimerEvent );
     TimerInit( &MacCtx.Rejoin1CycleTimer, OnRejoin1CycleTimerEvent );
-    TimerInit( &MacCtx.ForceRejoinReqCycleTimer, OnForceRejoinReqCycleTimerEvent );
+    TimerInit( &MacCtx.ForceRejoinReqCycleTimer, OnForceRejoinReqCycleTimerEvent1 );
 
     // Store the current initialization time
     Nvm.MacGroup2.InitializationTime = SysTimeGetMcuTime( );
@@ -5665,6 +5701,7 @@ static bool ConvertRejoinCycleTime( uint32_t rejoinCycleTime, uint32_t* timeInMi
 
 static void OnRejoin0CycleTimerEvent( void* context )
 {
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex)
     TimerStop( &MacCtx.Rejoin0CycleTimer );
     ConvertRejoinCycleTime( Nvm.MacGroup2.Rejoin0CycleInSec, &MacCtx.Rejoin0CycleTime );
 
@@ -5674,10 +5711,12 @@ static void OnRejoin0CycleTimerEvent( void* context )
 
     TimerSetValue( &MacCtx.Rejoin0CycleTimer, MacCtx.Rejoin0CycleTime );
     TimerStart( &MacCtx.Rejoin0CycleTimer );
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
 static void OnRejoin1CycleTimerEvent( void* context )
 {
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex)
     TimerStop( &MacCtx.Rejoin1CycleTimer );
     ConvertRejoinCycleTime( Nvm.MacGroup2.Rejoin1CycleInSec, &MacCtx.Rejoin1CycleTime );
 
@@ -5687,6 +5726,7 @@ static void OnRejoin1CycleTimerEvent( void* context )
 
     TimerSetValue( &MacCtx.Rejoin1CycleTimer, MacCtx.Rejoin1CycleTime );
     TimerStart( &MacCtx.Rejoin1CycleTimer );
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
 static void OnForceRejoinReqCycleTimerEvent( void* context )
@@ -5713,6 +5753,12 @@ static void OnForceRejoinReqCycleTimerEvent( void* context )
     }
 
     OnMacProcessNotify( );
+}
+static void OnForceRejoinReqCycleTimerEvent1( void* context )
+{
+    LORA_MAC_MUTEX_TAKE(LoRaMacMutex);
+    OnForceRejoinReqCycleTimerEvent(context);
+    LORA_MAC_MUTEX_GIVE(LoRaMacMutex);  
 }
 
 void LoRaMacTestSetDutyCycleOn( bool enable )
