@@ -291,7 +291,11 @@ static Band_t RegionBands[REGION_NVM_MAX_NB_BANDS];
 
 static SemaphoreHandle_t  LoRaMacMutex; // Operation protection for timer tasks and interrupt tasks
 
-
+/*
+ * Statistics on how long it takes to open the receive window (ms)
+ * The time it takes to execute the OnRxWindow1TimerEvent() or OnRxWindow2TimerEvent
+ */
+static uint32_t openRXwindowTakeTimeMs = 23;
 
 /*!
  * Defines the LoRaMac radio events status
@@ -770,7 +774,7 @@ static void OnRadioTxDone( void )
     } else {
         TxDoneParams.CurTime = TimerGetCurrentTime();
     }
-    // printf("OnRadioTxDone : %d, %d\r\n",  TxDoneParams.CurTime, TimerGetCurrentTime() - TxDoneParams.CurTime);
+    //ESP_LOGI(TAG,"OnRadioTxDone : %d, %d\r\n",  TxDoneParams.CurTime, TimerGetCurrentTime() - TxDoneParams.CurTime);
 
     MacCtx.LastTxSysTime = SysTimeGet( );
 
@@ -856,10 +860,11 @@ static void ProcessRadioTxDone( void )
     // Setup timers
     CRITICAL_SECTION_BEGIN( );
     uint32_t offset = TimerGetCurrentTime( ) - TxDoneParams.CurTime;
-    TimerSetValue( &MacCtx.RxWindowTimer1, MacCtx.RxWindow1Delay - offset );
+    TimerSetValue( &MacCtx.RxWindowTimer1, MacCtx.RxWindow1Delay - offset - openRXwindowTakeTimeMs );
     TimerStart( &MacCtx.RxWindowTimer1 );
-    TimerSetValue( &MacCtx.RxWindowTimer2, MacCtx.RxWindow2Delay - offset );
+    TimerSetValue( &MacCtx.RxWindowTimer2, MacCtx.RxWindow2Delay - offset - openRXwindowTakeTimeMs );
     TimerStart( &MacCtx.RxWindowTimer2 );
+    //ESP_LOGI(TAG,"RxWindow1Delay: %d ms, RxWindow2Delay: %d ms, offset: %dms, openRXwindowTakeTime: %d ms\r\n", MacCtx.RxWindow1Delay, MacCtx.RxWindow2Delay, offset, openRXwindowTakeTimeMs);
     CRITICAL_SECTION_END( );
 
     if( MacCtx.NodeAckRequested == true )
@@ -2003,6 +2008,8 @@ static void OnTxDelayedTimerEvent1( void* context )
 static void OnRxWindow1TimerEvent( void* context )
 {
     LORA_MAC_MUTEX_TAKE(LoRaMacMutex)
+    TimerTime_t cur = TimerGetCurrentTime();
+
     MacCtx.RxWindow1Config.Channel = MacCtx.Channel;
     MacCtx.RxWindow1Config.DrOffset = Nvm.MacGroup2.MacParams.Rx1DrOffset;
     MacCtx.RxWindow1Config.DownlinkDwellTime = Nvm.MacGroup2.MacParams.DownlinkDwellTime;
@@ -2011,6 +2018,7 @@ static void OnRxWindow1TimerEvent( void* context )
     MacCtx.RxWindow1Config.NetworkActivation = Nvm.MacGroup2.NetworkActivation;
 
     RxWindowSetup( &MacCtx.RxWindowTimer1, &MacCtx.RxWindow1Config );
+    openRXwindowTakeTimeMs = TimerGetCurrentTime() - cur;
     LORA_MAC_MUTEX_GIVE(LoRaMacMutex);
 }
 
@@ -3330,7 +3338,7 @@ static void RxWindowSetup( TimerEvent_t* rxTimer, RxConfigParams_t* rxConfig )
 
     if( RegionRxConfig( Nvm.MacGroup2.Region, rxConfig, ( int8_t* )&MacCtx.McpsIndication.RxDatarate ) == true )
     {
-        //printf("Rx max Window: %d ms,  windowtimeout: %d ms, WindowOffset: %d ms\r\n", Nvm.MacGroup2.MacParams.MaxRxWindow, rxConfig->WindowTimeout,  rxConfig->WindowOffset);
+        //ESP_LOGI(TAG,"Rx max Window: %d ms,  windowtimeout: %d symbols, WindowOffset: %d ms\r\n", Nvm.MacGroup2.MacParams.MaxRxWindow, rxConfig->WindowTimeout,  rxConfig->WindowOffset);
         Radio.Rx( Nvm.MacGroup2.MacParams.MaxRxWindow );
         MacCtx.RxSlot = rxConfig->RxSlot;
     }
