@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "utilities.h"
+#include "freertos/FreeRTOS.h"
 
 /*!
  * Redefinition of rand() and srand() standard C functions.
@@ -150,11 +151,15 @@ uint32_t Crc32Finalize( uint32_t crc )
     return ~crc;
 }
 
+static portMUX_TYPE lora_spinlock = portMUX_INITIALIZER_UNLOCKED;
+
 void BoardCriticalSectionBegin( uint32_t *mask )
 {
+    portENTER_CRITICAL(&lora_spinlock);
 }
 
 void BoardCriticalSectionEnd( uint32_t *mask )
 {
+    portEXIT_CRITICAL(&lora_spinlock);
 }
 
