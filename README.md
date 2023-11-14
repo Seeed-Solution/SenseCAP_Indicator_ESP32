@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://wiki.seeedstudio.com/SenseCAP_Indicator_Get_Started/">
+  <a href="https://wiki.seeedstudio.com/SenseCAP_Indicator_How_To_Flash_The_Default_Firmware/">
     <img src="https://files.seeedstudio.com/wiki/wiki-platform/SeeedStudio.png" width="auto" height="auto" alt="SenseCAP">
   </a>
 </p>
