@@ -42,7 +42,7 @@ The project includes various examples that demonstrate how to effectively use ES
 
 ## Usage
 
-1. Get and install the [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#installation-step-by-step) development framework. or 
+1. Get and install the [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#installation-step-by-step) development framework.
 2. Download this project and open it in the ESP-IDF development framework.
 3. run `idf.py build flash` to compile and burn the firmware.
 
