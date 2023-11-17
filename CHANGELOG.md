@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## 2023-11-17
+### Changed
+-  No longer need patching IDF (thx to Hermit from SqureLine Studio)
+-  Update README to compile with ESP-IDF v5.1.1
+
 ## 2023-10-09
 ### Fixed
 - Connection bug in Home Assistant (dc0b8b7).

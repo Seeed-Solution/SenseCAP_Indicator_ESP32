@@ -40,7 +40,15 @@ The project includes various examples that demonstrate how to effectively use ES
 - `photo_demo` Demonstrates how to display a photo of yourself.
 - `squareline_demo` Demonstrates how to display the UI file exported by the squareline project.
 
-## **SenseCAP Indicator Abstract**
+## Usage
+
+1. Get and install the [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#installation-step-by-step) development framework. or 
+2. Download this project and open it in the ESP-IDF development framework.
+3. run `idf.py build flash` to compile and burn the firmware.
+
+For more detailed information, please refer to [SenseCAP Indicator How To Flash The Default Firmware](https://wiki.seeedstudio.com/SenseCAP_Indicator_How_To_Flash_The_Default_Firmware/).
+
+## **SenseCAP Indicator**
 
 SenseCAP Indicator is a 4-inch touch screen driven by ESP32-S3 and RP2040 Dual-MCU and supports Wi-Fi/Bluetooth/LoRa communication.
 
