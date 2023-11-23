@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "bsp_i2c.h"
-
+#include "timer.h"
 //#define SX126X_SPI_DBUG 
 
 #define EXPANDER_IO_RADIO_NSS                                   0
@@ -35,19 +35,33 @@ static const char *TAG = "sx126x";
 static RadioOperatingModes_t OperatingMode;
 static bool init_flag = false;
 
+TimerTime_t g_lora_irq_time = 0;
+
 static void IRAM_ATTR gpio_isr_handler(void* arg)
 {
-    uint32_t gpio_num = (uint32_t) arg;
-    xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
+    TimerTime_t irq_time = TimerGetCurrentTime();
+    xQueueSendFromISR(gpio_evt_queue, &irq_time, NULL);
 }
+
+uint32_t SX126xGetDio1PinState( void );
 
 static void expander_io_int(void* arg)
 {
-    uint32_t io_num;
+    TimerTime_t irq_time;
+    RadioOperatingModes_t  mode;
     for(;;) {
-        if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
-            //printf("GPIO[%"PRIu32"] intr, val: %d\n", io_num, gpio_get_level(io_num));
-            (g_dioIrq) (0); //handle irq
+        if(xQueueReceive(gpio_evt_queue, &irq_time, portMAX_DELAY)) {
+            g_lora_irq_time = irq_time;
+            // printf("lora irq:%d\n", g_lora_irq_time);
+
+            if( SX126xGetDio1PinState()) { // Only handle DIO1 interrupt
+                xSemaphoreTake(radio_mutex, portMAX_DELAY);
+                mode = SX126xGetOperatingMode();
+                xSemaphoreGive(radio_mutex);
+                if( mode !=  MODE_SLEEP ) { // Filter out sleep mode interrupts
+                    (g_dioIrq) (0); //handle irq
+                }
+            }
         }
     }
 }
@@ -195,8 +209,8 @@ void SX126xIoIrqInit( DioIrqHandler dioIrq )
     io_conf.mode = GPIO_MODE_INPUT;
     io_conf.pull_up_en = 1;
     gpio_config(&io_conf);
-    gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
-    xTaskCreate(expander_io_int, "expander_io_int", GPIO_QUEUE_STACK, NULL, 10, NULL);
+    gpio_evt_queue = xQueueCreate(10, sizeof(TimerTime_t));
+    xTaskCreate(expander_io_int, "expander_io_int", GPIO_QUEUE_STACK, NULL, 0, NULL);
 
     gpio_install_isr_service(0);
     gpio_isr_handler_add(ESP32_EXPANDER_IO_INT, gpio_isr_handler, (void*)ESP32_EXPANDER_IO_INT);
@@ -219,7 +233,7 @@ void SX126xIoTcxoInit( void )
 
 uint32_t SX126xGetBoardTcxoWakeupTime( void )
 {
-#define BOARD_TCXO_WAKEUP_TIME                      5
+#define BOARD_TCXO_WAKEUP_TIME                      0
     return BOARD_TCXO_WAKEUP_TIME;
 }
 
@@ -282,6 +296,10 @@ void SX126xWriteCommand( RadioCommands_t command, uint8_t *buffer, uint16_t size
     SX126xCheckDeviceReady( );
 
     xSemaphoreTake(radio_mutex, portMAX_DELAY);
+    if(  command == RADIO_SET_SLEEP) {
+        // Update mode in advance to prevent interrupts from being triggered when the device is sleeping
+        SX126xSetOperatingMode( MODE_SLEEP ); 
+    }
     p_io_expander->set_level(EXPANDER_IO_RADIO_NSS, 0);
     spi_write_byte(( uint8_t *)&command, 1);
     spi_write_byte( buffer, size);
