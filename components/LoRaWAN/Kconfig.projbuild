@@ -1,0 +1,68 @@
+menu "LoRWAN"
+    menu "Enable built-in REGION"
+        config REGION_EU868
+            bool "Enable EU868"
+            default y
+        config REGION_US915
+            bool "Enable US915"
+            default y
+        config REGION_CN779
+            bool "Enable CN779"
+            default y
+        config REGION_EU433
+            bool "Enable EU433"
+            default y
+        config REGION_AU915
+            bool "Enable AU915"
+            default y
+        config REGION_AS923
+            bool "Enable AS923"
+            default y
+        config REGION_CN470
+            bool "Enable CN470"
+            default y
+        config REGION_KR920
+            bool "Enable KR920"
+            default y
+        config REGION_IN865
+            bool "Enable IN865"
+            default y
+        config REGION_RU864
+            bool "Enable RU864"
+            default y
+
+        choice CHANNEL_PLAN_GROUP_AS923_DEFAULT
+            depends on REGION_AS923
+            prompt "Default channel plan for AS923"
+            default CHANNEL_PLAN_GROUP_AS923_1
+        config CHANNEL_PLAN_GROUP_AS923_1
+            bool "CHANNEL_PLAN_GROUP_AS923_1"
+        config CHANNEL_PLAN_GROUP_AS923_2
+            bool "CHANNEL_PLAN_GROUP_AS923_2"
+        config CHANNEL_PLAN_GROUP_AS923_3
+            bool "CHANNEL_PLAN_GROUP_AS923_3"
+        config CHANNEL_PLAN_GROUP_AS923_4
+            bool "CHANNEL_PLAN_GROUP_AS923_4"
+        config CHANNEL_PLAN_GROUP_AS923_1_JP_CH24_CH38_LBT
+            bool "CHANNEL_PLAN_GROUP_AS923_1_JP_CH24_CH38_LBT"
+        config CHANNEL_PLAN_GROUP_AS923_1_JP_CH24_CH38_DC
+            bool "CHANNEL_PLAN_GROUP_AS923_1_JP_CH24_CH38_DC"
+        config CHANNEL_PLAN_GROUP_AS923_1_JP_CH37_CH61_LBT_DC
+            bool "CHANNEL_PLAN_GROUP_AS923_1_JP_CH37_CH61_LBT_DC"
+        endchoice
+
+        choice CHANNEL_PLAN_GROUP_CN470_DEFAULT
+            depends on REGION_CN470
+            prompt "Default channel plan for CN470"
+            default CHANNEL_PLAN_20MHZ_TYPE_A
+        config CHANNEL_PLAN_20MHZ_TYPE_A
+            bool "CHANNEL_PLAN_20MHZ_TYPE_A"
+        config CHANNEL_PLAN_20MHZ_TYPE_B
+            bool "CHANNEL_PLAN_20MHZ_TYPE_B"
+        config CHANNEL_PLAN_26MHZ_TYPE_A
+            bool "CHANNEL_PLAN_26MHZ_TYPE_A"
+        config CHANNEL_PLAN_26MHZ_TYPE_B
+            bool "CHANNEL_PLAN_26MHZ_TYPE_B"
+        endchoice
+    endmenu
+endmenu
