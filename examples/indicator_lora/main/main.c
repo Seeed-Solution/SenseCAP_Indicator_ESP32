@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "bsp_board.h"
 
 extern void demo_lora_cw( void );
 extern void demo_lora_rx( void );

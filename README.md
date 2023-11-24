@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://wiki.seeedstudio.com/SenseCAP_Indicator_Get_Started/">
+  <a href="https://wiki.seeedstudio.com/SenseCAP_Indicator_How_To_Flash_The_Default_Firmware/">
     <img src="https://files.seeedstudio.com/wiki/wiki-platform/SeeedStudio.png" width="auto" height="auto" alt="SenseCAP">
   </a>
 </p>
@@ -24,7 +24,7 @@ This project is built on the ESP32 IoT Development Framework (IDF) and utilizes 
     <img src="https://img.shields.io/github/repo-size/seeed-solution/SenseCAP_indicator_ESP32" alt="repo-size">
 </p>
 
-> Relevant: [SenseCAP Indicator RP2040](https://github.com/Seeed-Solution/SenseCAP_Indicator_RP2040)
+> Relevant: [SenseCAP Indicator RP2040](https://github.com/Seeed-Solution/SenseCAP_Indicator_RP2040) | [Share Your Projects HERE](https://github.com/Seeed-Solution/SenseCAP_Indicator_ESP32/discussions/33)
 
 The project includes various examples that demonstrate how to effectively use ESP32 functions. To test the examples, the firmware is programmed onto the ESP32 microcontroller unit (MCU).
 
@@ -40,7 +40,15 @@ The project includes various examples that demonstrate how to effectively use ES
 - `photo_demo` Demonstrates how to display a photo of yourself.
 - `squareline_demo` Demonstrates how to display the UI file exported by the squareline project.
 
-## **SenseCAP Indicator Abstract**
+## Usage
+
+1. Get and install the [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#installation-step-by-step) development framework.
+2. Download this project and open it in the ESP-IDF development framework.
+3. run `idf.py build flash` to compile and burn the firmware.
+
+For more detailed information, please refer to [SenseCAP Indicator How To Flash The Default Firmware](https://wiki.seeedstudio.com/SenseCAP_Indicator_How_To_Flash_The_Default_Firmware/).
+
+## **SenseCAP Indicator**
 
 SenseCAP Indicator is a 4-inch touch screen driven by ESP32-S3 and RP2040 Dual-MCU and supports Wi-Fi/Bluetooth/LoRa communication.
 

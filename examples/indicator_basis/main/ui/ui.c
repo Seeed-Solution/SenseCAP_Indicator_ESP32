@@ -1451,7 +1451,7 @@ void ui_screen_sensor_chart_screen_init()
 {
 	ui_screen_sensor_chart = lv_obj_create(NULL);
 	//lv_obj_clear_flag( ui_screen_sensor_chart, LV_OBJ_FLAG_SCROLLABLE );
-
+      /*WIFI icon*/
 	ui_wifi_st_7 = lv_img_create(ui_screen_sensor_chart);
 	lv_img_set_src(ui_wifi_st_7, &ui_img_wifi_disconet_png);
 	lv_obj_set_width( ui_wifi_st_7, LV_SIZE_CONTENT);  /// 1
@@ -1461,7 +1461,7 @@ void ui_screen_sensor_chart_screen_init()
 	lv_obj_set_align( ui_wifi_st_7, LV_ALIGN_TOP_RIGHT );
 	lv_obj_add_flag( ui_wifi_st_7, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
 	lv_obj_clear_flag( ui_wifi_st_7, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-
+      /*return back button*/
 	ui_back4 = lv_btn_create(ui_screen_sensor_chart);
 	lv_obj_set_width( ui_back4, 100);
 	lv_obj_set_height( ui_back4, 50);
@@ -1474,7 +1474,7 @@ void ui_screen_sensor_chart_screen_init()
 	lv_obj_set_style_bg_img_src( ui_back4, &ui_img_back_png, LV_PART_MAIN | LV_STATE_DEFAULT );
 
       lv_obj_add_event_cb(ui_back4, ui_event_back4, LV_EVENT_ALL, NULL);
-
+      /* Title shown */
 	ui_sensor_data_title = lv_label_create(ui_screen_sensor_chart);
 	lv_obj_set_width( ui_sensor_data_title, LV_SIZE_CONTENT);  /// 1
 	lv_obj_set_height( ui_sensor_data_title, LV_SIZE_CONTENT);   /// 1
@@ -1484,7 +1484,7 @@ void ui_screen_sensor_chart_screen_init()
 	lv_label_set_text(ui_sensor_data_title,"Temp"); //modify
 	lv_obj_set_style_text_font(ui_sensor_data_title, &ui_font_font1, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-
+      /* One Panel to organize */
 	lv_obj_t * sensor_chat_panel = lv_obj_create(ui_screen_sensor_chart);
 	lv_obj_set_align( sensor_chat_panel, LV_ALIGN_TOP_MID );
 	lv_obj_set_width( sensor_chat_panel, 480);
