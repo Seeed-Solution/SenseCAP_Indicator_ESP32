@@ -2,6 +2,7 @@
 #define VIEW_DATA_H
 
 #include "config.h"
+#include "RegionCommon.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,6 +117,38 @@ struct view_data_sensor_history_data
     float week_max;
 };
 
+
+enum view_data_lorawan_join{
+    LORAWAN_JOIN_ST_FAIL,
+    LORAWAN_JOIN_ST_OK,
+    LORAWAN_JOIN_ST_PROCEED,
+};
+
+struct view_data_lorawan_basic_cfg {
+    DeviceClass_t  class; 
+    LoRaMacRegion_t region;
+    uint32_t  uplink_interval_min;
+    bool IsOtaaActivation;
+};
+
+struct view_data_lorawan_network_info{
+    uint8_t eui[8];
+    uint8_t join_eui[8];
+    uint8_t app_key[16];
+    uint8_t dev_addr[4];
+    uint8_t apps_key[16];
+    uint8_t nwks_key[16];
+};
+
+#define LORAWAN_LOG_LEVEL_INFO   0
+#define LORAWAN_LOG_LEVEL_WARN   1
+#define LORAWAN_LOG_LEVEL_ERROR  2
+
+struct view_data_lorawa_log {
+    uint8_t level; // 0: info ,  1: warn , 2: error 
+    uint8_t data[128];
+};
+
 enum {
     VIEW_EVENT_SCREEN_START = 0,  // uint8_t, enum start_screen, which screen when start
 
@@ -160,6 +193,14 @@ enum {
     VIEW_EVENT_SHUTDOWN,      //NULL
     VIEW_EVENT_FACTORY_RESET, //NULL
     VIEW_EVENT_SCREEN_CTRL,   // bool  0:disable , 1:enable
+
+    VIEW_EVENT_LORAWAN_JOIN_ST,      // enum view_data_lorawan_join
+    VIEW_EVENT_LORAWAN_CFG_UPDATE,   // struct view_data_lorawan_basic_cfg
+    VIEW_EVENT_LORAWAN_CFG_APPLY,    // struct view_data_lorawan_basic_cfg
+    VIEW_EVENT_LORAWAN_NETWORK_INFO_UPDATE,   // struct view_data_lorawan_network_info
+    VIEW_EVENT_LORAWAN_JOIN_ACTION,  //  bool  0: disable , 1: enable
+    VIEW_EVENT_LORAWAN_LOG,          // struct view_data_lorawa_log
+    VIEW_EVENT_LORAWAN_LIGHT_ST,  // bool  0:off , 1: on
 
     VIEW_EVENT_ALL,
 };
