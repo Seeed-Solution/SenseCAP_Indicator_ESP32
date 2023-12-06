@@ -258,7 +258,7 @@ SecureElementStatus_t SecureElementAesEncrypt( uint8_t* buffer, uint16_t size, K
 
         while( size != 0 )
         {
-            aes_encrypt( &buffer[block], &encBuffer[block], &aesContext );
+            lorawan_aes_encrypt( &buffer[block], &encBuffer[block], &aesContext );
             block = block + 16;
             size  = size - 16;
         }

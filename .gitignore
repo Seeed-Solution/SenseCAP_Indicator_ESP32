@@ -30,3 +30,6 @@ dependencies.lock
 *cmake-build-debug
 
 *.tmp
+
+#tools ignored
+tools/flash_firmware

@@ -203,6 +203,12 @@ void SX126xIoIrqInit( DioIrqHandler dioIrq )
 {
     g_dioIrq = (uint32_t *)dioIrq;
 
+    static bool Ioirq_init_flag = false;
+    if( Ioirq_init_flag ){
+        return;
+    }
+    Ioirq_init_flag = true;
+
     gpio_config_t io_conf = {};
     io_conf.intr_type = GPIO_INTR_NEGEDGE; //falling edge
     io_conf.pin_bit_mask = (1ULL << ESP32_EXPANDER_IO_INT);

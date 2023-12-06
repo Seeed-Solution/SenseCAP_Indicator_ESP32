@@ -565,7 +565,7 @@ return_type aes_set_key( const uint8_t key[], length_type keylen, aes_context ct
 
 /*  Encrypt a single block of 16 bytes */
 
-return_type aes_encrypt( const uint8_t in[N_BLOCK], uint8_t  out[N_BLOCK], const aes_context ctx[1] )
+return_type lorawan_aes_encrypt( const uint8_t in[N_BLOCK], uint8_t  out[N_BLOCK], const aes_context ctx[1] )
 {
     if( ctx->rnd )
     {
@@ -601,7 +601,7 @@ return_type aes_cbc_encrypt( const uint8_t *in, uint8_t *out,
     while(n_block--)
     {
         xor_block(iv, in);
-        if(aes_encrypt(iv, iv, ctx) != EXIT_SUCCESS)
+        if(lorawan_aes_encrypt(iv, iv, ctx) != EXIT_SUCCESS)
             return EXIT_FAILURE;
         //memcpy(out, iv, N_BLOCK);
         block_copy(out, iv);

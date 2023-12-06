@@ -18,7 +18,6 @@
 #include "esp_netif.h"
 #include "esp_event.h"
 #include "iperf.h"
-#include "esp_coexist.h"
 
 #include "lwip/inet.h"
 #include "lwip/netdb.h"
