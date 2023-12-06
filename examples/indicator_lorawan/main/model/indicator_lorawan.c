@@ -703,7 +703,7 @@ static int __lorawan_init(void)
     LoRaMacMibSetRequestConfirm( &mibReq );
 
 
-    LmHandlerSetSystemMaxRxError( 20 );
+    LmHandlerSetSystemMaxRxError( 50 );
     LmHandlerPackageRegister( PACKAGE_ID_COMPLIANCE, &LmhpComplianceParams );
     LmHandlerJoin();
 
@@ -761,7 +761,7 @@ static void __lorawan_task(void *p_arg)
                 lorawan_log_display(LORAWAN_LOG_LEVEL_INFO, "STOP LoRaWAN\r\n");
             } 
         }
-        vTaskDelay(pdMS_TO_TICKS(5));
+        vTaskDelay(pdMS_TO_TICKS(2));
     }
 }
 
@@ -844,7 +844,7 @@ int indicator_lorawan_init(void)
 
     __lorawan_cfg_restore();
 
-    xTaskCreate(&__lorawan_task, "__lorawan_task", 1024 * 10, NULL, 2, NULL);
+    xTaskCreate(&__lorawan_task, "__lorawan_task", 1024 * 5, NULL, 2, NULL);
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
                                                             VIEW_EVENT_BASE, VIEW_EVENT_LORAWAN_CFG_APPLY, 
