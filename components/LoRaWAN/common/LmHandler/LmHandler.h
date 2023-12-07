@@ -269,6 +269,7 @@ LmHandlerErrorStatus_t LmHandlerSend( LmHandlerAppData_t *appData, LmHandlerMsgT
  * \Note if the device is ABP, this is a pass through function
  */
 void LmHandlerJoin( void );
+void LmHandlerJoin1( bool isOtaa );
 
 /*!
  * Check whether the Device is joined to the network

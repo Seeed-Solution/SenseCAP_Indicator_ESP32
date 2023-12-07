@@ -468,6 +468,11 @@ void LmHandlerJoin( void )
 {
     LmHandlerJoinRequest( CommissioningParams.IsOtaaActivation );
 }
+void LmHandlerJoin1( bool isOtaa )
+{
+    LmHandlerJoinRequest( isOtaa );
+}
+
 
 LmHandlerFlagStatus_t LmHandlerJoinStatus( void )
 {

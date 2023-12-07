@@ -102,7 +102,7 @@ void lorawan_network_info_printf(struct view_data_lorawan_network_info *p_info)
     printf("\r\n");
 
     printf("DEV ADDR (ABP): ");
-    for(i = 0; i<16 ; i++) {
+    for(i = 0; i<4 ; i++) {
         printf("%02X", p_info->dev_addr[i]);
     }
     printf("\r\n");
@@ -414,8 +414,10 @@ static void OnJoinRequest( LmHandlerJoinParams_t* params )
     }
 
     if( params->Status == LORAMAC_HANDLER_ERROR )
-    {
-        LmHandlerJoin( );
+    {   
+        if( __g_lorawan_model.auto_join ) {
+            LmHandlerJoin( );
+        }
     }
     else
     {
@@ -659,7 +661,7 @@ static int __lorawan_init(void)
             vTaskDelay(pdMS_TO_TICKS(10000));
         }
     }
-    
+
     MibRequestConfirm_t mibReq;
     
     // eui
@@ -681,8 +683,17 @@ static int __lorawan_init(void)
     mibReq.Param.NwkKey = p_model->info.app_key;
     LoRaMacMibSetRequestConfirm( &mibReq );
 
-    // dev addr
+    // dev addr MSB
+    uint32_t DevAddr = 0;
 
+    DevAddr +=  p_model->info.dev_addr[0] << 24;
+    DevAddr +=  p_model->info.dev_addr[1] << 16;
+    DevAddr +=  p_model->info.dev_addr[2] << 8;
+    DevAddr +=  p_model->info.dev_addr[3];
+    
+    mibReq.Type = MIB_DEV_ADDR;
+    mibReq.Param.DevAddr = DevAddr;
+    LoRaMacMibSetRequestConfirm( &mibReq );
 
     //apps key
     mibReq.Type = MIB_APP_S_KEY;
@@ -705,7 +716,8 @@ static int __lorawan_init(void)
 
     LmHandlerSetSystemMaxRxError( 50 );
     LmHandlerPackageRegister( PACKAGE_ID_COMPLIANCE, &LmhpComplianceParams );
-    LmHandlerJoin();
+    
+    LmHandlerJoin1(p_model->basic_cfg.IsOtaaActivation);
 
     // TX timer
     TxPeriodicity = __g_lorawan_model.basic_cfg.uplink_interval_min * 60 * 1000 + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
@@ -714,12 +726,17 @@ static int __lorawan_init(void)
     OnTxTimerEvent( NULL );
 }
 
-static void __lorawan_deinit(void)
+static bool  __lorawan_deinit(void)
 {
     IsTxFramePending = 0;
     TimerStop( &TxTimer );
     LoRaMacStop();
-    LoRaMacDeInitialization();
+    LoRaMacStatus_t st = LoRaMacDeInitialization();
+    if( st != LORAMAC_STATUS_OK ) {
+        ESP_LOGE(TAG, "LoRaMacDeInitialization: %d", st );
+        return false;
+    }
+    return true;
 }
 
 static void UplinkProcess( void )
@@ -740,6 +757,7 @@ static void __lorawan_task(void *p_arg)
 {
     bool start = false;
     bool init_flag = false;
+    
     while(1) {
         
         start = __g_lorawan_model.auto_join;
@@ -754,11 +772,23 @@ static void __lorawan_task(void *p_arg)
             LmHandlerProcess( );
             UplinkProcess( );
         } else {
-            
+
             if( init_flag ){
-                init_flag = false;
-                __lorawan_deinit();
-                lorawan_log_display(LORAWAN_LOG_LEVEL_INFO, "STOP LoRaWAN\r\n");
+                
+                if( LoRaMacIsBusy() ) {
+                    //ESP_LOGI(TAG, " continue handle lorawan...");
+                    LmHandlerProcess( );
+                    UplinkProcess( );
+
+                } else {
+                    if( __lorawan_deinit()) {
+                        init_flag = false;
+                        lorawan_log_display(LORAWAN_LOG_LEVEL_INFO, "STOP LoRaWAN\r\n");
+                    } else {
+                        vTaskDelay(pdMS_TO_TICKS(1000));
+                    }
+                }
+                
             } 
         }
         vTaskDelay(pdMS_TO_TICKS(2));
@@ -769,6 +799,12 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
 {
     switch (id)
     {
+        case VIEW_EVENT_LORAWAN_NETWORK_INFO_UPDATE: {
+            struct view_data_lorawan_network_info *p_info = (struct view_data_lorawan_network_info *)event_data;
+            ESP_LOGI(TAG, "event: VIEW_EVENT_LORAWAN_NETWORK_INFO_UPDATE");
+            __lorawan_network_info_set(p_info);
+            break;
+        }
         case VIEW_EVENT_LORAWAN_CFG_APPLY: {
             struct view_data_lorawan_basic_cfg * p_cfg = (struct view_data_lorawan_basic_cfg *)event_data;
             ESP_LOGI(TAG, "event: VIEW_EVENT_LORAWAN_CFG_APPLY");
@@ -845,6 +881,10 @@ int indicator_lorawan_init(void)
     __lorawan_cfg_restore();
 
     xTaskCreate(&__lorawan_task, "__lorawan_task", 1024 * 5, NULL, 2, NULL);
+
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
+                                                        VIEW_EVENT_BASE, VIEW_EVENT_LORAWAN_NETWORK_INFO_UPDATE, 
+                                                        __view_event_handler, NULL, NULL));
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, 
                                                             VIEW_EVENT_BASE, VIEW_EVENT_LORAWAN_CFG_APPLY, 

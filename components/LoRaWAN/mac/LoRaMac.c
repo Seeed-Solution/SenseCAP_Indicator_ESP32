@@ -5336,10 +5336,9 @@ static void OnAbpJoinPendingTimerEvent( void *context )
 /*!
  * \brief Start ABP join simulation
  */
+static bool initialized = false;
 static void AbpJoinPendingStart( void )
 {
-    static bool initialized = false;
-
     if( initialized == false )
     {
         initialized = true;
@@ -5802,6 +5801,8 @@ LoRaMacStatus_t LoRaMacDeInitialization( void )
         // Switch off Radio
         Radio.Sleep( );
 
+        initialized = false; // must reinit
+        
         // Return success
         return LORAMAC_STATUS_OK;
     }
