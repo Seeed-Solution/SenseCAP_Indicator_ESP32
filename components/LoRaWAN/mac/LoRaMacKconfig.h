@@ -77,6 +77,13 @@ extern "C" {
 
 #define SOFT_SE 
 
+
+#ifdef CONFIG_USE_LRWAN_1_1_X_CRYPTO
+    #define USE_LRWAN_1_1_X_CRYPTO  1
+#else
+    #define USE_LRWAN_1_1_X_CRYPTO  0
+#endif
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
