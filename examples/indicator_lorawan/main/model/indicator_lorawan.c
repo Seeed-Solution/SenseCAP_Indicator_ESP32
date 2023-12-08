@@ -423,6 +423,10 @@ static void OnJoinRequest( LmHandlerJoinParams_t* params )
     }
     else
     {
+
+        enum view_data_lorawan_join join_st =  LORAWAN_JOIN_ST_OK;
+        esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_LORAWAN_JOIN_ST, (void *)&join_st, sizeof(join_st), portMAX_DELAY);
+
         LmHandlerRequestClass( __g_lorawan_model.basic_cfg.class );
 
         OnTxTimerEvent( NULL );  //send data right now
@@ -769,6 +773,9 @@ static void __lorawan_task(void *p_arg)
             if( !init_flag ){
                 init_flag =true;
                 lorawan_log_display(LORAWAN_LOG_LEVEL_INFO, "STARTUP LoRaWAN\r\n");
+                enum view_data_lorawan_join join_st =  LORAWAN_JOIN_ST_PROCEED;
+                esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_LORAWAN_JOIN_ST, (void *)&join_st, sizeof(join_st), portMAX_DELAY);
+
                 __lorawan_init();
             }
 
@@ -787,6 +794,9 @@ static void __lorawan_task(void *p_arg)
                     if( __lorawan_deinit()) {
                         init_flag = false;
                         lorawan_log_display(LORAWAN_LOG_LEVEL_INFO, "STOP LoRaWAN\r\n");
+                        enum view_data_lorawan_join join_st =  LORAWAN_JOIN_ST_FAIL;  //stop
+                        esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_LORAWAN_JOIN_ST, (void *)&join_st, sizeof(join_st), portMAX_DELAY);
+
                     } else {
                         vTaskDelay(pdMS_TO_TICKS(1000));
                     }
