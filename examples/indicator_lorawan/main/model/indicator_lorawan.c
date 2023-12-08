@@ -13,6 +13,7 @@
 #include "githubVersion.h"
 #include "timer.h"
 
+
 #define DISPLAY_CFG_STORAGE  "lorawan"
 
 extern  const char* MacStatusStrings[];
@@ -334,6 +335,7 @@ static LmHandlerAppData_t AppData =
     .Port = 0,
 };
 
+static void OnTxTimerEvent( void* context );
 static void OnNetworkParametersChange( CommissioningParams_t* params )
 {
 
@@ -422,6 +424,8 @@ static void OnJoinRequest( LmHandlerJoinParams_t* params )
     else
     {
         LmHandlerRequestClass( __g_lorawan_model.basic_cfg.class );
+
+        OnTxTimerEvent( NULL );  //send data right now
     }
 }
 
@@ -723,7 +727,6 @@ static int __lorawan_init(void)
     TxPeriodicity = __g_lorawan_model.basic_cfg.uplink_interval_min * 60 * 1000 + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
     TimerInit( &TxTimer, OnTxTimerEvent );
     TimerSetValue( &TxTimer, TxPeriodicity );
-    OnTxTimerEvent( NULL );
 }
 
 static bool  __lorawan_deinit(void)
