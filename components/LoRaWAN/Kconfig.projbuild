@@ -65,4 +65,8 @@ menu "LoRWAN"
             bool "CHANNEL_PLAN_26MHZ_TYPE_B"
         endchoice
     endmenu
+
+    config USE_LRWAN_1_1_X_CRYPTO
+        bool "USE LRWAN_1_1_X_CRYPTO"
+        default n
 endmenu
