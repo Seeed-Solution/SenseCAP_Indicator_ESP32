@@ -1,12 +1,25 @@
 #ifndef VIEW_DATA_H
 #define VIEW_DATA_H
 
-#include "config.h"
+#include <stdbool.h>
+#include <string.h> 
+#include "esp_system.h"
+#include "esp_err.h"
+#include "esp_log.h"
+#include "esp_event_base.h"
+#include "bsp_board.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 #include "RegionCommon.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+ESP_EVENT_DECLARE_BASE(VIEW_EVENT_BASE);
+extern esp_event_loop_handle_t view_event_handle;
 
 enum start_screen{
     SCREEN_SENSECAP_LOG, //todo
@@ -100,7 +113,7 @@ enum sensor_data_type{
 struct view_data_sensor_data
 {
     enum sensor_data_type sensor_type;
-    float  vaule;
+    float  value;
 };
 
 struct view_data_sensor_history_data
@@ -116,7 +129,6 @@ struct view_data_sensor_history_data
     float week_min;
     float week_max;
 };
-
 
 enum view_data_lorawan_join{
     LORAWAN_JOIN_ST_FAIL,
@@ -149,39 +161,25 @@ struct view_data_lorawa_log {
     uint8_t data[128];
 };
 
+
 enum {
     VIEW_EVENT_SCREEN_START = 0,  // uint8_t, enum start_screen, which screen when start
-
-    VIEW_EVENT_TIME,  //  bool time_format_24
     
-    VIEW_EVENT_WIFI_ST,   //view_data_wifi_st_t
-    VIEW_EVENT_CITY,      // char city[32], max display 24 char
-
     VIEW_EVENT_SENSOR_DATA, // struct view_data_sensor_data
 
-    VIEW_EVENT_SENSOR_TEMP,  
-    VIEW_EVENT_SENSOR_HUMIDITY,
-    VIEW_EVENT_SENSOR_TVOC,
-    VIEW_EVENT_SENSOR_CO2,
+    VIEW_EVENT_SENSOR_DATA_CHART,
 
-    VIEW_EVENT_SENSOR_TEMP_HISTORY,
-    VIEW_EVENT_SENSOR_HUMIDITY_HISTORY,
-    VIEW_EVENT_SENSOR_TVOC_HISTORY,
-    VIEW_EVENT_SENSOR_CO2_HISTORY,
-
-    VIEW_EVENT_SENSOR_DATA_HISTORY, //struct view_data_sensor_history_data
-
-
+    VIEW_EVENT_WIFI_ST,   //view_data_wifi_st_t
+    
     VIEW_EVENT_WIFI_LIST,       //view_data_wifi_list_t
     VIEW_EVENT_WIFI_LIST_REQ,   // NULL
     VIEW_EVENT_WIFI_CONNECT,    // struct view_data_wifi_config
-
     VIEW_EVENT_WIFI_CONNECT_RET,   // struct view_data_wifi_connet_ret_msg
-
-
     VIEW_EVENT_WIFI_CFG_DELETE,
 
+    VIEW_EVENT_CITY,      // char city[32], max display 24 char
 
+    VIEW_EVENT_TIME,  //  bool time_format_24
     VIEW_EVENT_TIME_CFG_UPDATE,  //  struct view_data_time_cfg
     VIEW_EVENT_TIME_CFG_APPLY,   //  struct view_data_time_cfg
 

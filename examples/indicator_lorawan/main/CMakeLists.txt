@@ -1,19 +1,30 @@
-set(UI_DIR ./ui)
-file(GLOB_RECURSE UI_SOURCES ${UI_DIR}/*.c)
+# Custom function to collect source files from a specified directory
+function(collect_sources source_var)
+  # Initialize the sources variable
+  set(sources "")
 
-set(MODEL_DIR ./model)
-file(GLOB_RECURSE MODEL_SOURCES ${MODEL_DIR}/*.c)
+  # Iterate over the directories to include
+  foreach(dir IN LISTS ARGN)
+    # Recursively glob all `.c` files in the directory
+    file(GLOB_RECURSE dir_sources "${dir}/*.c")
 
-set(VIEW_DIR ./view)
-file(GLOB_RECURSE VIEW_SOURCES ${VIEW_DIR}/*.c)
+    # Append the files to the sources variable
+    list(APPEND sources ${dir_sources})
+  endforeach()
 
-set(CONTROLLER_DIR ./controller)
-file(GLOB_RECURSE CONTROLLER_SOURCES ${CONTROLLER_DIR}/*.c)
+  # Set the sources variable in the parent scope
+  set(${source_var} ${sources} PARENT_SCOPE)
+endfunction()
 
-set(UTIL_DIR ./util)
-file(GLOB_RECURSE UTIL_SOURCES ${UTIL_DIR}/*.c)
+# Define a list of directories to include
+set(DIRECTORIES_TO_INCLUDE "util" "storage" "display_ctrl" "./button" "./ui" "./esp32_rp2040" "wifi" "datetime" "sensor" "lorawan" "cmd" "terminal" "lorawan_light")
 
+# Call the custom function to collect the source files
+collect_sources(COLLECTED_SOURCES ${DIRECTORIES_TO_INCLUDE})
+
+# Register the component
 idf_component_register(
-    SRCS "main.c" "lv_port.c" ${UI_SOURCES} ${MODEL_SOURCES} ${VIEW_SOURCES} ${CONTROLLER_SOURCES} ${UTIL_SOURCES}
-    INCLUDE_DIRS "."  ${UI_DIR} ${MODEL_DIR} ${VIEW_DIR} ${CONTROLLER_DIR} ${UTIL_DIR}
-    EMBED_TXTFILES timeapi_cert.pem)
+  SRCS "main.c" "lv_port.c" "indicator_model.c" "indicator_view.c" ${COLLECTED_SOURCES}
+  INCLUDE_DIRS "." ${DIRECTORIES_TO_INCLUDE}
+  EMBED_TXTFILES timeapi_cert.pem
+)
