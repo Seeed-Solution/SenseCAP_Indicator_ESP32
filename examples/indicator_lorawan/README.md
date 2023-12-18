@@ -1,31 +1,28 @@
-# Indicator Basis Demo
+# SenseCAP Indicator LoRaWAN Demo
 
-This demo mainly implements time, sensor data display, and some configuration functions.
+## Introduction
+The SenseCAP Indicator LoRaWAN Demo, developed for the ESP32 platform, showcases the application of LoRaWAN technology in environmental monitoring. It provides a user-friendly interface for managing LoRaWAN network connections and transmitting sensor data.
 
-<figure class="third">
-    <img src="./docs/page1.png" width="480"/> <img src="./docs/page2.png" width="480"/>
-    <img src="./docs/page3.png" width="480"/> <img src="./docs/page4.png" width="480"/>
-</figure>
+## Usage
+![LoRaWAN Screen](./feature.png)
+The LoRaWAN screen is the user's gateway to control the device's network connection activities. It automates the connection to the LoRaWAN network and efficiently transmits captured sensor data.
 
-## Function
-- [x] Time display.
-- [x] CO2, tVOC, Temperature and Humidity data real-time display.
-- [x] CO2, tVOC, Temperature and Humidity history data display.
-- [x] Wifi config.
-- [x] Display config.
-- [x] time config.
+### Console Commands
+To adjust device settings, use the `lorawan` command in the console. This command allows you to set essential parameters like EUI, Join EUI, and App Key, crucial for connecting and authenticating your device with a LoRaWAN network.
 
 
-## How to use example
+### Examples
+```sh
+lorawan --eui <Your_EUI> --join_eui <Your_Join_EUI> --app_key <Your_App_Key>
+```
+1. **Set EUI**:
+   ```sh
+   lorawan --eui 0004A30B001C0530
+   ```
+   This sets the EUI of your device.
 
-Please first read the [User Guide](https://wiki.seeedstudio.com/SenseCAP_Indicator_Get_Started) of the SenseCAP Indicator Board to learn about its software and hardware information.
-
-
-### Build and Flash
-
-1. The project configure PSRAM with Octal 120M by default. please see [here](../../tools/patch/README.md#idf-patch) to enable `PSRAM Octal 120M` feature.
-2. Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
-
-(To exit the serial monitor, type ``Ctrl-]``.)
-
-See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for full steps to configure and use ESP-IDF to build projects.
+2. **Set Join EUI and App Key**:
+   ```sh
+   lorawan --join_eui 70B3D57ED0007E4A --app_key 8AFE71A145B253E49C3031AD06827777
+   ```
+   Use this to set the Join EUI and App Key for network authentication.

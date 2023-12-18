@@ -11,10 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## 2023-12-18                
+### Changed
+- Update indicator_lorawan demo README
+
+## 2023-12-15
+### Changed
+- File structure to dependent
+### Fixed
+- LoRaWAN frequency change rebooting
+
+## 2023-11-23
+### Changed
+-  Modify sdkconfig.defaults for lvgl,photo,squareline_demo
+### Added
+-  Add Project Share to README
+
 ## 2023-11-17
 ### Changed
 -  No longer need patching IDF (thx to Hermit from SqureLine Studio)
 -  Update README to compile with ESP-IDF v5.1.1
+
+## 2023-10-31
+### Added
+-  lorawan demo and fix bugs
 
 ## 2023-10-09
 ### Fixed

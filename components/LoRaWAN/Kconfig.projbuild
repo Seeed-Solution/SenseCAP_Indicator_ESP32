@@ -1,4 +1,4 @@
-menu "LoRWAN"
+menu "LoRaWAN"
     menu "Enable built-in REGION"
         config REGION_EU868
             bool "Enable EU868"
