@@ -331,7 +331,7 @@ int indicator_cmd_init(void)
     repl_config.max_cmdline_length = 1024;
 
     register_lorawan();
-    register_lorawan_test();
+    // register_lorawan_test();
 
     esp_console_dev_uart_config_t hw_config = ESP_CONSOLE_DEV_UART_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_console_new_repl_uart(&hw_config, &repl_config, &repl));

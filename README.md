@@ -39,6 +39,7 @@ The project includes various examples that demonstrate how to effectively use ES
 - `lvgl_demos` Demonstrated some demos of lvgl.
 - `photo_demo` Demonstrates how to display a photo of yourself.
 - `squareline_demo` Demonstrates how to display the UI file exported by the squareline project.
+- `lorawan_demo` Demonstrates how to communicate using lorawan in SenseCAP Indicator.
 
 ## Usage
 
