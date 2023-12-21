@@ -93,6 +93,7 @@ extern lv_obj_t * ui_PnlDot1;
 extern lv_obj_t * ui_PnlDot3;
 extern lv_obj_t * ui_PnlDot2;
 extern lv_obj_t * ui_PnlDot4;
+extern lv_obj_t * ui_LblTime3;
 // SCREEN: ui_ScreenSetting
 void ui_ScreenSetting_screen_init(void);
 void ui_event_ScreenSetting(lv_event_t * e);

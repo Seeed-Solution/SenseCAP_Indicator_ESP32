@@ -90,6 +90,7 @@ lv_obj_t * ui_PnlDot1;
 lv_obj_t * ui_PnlDot3;
 lv_obj_t * ui_PnlDot2;
 lv_obj_t * ui_PnlDot4;
+lv_obj_t * ui_LblTime3;
 
 
 // SCREEN: ui_ScreenSetting

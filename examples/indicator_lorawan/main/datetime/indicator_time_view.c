@@ -50,6 +50,7 @@ static void __view_event_handler(void *arg, esp_event_base_t event_base, int32_t
             lv_snprintf(buf, sizeof(buf), "%02d:%02d", _format_hour, timeinfo.tm_min);
             lv_label_set_text(ui_LblTime1, buf);
             lv_label_set_text(ui_LblTime2, buf);
+            lv_label_set_text(ui_LblTime3, buf);
 
             switch (timeinfo.tm_wday) {
                 case 0: p_wday_str = "Sunday"; break;

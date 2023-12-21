@@ -94,6 +94,14 @@ void ui_ScreenBulb_screen_init(void)
     lv_obj_set_align(ui_PnlDot4, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_PnlDot4, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
+    ui_LblTime3 = lv_label_create(ui_ScreenBulb);
+    lv_obj_set_width(ui_LblTime3, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LblTime3, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LblTime3, 30);
+    lv_obj_set_y(ui_LblTime3, 20);
+    lv_label_set_text(ui_LblTime3, "00:00");
+    lv_obj_set_style_text_font(ui_LblTime3, &ui_font_SmallTitle, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     lv_obj_add_event_cb(ui_BtnBackSBulb, ui_event_BtnBackSBulb, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SwitchBulb, ui_event_SwitchBulb, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ScreenBulb, ui_event_ScreenBulb, LV_EVENT_ALL, NULL);
