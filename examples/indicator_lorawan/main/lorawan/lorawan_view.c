@@ -298,5 +298,6 @@ static void update_lorawan_network_status(enum view_data_lorawan_join status)
     }
     lv_port_sem_take();
     lv_img_set_src(ui_LblLoRaStatus1, p_img);
+    lv_img_set_src(ui_LblLoRaStatus2, p_img);
     lv_port_sem_give();
 }

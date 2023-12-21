@@ -16,8 +16,6 @@ extern "C" {
 #include "components/ui_comp.h"
 #include "components/ui_comp_hook.h"
 #include "ui_events.h"
-void BulbSwitch_Animation(lv_obj_t * TargetObject, int delay);
-void ActivationSwitch_Animation(lv_obj_t * TargetObject, int delay);
 // SCREEN: ui_ScreenTime
 void ui_ScreenTime_screen_init(void);
 void ui_event_ScreenTime(lv_event_t * e);
@@ -46,9 +44,10 @@ void ui_event_ScreenSensor(lv_event_t * e);
 extern lv_obj_t * ui_ScreenSensor;
 extern lv_obj_t * ui_LblTime1;
 extern lv_obj_t * ui_PnlDots1;
-extern lv_obj_t * ui_PnlDot1;
-extern lv_obj_t * ui_PnlDot2;
-extern lv_obj_t * ui_PnlDot3;
+extern lv_obj_t * ui_PnlDot11;
+extern lv_obj_t * ui_PnlDot12;
+extern lv_obj_t * ui_PnlDot13;
+extern lv_obj_t * ui_PnlDot14;
 void ui_event_BtnHumi(lv_event_t * e);
 extern lv_obj_t * ui_BtnHumi;
 extern lv_obj_t * ui_ImgHumi;
@@ -76,6 +75,9 @@ extern lv_obj_t * ui_LblUnitTmp;
 void ui_event_BtnWifi2(lv_event_t * e);
 extern lv_obj_t * ui_BtnWifi2;
 extern lv_obj_t * ui_LblWifiStatus2;
+void ui_event_BtnLoRa2(lv_event_t * e);
+extern lv_obj_t * ui_BtnLoRa2;
+extern lv_obj_t * ui_LblLoRaStatus2;
 // SCREEN: ui_ScreenBulb
 void ui_ScreenBulb_screen_init(void);
 void ui_event_ScreenBulb(lv_event_t * e);
@@ -86,6 +88,11 @@ extern lv_obj_t * ui_LblTitleBulb;
 extern lv_obj_t * ui_ImgBulb;
 void ui_event_SwitchBulb(lv_event_t * e);
 extern lv_obj_t * ui_SwitchBulb;
+extern lv_obj_t * ui_PnlDots2;
+extern lv_obj_t * ui_PnlDot1;
+extern lv_obj_t * ui_PnlDot3;
+extern lv_obj_t * ui_PnlDot2;
+extern lv_obj_t * ui_PnlDot4;
 // SCREEN: ui_ScreenSetting
 void ui_ScreenSetting_screen_init(void);
 void ui_event_ScreenSetting(lv_event_t * e);
@@ -93,10 +100,6 @@ extern lv_obj_t * ui_ScreenSetting;
 extern lv_obj_t * ui_LblTime2;
 extern lv_obj_t * ui_ImgSetting1;
 extern lv_obj_t * ui_LblTitleSetting;
-extern lv_obj_t * ui_PnlDots2;
-extern lv_obj_t * ui_PnlDot4;
-extern lv_obj_t * ui_PnlDot5;
-extern lv_obj_t * ui_PnlDot6;
 void ui_event_BtnUsrLoraWAN1(lv_event_t * e);
 extern lv_obj_t * ui_BtnUsrLoraWAN1;
 extern lv_obj_t * ui_ImgLoraWAN1;
@@ -113,6 +116,11 @@ void ui_event_BtnDateTime1(lv_event_t * e);
 extern lv_obj_t * ui_BtnDateTime1;
 extern lv_obj_t * ui_ImgDateTime1;
 extern lv_obj_t * ui_LblTitleDateTime1;
+extern lv_obj_t * ui_PnlDots3;
+extern lv_obj_t * ui_PnlDot5;
+extern lv_obj_t * ui_PnlDot7;
+extern lv_obj_t * ui_PnlDot8;
+extern lv_obj_t * ui_PnlDot6;
 // SCREEN: ui_ScreenCharts
 void ui_ScreenCharts_screen_init(void);
 extern lv_obj_t * ui_ScreenCharts;
