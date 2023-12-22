@@ -268,6 +268,9 @@ uint16_t NvmDataMgmtRestore( void )
     
     static LoRaMacNvmData_t data;
     esp_err_t err;
+    
+    LoRaMacRegion_t new_region = nvm->MacGroup2.Region;
+
 
     // Crypto
     err = __nvs_read_then_check(NVS_DATA_CRYPTO_KEY, ( uint8_t* ) &data.Crypto,  sizeof( data.Crypto ));
@@ -279,25 +282,6 @@ uint16_t NvmDataMgmtRestore( void )
         return  0;
     }
 
-    // Mac Group 1
-    err = __nvs_read_then_check(NVS_DATA_MACGROUP1_KEY, ( uint8_t* ) &data.MacGroup1,  sizeof( data.MacGroup1 ));
-    if( err == ESP_OK )
-    {
-        memcpy( (uint8_t*) &nvm->MacGroup1, (uint8_t*) &data.MacGroup1 ,sizeof( data.MacGroup1 ));
-    } else if( err != ESP_ERR_NVS_NOT_FOUND) {
-        ESP_LOGE("lorawan", "nvs MacGroup1 read err:0x%x", err);
-        return  0;
-    }
-
-    // Mac Group 2
-    err = __nvs_read_then_check(NVS_DATA_MACGROUP2_KEY, ( uint8_t* ) &data.MacGroup2,  sizeof( data.MacGroup2 ));
-    if( err == ESP_OK )
-    {
-        memcpy( (uint8_t*) &nvm->MacGroup2, (uint8_t*) &data.MacGroup2 ,sizeof( data.MacGroup2 ));
-    } else if( err != ESP_ERR_NVS_NOT_FOUND) {
-        ESP_LOGE("lorawan", "nvs MacGroup2 read err:0x%x", err);
-        return  0;
-    }
     // Secure element
     err = __nvs_read_then_check(NVS_DATA_SECURE_KEY, ( uint8_t* ) &data.SecureElement,  sizeof( data.SecureElement ));
     if( err == ESP_OK )
@@ -305,6 +289,31 @@ uint16_t NvmDataMgmtRestore( void )
         memcpy( (uint8_t*) &nvm->SecureElement, (uint8_t*) &data.SecureElement ,sizeof( data.SecureElement ));
     } else if( err != ESP_ERR_NVS_NOT_FOUND) {
         ESP_LOGE("lorawan", "nvs SecureElement read err:0x%x", err);
+        return  0;
+    }
+
+    // Mac Group 2
+    err = __nvs_read_then_check(NVS_DATA_MACGROUP2_KEY, ( uint8_t* ) &data.MacGroup2,  sizeof( data.MacGroup2 ));
+    if( err == ESP_OK )
+    {
+        if( new_region != data.MacGroup2.Region ) {
+            ESP_LOGI("lorawan", "change region: %d --> %d", data.MacGroup2.Region, new_region);
+            return 0; //When changing the region, the following fields cannot be restored.
+        }
+
+        memcpy( (uint8_t*) &nvm->MacGroup2, (uint8_t*) &data.MacGroup2 ,sizeof( data.MacGroup2 ));
+    } else if( err != ESP_ERR_NVS_NOT_FOUND) {
+        ESP_LOGE("lorawan", "nvs MacGroup2 read err:0x%x", err);
+        return  0;
+    }
+
+    // Mac Group 1
+    err = __nvs_read_then_check(NVS_DATA_MACGROUP1_KEY, ( uint8_t* ) &data.MacGroup1,  sizeof( data.MacGroup1 ));
+    if( err == ESP_OK )
+    {
+        memcpy( (uint8_t*) &nvm->MacGroup1, (uint8_t*) &data.MacGroup1 ,sizeof( data.MacGroup1 ));
+    } else if( err != ESP_ERR_NVS_NOT_FOUND) {
+        ESP_LOGE("lorawan", "nvs MacGroup1 read err:0x%x", err);
         return  0;
     }
 

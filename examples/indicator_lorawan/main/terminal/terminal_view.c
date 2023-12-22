@@ -20,8 +20,8 @@ static const char *TAG_TERMINAL = "indicator>";
 static struct indicator_terminal __g_terminal;
 
 #define COLOR_INFO  0x66BB6A // green
-#define COLOR_WARN  0xE91E63 // Pink
-#define COLOR_ERROR 0xFDD835 // Yellow
+#define COLOR_WARN  0xFDD835 // Yellow
+#define COLOR_ERROR 0xE91E63 // Pink
 
 #ifdef MAX_TERMINAL_LOG_COUNT
     #error "MAX_TERMINAL_LOG_COUNT (ms)is already defined"

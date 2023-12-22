@@ -452,7 +452,7 @@ static void OnTxData(LmHandlerTxParams_t *params)
     uint8_t level         = LORAWAN_LOG_LEVEL_INFO;
     uint8_t index         = 0;
 
-    if (params->AppData.BufferSize != 0) {
+    if (params->AppData.BufferSize != 0  && (LmHandlerJoinStatus() == LORAMAC_HANDLER_SET)) {
         if (params->MsgType == LORAMAC_HANDLER_CONFIRMED_MSG) {
             if (params->AckReceived == 0) {
                 level = LORAWAN_LOG_LEVEL_WARN;
@@ -813,11 +813,6 @@ static void __view_event_handler(void *handler_args, esp_event_base_t base, int3
         case VIEW_EVENT_LORAWAN_CFG_APPLY: {
             struct view_data_lorawan_basic_cfg *p_cfg = (struct view_data_lorawan_basic_cfg *)event_data;
             ESP_LOGI(TAG, "event: VIEW_EVENT_LORAWAN_CFG_APPLY");
-
-            if( p_cfg->region  != __g_lorawan_model.basic_cfg.region ) {
-                NvmDataMgmtFactoryReset();
-            }
-            
             __lorawan_basic_cfg_set(p_cfg);
             __lorawan_basic_cfg_save(p_cfg);
             break;
