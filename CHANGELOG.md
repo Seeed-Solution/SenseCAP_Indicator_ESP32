@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## 2024-01-05                
+
+### Added
+- Add a terminal png on indicator_lorawan demo
+
+### Changed
+- change button title
+
 ## 2023-12-18                
 ### Changed
 - Update indicator_lorawan demo README

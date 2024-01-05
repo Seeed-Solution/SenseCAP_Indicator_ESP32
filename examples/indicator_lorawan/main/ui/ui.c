@@ -91,6 +91,9 @@ lv_obj_t * ui_PnlDot3;
 lv_obj_t * ui_PnlDot2;
 lv_obj_t * ui_PnlDot4;
 lv_obj_t * ui_LblTime3;
+void ui_event_BtnLoRa3(lv_event_t * e);
+lv_obj_t * ui_BtnLoRa3;
+lv_obj_t * ui_LblLoRaStatus3;
 
 
 // SCREEN: ui_ScreenSetting
@@ -121,21 +124,6 @@ lv_obj_t * ui_PnlDot5;
 lv_obj_t * ui_PnlDot7;
 lv_obj_t * ui_PnlDot8;
 lv_obj_t * ui_PnlDot6;
-
-
-// SCREEN: ui_ScreenCharts
-void ui_ScreenCharts_screen_init(void);
-lv_obj_t * ui_ScreenCharts;
-void ui_event_BtnBackSHistory(lv_event_t * e);
-lv_obj_t * ui_BtnBackSHistory;
-lv_obj_t * ui_LblTitleHistory;
-lv_obj_t * ui_PnlHistory;
-void ui_event_TabView2(lv_event_t * e);
-lv_obj_t * ui_TabView2;
-lv_obj_t * ui_TabPageDay;
-lv_obj_t * ui_ChartDay;
-lv_obj_t * ui_TabPageWeek;
-lv_obj_t * ui_ChartWeek;
 
 
 // SCREEN: ui_ScreenLoRaWAN
@@ -208,6 +196,15 @@ lv_obj_t * ui_BtnLoRaWANStatus;
 lv_obj_t * ui_LblLoRaWANStatus;
 
 
+// SCREEN: ui_ScreenMonitor
+void ui_ScreenMonitor_screen_init(void);
+lv_obj_t * ui_ScreenMonitor;
+void ui_event_BtnBackSConsole(lv_event_t * e);
+lv_obj_t * ui_BtnBackSConsole;
+lv_obj_t * ui_LblTitleConsole;
+lv_obj_t * ui_PnlConsole;
+
+
 // SCREEN: ui_ScreenWIFI
 void ui_ScreenWIFI_screen_init(void);
 lv_obj_t * ui_ScreenWIFI;
@@ -270,13 +267,19 @@ lv_obj_t * ui_BtnBackSDateTime;
 lv_obj_t * ui_LblTitleDateTime;
 
 
-// SCREEN: ui_ScreenConsole
-void ui_ScreenConsole_screen_init(void);
-lv_obj_t * ui_ScreenConsole;
-void ui_event_BtnBackSConsole(lv_event_t * e);
-lv_obj_t * ui_BtnBackSConsole;
-lv_obj_t * ui_LblTitleConsole;
-lv_obj_t * ui_PnlConsole;
+// SCREEN: ui_ScreenCharts
+void ui_ScreenCharts_screen_init(void);
+lv_obj_t * ui_ScreenCharts;
+void ui_event_BtnBackSHistory(lv_event_t * e);
+lv_obj_t * ui_BtnBackSHistory;
+lv_obj_t * ui_LblTitleHistory;
+lv_obj_t * ui_PnlHistory;
+void ui_event_TabView2(lv_event_t * e);
+lv_obj_t * ui_TabView2;
+lv_obj_t * ui_TabPageDay;
+lv_obj_t * ui_ChartDay;
+lv_obj_t * ui_TabPageWeek;
+lv_obj_t * ui_ChartWeek;
 lv_obj_t * ui____initial_actions0;
 const lv_img_dsc_t * ui_imgset_co[1] = {&ui_img_co2_png};
 const lv_img_dsc_t * ui_imgset_humidity_[2] = {&ui_img_humidity_1_png, &ui_img_humidity_2_png};
@@ -403,6 +406,9 @@ void ui_event_ScreenBulb(lv_event_t * e)
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_ScreenSensor, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_ScreenSensor_screen_init);
     }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        fn_save_pre_screen(e);
+    }
 }
 void ui_event_BtnBackSBulb(lv_event_t * e)
 {
@@ -423,6 +429,14 @@ void ui_event_SwitchBulb(lv_event_t * e)
     if(event_code == LV_EVENT_VALUE_CHANGED &&  lv_obj_has_state(target, LV_STATE_CHECKED)) {
         lora_light_on(e);
         _ui_image_set_property(ui_ImgBulb, _UI_IMAGE_PROPERTY_IMAGE, & ui_img_bulb_light_png);
+    }
+}
+void ui_event_BtnLoRa3(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        check_if_lorawan_connected(e);
     }
 }
 void ui_event_ScreenSetting(lv_event_t * e)
@@ -471,22 +485,6 @@ void ui_event_BtnDateTime1(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_SHORT_CLICKED) {
         _ui_screen_change(&ui_ScreenDatetime, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_ScreenDatetime_screen_init);
-    }
-}
-void ui_event_BtnBackSHistory(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_ScreenSensor, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_ScreenSensor_screen_init);
-    }
-}
-void ui_event_TabView2(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_VALUE_CHANGED) {
-        TabviewChanged(e);
     }
 }
 void ui_event_BtnBackSLoRaWAN(lv_event_t * e)
@@ -560,7 +558,7 @@ void ui_event_toTerminal(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_ScreenConsole, LV_SCR_LOAD_ANIM_FADE_ON, 300, 0, &ui_ScreenConsole_screen_init);
+        _ui_screen_change(&ui_ScreenMonitor, LV_SCR_LOAD_ANIM_FADE_ON, 300, 0, &ui_ScreenMonitor_screen_init);
     }
 }
 void ui_event_BtnLoRaWANStatus(lv_event_t * e)
@@ -570,6 +568,14 @@ void ui_event_BtnLoRaWANStatus(lv_event_t * e)
     if(event_code == LV_EVENT_SHORT_CLICKED) {
         _ui_state_modify(ui_BtnLoRaWANStatus, LV_STATE_CHECKED, _UI_MODIFY_STATE_TOGGLE);
         fn_LoRaWANStatus_clicked(e);
+    }
+}
+void ui_event_BtnBackSConsole(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        Back2PreScreen(e);
     }
 }
 void ui_event_BtnBackSWifi(lv_event_t * e)
@@ -667,12 +673,20 @@ void ui_event_BtnBackSDateTime(lv_event_t * e)
         Back2PreScreen(e);
     }
 }
-void ui_event_BtnBackSConsole(lv_event_t * e)
+void ui_event_BtnBackSHistory(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_ScreenLoRaWAN, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_ScreenLoRaWAN_screen_init);
+        _ui_screen_change(&ui_ScreenSensor, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_ScreenSensor_screen_init);
+    }
+}
+void ui_event_TabView2(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        TabviewChanged(e);
     }
 }
 
@@ -690,12 +704,12 @@ void ui_init(void)
     ui_ScreenSensor_screen_init();
     ui_ScreenBulb_screen_init();
     ui_ScreenSetting_screen_init();
-    ui_ScreenCharts_screen_init();
     ui_ScreenLoRaWAN_screen_init();
+    ui_ScreenMonitor_screen_init();
     ui_ScreenWIFI_screen_init();
     ui_ScreenDisplay_screen_init();
     ui_ScreenDatetime_screen_init();
-    ui_ScreenConsole_screen_init();
+    ui_ScreenCharts_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_ScreenTime);
 }

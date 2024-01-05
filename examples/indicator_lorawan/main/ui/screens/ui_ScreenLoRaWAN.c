@@ -577,7 +577,7 @@ void ui_ScreenLoRaWAN_screen_init(void)
     lv_obj_set_width(ui_Label3, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Label3, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_Label3, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label3, "Console");
+    lv_label_set_text(ui_Label3, "Monitor");
 
     ui_BtnLoRaWANStatus = lv_btn_create(ui_ScreenLoRaWAN);
     lv_obj_set_width(ui_BtnLoRaWANStatus, 100);

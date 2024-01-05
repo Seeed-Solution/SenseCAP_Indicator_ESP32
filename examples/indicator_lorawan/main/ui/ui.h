@@ -94,6 +94,9 @@ extern lv_obj_t * ui_PnlDot3;
 extern lv_obj_t * ui_PnlDot2;
 extern lv_obj_t * ui_PnlDot4;
 extern lv_obj_t * ui_LblTime3;
+void ui_event_BtnLoRa3(lv_event_t * e);
+extern lv_obj_t * ui_BtnLoRa3;
+extern lv_obj_t * ui_LblLoRaStatus3;
 // SCREEN: ui_ScreenSetting
 void ui_ScreenSetting_screen_init(void);
 void ui_event_ScreenSetting(lv_event_t * e);
@@ -122,19 +125,6 @@ extern lv_obj_t * ui_PnlDot5;
 extern lv_obj_t * ui_PnlDot7;
 extern lv_obj_t * ui_PnlDot8;
 extern lv_obj_t * ui_PnlDot6;
-// SCREEN: ui_ScreenCharts
-void ui_ScreenCharts_screen_init(void);
-extern lv_obj_t * ui_ScreenCharts;
-void ui_event_BtnBackSHistory(lv_event_t * e);
-extern lv_obj_t * ui_BtnBackSHistory;
-extern lv_obj_t * ui_LblTitleHistory;
-extern lv_obj_t * ui_PnlHistory;
-void ui_event_TabView2(lv_event_t * e);
-extern lv_obj_t * ui_TabView2;
-extern lv_obj_t * ui_TabPageDay;
-extern lv_obj_t * ui_ChartDay;
-extern lv_obj_t * ui_TabPageWeek;
-extern lv_obj_t * ui_ChartWeek;
 // SCREEN: ui_ScreenLoRaWAN
 void ui_ScreenLoRaWAN_screen_init(void);
 extern lv_obj_t * ui_ScreenLoRaWAN;
@@ -203,6 +193,13 @@ extern lv_obj_t * ui_Label3;
 void ui_event_BtnLoRaWANStatus(lv_event_t * e);
 extern lv_obj_t * ui_BtnLoRaWANStatus;
 extern lv_obj_t * ui_LblLoRaWANStatus;
+// SCREEN: ui_ScreenMonitor
+void ui_ScreenMonitor_screen_init(void);
+extern lv_obj_t * ui_ScreenMonitor;
+void ui_event_BtnBackSConsole(lv_event_t * e);
+extern lv_obj_t * ui_BtnBackSConsole;
+extern lv_obj_t * ui_LblTitleConsole;
+extern lv_obj_t * ui_PnlConsole;
 // SCREEN: ui_ScreenWIFI
 void ui_ScreenWIFI_screen_init(void);
 extern lv_obj_t * ui_ScreenWIFI;
@@ -259,13 +256,19 @@ extern lv_obj_t * ui_time_format_cfg1;
 void ui_event_BtnBackSDateTime(lv_event_t * e);
 extern lv_obj_t * ui_BtnBackSDateTime;
 extern lv_obj_t * ui_LblTitleDateTime;
-// SCREEN: ui_ScreenConsole
-void ui_ScreenConsole_screen_init(void);
-extern lv_obj_t * ui_ScreenConsole;
-void ui_event_BtnBackSConsole(lv_event_t * e);
-extern lv_obj_t * ui_BtnBackSConsole;
-extern lv_obj_t * ui_LblTitleConsole;
-extern lv_obj_t * ui_PnlConsole;
+// SCREEN: ui_ScreenCharts
+void ui_ScreenCharts_screen_init(void);
+extern lv_obj_t * ui_ScreenCharts;
+void ui_event_BtnBackSHistory(lv_event_t * e);
+extern lv_obj_t * ui_BtnBackSHistory;
+extern lv_obj_t * ui_LblTitleHistory;
+extern lv_obj_t * ui_PnlHistory;
+void ui_event_TabView2(lv_event_t * e);
+extern lv_obj_t * ui_TabView2;
+extern lv_obj_t * ui_TabPageDay;
+extern lv_obj_t * ui_ChartDay;
+extern lv_obj_t * ui_TabPageWeek;
+extern lv_obj_t * ui_ChartWeek;
 extern lv_obj_t * ui____initial_actions0;
 
 LV_IMG_DECLARE(ui_img_background_png);    // assets\background.png
@@ -279,6 +282,7 @@ LV_IMG_DECLARE(ui_img_temp_2_png);    // assets\temp_2.png
 LV_IMG_DECLARE(ui_img_back_png);    // assets\back.png
 LV_IMG_DECLARE(ui_img_bulb_dark_png);    // assets\bulb dark.png
 LV_IMG_DECLARE(ui_img_bulb_light_png);    // assets\bulb light.png
+LV_IMG_DECLARE(ui_img_terminal_png);    // assets\terminal.png
 LV_IMG_DECLARE(ui_img_setting_png);    // assets\setting.png
 LV_IMG_DECLARE(ui_img_datacloud_png);    // assets\datacloud.png
 LV_IMG_DECLARE(ui_img_wifi_setting_png);    // assets\wifi_setting.png

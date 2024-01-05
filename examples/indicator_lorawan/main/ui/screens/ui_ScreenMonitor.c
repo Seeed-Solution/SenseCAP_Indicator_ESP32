@@ -5,12 +5,12 @@
 
 #include "../ui.h"
 
-void ui_ScreenConsole_screen_init(void)
+void ui_ScreenMonitor_screen_init(void)
 {
-    ui_ScreenConsole = lv_obj_create(NULL);
-    lv_obj_clear_flag(ui_ScreenConsole, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_ScreenMonitor = lv_obj_create(NULL);
+    lv_obj_clear_flag(ui_ScreenMonitor, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_BtnBackSConsole = lv_btn_create(ui_ScreenConsole);
+    ui_BtnBackSConsole = lv_btn_create(ui_ScreenMonitor);
     lv_obj_set_width(ui_BtnBackSConsole, 100);
     lv_obj_set_height(ui_BtnBackSConsole, 50);
     lv_obj_set_x(ui_BtnBackSConsole, 10);
@@ -21,21 +21,22 @@ void ui_ScreenConsole_screen_init(void)
     lv_obj_set_style_bg_opa(ui_BtnBackSConsole, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(ui_BtnBackSConsole, &ui_img_back_png, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_LblTitleConsole = lv_label_create(ui_ScreenConsole);
+    ui_LblTitleConsole = lv_label_create(ui_ScreenMonitor);
     lv_obj_set_width(ui_LblTitleConsole, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LblTitleConsole, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_LblTitleConsole, 1);
     lv_obj_set_y(ui_LblTitleConsole, 50);
     lv_obj_set_align(ui_LblTitleConsole, LV_ALIGN_TOP_MID);
-    lv_label_set_text(ui_LblTitleConsole, "Console");
+    lv_label_set_text(ui_LblTitleConsole, "Monitor");
     lv_obj_set_style_text_font(ui_LblTitleConsole, &ui_font_HeadTitle, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_PnlConsole = lv_obj_create(ui_ScreenConsole);
+    ui_PnlConsole = lv_obj_create(ui_ScreenMonitor);
     lv_obj_set_width(ui_PnlConsole, 480);
     lv_obj_set_height(ui_PnlConsole, 380);
     lv_obj_set_x(ui_PnlConsole, 0);
     lv_obj_set_y(ui_PnlConsole, -1);
     lv_obj_set_align(ui_PnlConsole, LV_ALIGN_BOTTOM_MID);
+    lv_obj_clear_flag(ui_PnlConsole, LV_OBJ_FLAG_SCROLL_ELASTIC);      /// Flags
     lv_obj_set_style_bg_color(ui_PnlConsole, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_PnlConsole, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui_PnlConsole, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);

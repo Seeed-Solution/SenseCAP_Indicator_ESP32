@@ -6,12 +6,12 @@ SET(SOURCES components/ui_comp_btnwifi1.c
     screens/ui_ScreenSensor.c
     screens/ui_ScreenBulb.c
     screens/ui_ScreenSetting.c
-    screens/ui_ScreenCharts.c
     screens/ui_ScreenLoRaWAN.c
+    screens/ui_ScreenMonitor.c
     screens/ui_ScreenWIFI.c
     screens/ui_ScreenDisplay.c
     screens/ui_ScreenDatetime.c
-    screens/ui_ScreenConsole.c
+    screens/ui_ScreenCharts.c
     ui.c
     components/ui_comp_hook.c
     ui_helpers.c
@@ -27,6 +27,7 @@ SET(SOURCES components/ui_comp_btnwifi1.c
     images/ui_img_back_png.c
     images/ui_img_bulb_dark_png.c
     images/ui_img_bulb_light_png.c
+    images/ui_img_terminal_png.c
     images/ui_img_setting_png.c
     images/ui_img_datacloud_png.c
     images/ui_img_wifi_setting_png.c

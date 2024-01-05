@@ -14,7 +14,7 @@ void fn_save_pre_screen(lv_event_t * e);
 void btn_clicked_sensor_charts_event(lv_event_t * e);
 void lora_light_off(lv_event_t * e);
 void lora_light_on(lv_event_t * e);
-void TabviewChanged(lv_event_t * e);
+void check_if_lorawan_connected(lv_event_t * e);
 void Back2PreScreen(lv_event_t * e);
 void BtnPlusDecreaseNum(lv_event_t * e);
 void NumIntervalDefocused(lv_event_t * e);
@@ -24,6 +24,7 @@ void brighness_update_callback(lv_event_t * e);
 void brighness_cfg_event_cb(lv_event_t * e);
 void display_cfg_apply_event_cb(lv_event_t * e);
 void save_timesetting(lv_event_t * e);
+void TabviewChanged(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

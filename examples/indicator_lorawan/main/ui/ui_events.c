@@ -19,7 +19,21 @@ void Back2PreScreen(lv_event_t *e)
         return;
     }
     // any screen change anim
-    _ui_screen_change(&g_prev_scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, NULL);
+    
+    lv_obj_t **target_scr = &g_prev_scr;
+    lv_scr_load_anim_t anim = LV_SCR_LOAD_ANIM_NONE;
+    uint32_t speed = 0;
+    uint32_t delay = 0;
+
+    // for light bulb specific
+    if (lv_scr_act() == ui_ScreenMonitor && g_prev_scr == ui_ScreenBulb) {
+        target_scr = &ui_ScreenBulb;
+        anim = LV_SCR_LOAD_ANIM_MOVE_TOP;
+    } else if (lv_scr_act() == ui_ScreenMonitor) {
+        target_scr = &ui_ScreenLoRaWAN;
+    }
+
+    _ui_screen_change(target_scr, anim, speed, delay, NULL);
 }
 
 int NumCheck(lv_event_t *e)

@@ -99,7 +99,7 @@ static void __view_event_handler(void *arg, esp_event_base_t event_base, int32_t
                 lv_obj_add_state(ui_toTerminal, LV_STATE_CHECKED);
                 lv_obj_clear_flag(ui_toTerminal, LV_OBJ_FLAG_CLICKABLE);
 
-                lv_label_set_text(ui_LblLoRaWANStatus, "START");
+                lv_label_set_text(ui_LblLoRaWANStatus, "Join");
                 lv_obj_add_flag(ui_SwClass, LV_OBJ_FLAG_CLICKABLE);
                 lv_obj_add_flag(ui_DdFreq, LV_OBJ_FLAG_CLICKABLE);
                 lv_obj_add_flag(ui_SwActivation, LV_OBJ_FLAG_CLICKABLE);
@@ -279,19 +279,22 @@ static void update_panel_network_cfg(struct view_data_lorawan_basic_cfg *cfg)
     }
     lv_port_sem_give();
 }
-
+static bool allow_monitor = false;
 static void update_lorawan_network_status(enum view_data_lorawan_join status)
 {
     lv_img_dsc_t *p_img = &ui_img_lora_disconnect_png;
     switch (status) {
         case LORAWAN_JOIN_ST_OK:
             p_img = &ui_img_lora_connected_png;
+            allow_monitor = true;
             break;
         case LORAWAN_JOIN_ST_FAIL:
             p_img = &ui_img_lora_disconnect_png;
+            allow_monitor = false;
             break;
         case LORAWAN_JOIN_ST_PROCEED:
             p_img = &ui_img_lora_ing_png;
+            allow_monitor = true;
             break;
         default:
             break;
@@ -300,4 +303,13 @@ static void update_lorawan_network_status(enum view_data_lorawan_join status)
     lv_img_set_src(ui_LblLoRaStatus1, p_img);
     lv_img_set_src(ui_LblLoRaStatus2, p_img);
     lv_port_sem_give();
+}
+
+void check_if_lorawan_connected(lv_event_t * e)
+{
+    if(allow_monitor){
+        _ui_screen_change(&ui_ScreenMonitor, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 200, 0, &ui_ScreenMonitor_screen_init);
+    }else{
+        ESP_LOGI(TAG, "Join LoRaWAN Network First!");
+    }
 }

@@ -68,12 +68,6 @@ void app_main(void)
         .task_core_id    = tskNO_AFFINITY};
     ESP_ERROR_CHECK(esp_event_loop_create(&view_event_task_args, &view_event_handle));
 
-    lv_port_sem_take();
-    /* (must be 480*800, set LCD_EVB_SCREEN_ROTATION_90 in menuconfig)*/
-    ui_init();
-
-    lv_port_sem_give();
-
     indicator_view_init();
 
     indicator_model_init();
