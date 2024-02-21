@@ -58,7 +58,6 @@ static void __indicator_image_task(void *p_arg)
     unsigned char *decoded_str =NULL;
 
 
-
     // 计算解码后的长度
     int ret = mbedtls_base64_decode(NULL, 0, &output_len, (const unsigned char *)base64_jpeg, str_len);
     if (1)
@@ -132,7 +131,7 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Out of ui_init()");
 
-    xTaskCreate(&__indicator_image_task, "__indicator_image_task", 1024 * 10, NULL, 50, NULL);
+    // xTaskCreate(&__indicator_image_task, "__indicator_image_task", 1024 * 10, NULL, 50, NULL);
 
     while (1)
     {
