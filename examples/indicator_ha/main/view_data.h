@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+typedef long long int time_t;
+
 enum start_screen{
     SCREEN_SENSECAP_LOG, //todo
     SCREEN_WIFI_CONFIG,
