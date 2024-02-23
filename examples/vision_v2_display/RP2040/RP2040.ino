@@ -9,6 +9,7 @@
   #define ESP_rxPin 17
   #define ESP_txPin 16
   #define espSerial Serial1
+  #define ESP32_COMM_BAUD_RATE              (115200)
   // Right Grove -> Check https://files.seeedstudio.com/wiki/SenseCAP/SenseCAP_Indicator/grove.png
   #if AT_UART == 1 
     #define rxPin 20
@@ -28,13 +29,14 @@ const char compile_date[] = __DATE__ " " __TIME__;
 SSCMA AI;
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  // while(!Serial) ;
   Serial.println(compile_date);
   #ifdef ARDUINO_ARCH_RP2040 
-    Serial.println("Setting UART For RP2040");
+    Serial.println("Setting ESP32 UART For RP2040");
     espSerial.setRX(ESP_rxPin);
     espSerial.setTX(ESP_txPin);
-    espSerial.begin(115200);
+    espSerial.begin(ESP32_COMM_BAUD_RATE);
   #endif
 
   #if (AT_UART == 1)
@@ -43,21 +45,21 @@ void setup()
   #else 
     Serial.println("Using I2C");
     #ifdef ARDUINO_ARCH_RP2040
-    Serial.println("Setting Wire for RP2040");
-      Wire.setSDA(_SDA);
+      Serial.println("Setting Wire for RP2040");
       Wire.setSCL(_SCL);
-      Wire.begin();
+      Wire.setSDA(_SDA);
     #endif
     AI.begin();
   #endif
 
-  Serial.println("App Start!");
+  // Serial.println("App Start!");
 
 }
 
 void loop()
 {
     JsonDocument doc; // Adjust size as needed
+    // DynamicJsonDocument doc(10*1024);
     if (!AI.invoke(1, false, true))
     {
         // Performance metrics
@@ -65,6 +67,11 @@ void loop()
         // doc["inference"]= AI.perf().inference;
         // doc["postprocess"]= AI.perf().postprocess;
 
+        // Last image
+        if (AI.last_image().length())
+        {
+            doc["img"] = AI.last_image();
+        }
         // // Boxes
         // JsonArray boxes = doc.createNestedArray("boxes");
         for (int i = 0; i < AI.boxes().size(); i++)
@@ -141,14 +148,9 @@ void loop()
         //     Serial.println("]");
         // }
 
-        // Last image
-        if (AI.last_image().length())
-        {
-            doc["img"] = AI.last_image().c_str();
-        }
-
-        serializeJsonPretty(doc, Serial); // Serialize and print the JSON document
-        Serial.println();                 // Ensure there's a newline at the end
+        // serializeJsonPretty(doc, Serial); // Serialize and print the JSON document
+        serializeJson(doc, espSerial); // Serialize and print the JSON document
+        // Serial.println();                 // Ensure there's a newline at the end
     }
-    delay(2000);
+    // delay(3000);
 }
