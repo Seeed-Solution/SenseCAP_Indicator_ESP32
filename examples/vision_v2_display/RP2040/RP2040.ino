@@ -11,9 +11,10 @@
   #define espSerial Serial1
   #define ESP32_COMM_BAUD_RATE              (115200)
   // Right Grove -> Check https://files.seeedstudio.com/wiki/SenseCAP/SenseCAP_Indicator/grove.png
-  #define rxPin 26
-  #define txPin 27
-  SoftwareSerial atSerial = SoftwareSerial(rxPin, txPin);
+  #define txPin 20
+  #define rxPin 21
+  //SoftwareSerial atSerial = SoftwareSerial(rxPin, txPin);
+  #define atSerial Serial2
   #define _SDA 20
   #define _SCL 21
 #elif ESP32 // XIAO /////////////////////////
@@ -54,10 +55,10 @@ void setup()
 void setup1()
 {
   #ifdef pcSerial
-    pcSerial.println("Setting Wire for AI_I2C");
+    pcSerial.println("Setting Wire1 for AI_I2C");
   #endif
-    Wire.setSCL(_SCL);
-    Wire.setSDA(_SDA);
+    Wire1.setSCL(_SCL);
+    Wire1.setSDA(_SDA);
     AI_I2C.begin();
     Serial.printf("AI_I2C _serialType: %d\n", AI_I2C._serialType);
 }
