@@ -95,7 +95,7 @@ static inline void display_one_page(const unsigned char *p_data)
             img_dsc.data = decoded_str;
             lv_img_set_src(ui_v2_image, &img_dsc);
 
-            ESP_LOGI(TAG, "Decoded image size: %zu", output_len);
+            // ESP_LOGI(TAG, "Decoded image size: %zu", output_len);
         }
         else
         {

@@ -24,9 +24,9 @@ static const char *TAG = "esp32_rp2040";
 #define ESP32_RP2040_CTS (UART_PIN_NO_CHANGE)
 
 #define ESP32_COMM_PORT_NUM (2)
-#define ESP32_COMM_BAUD_RATE (115200)
-#define ESP32_RP2040_COMM_TASK_STACK_SIZE (1024 * 5)
-#define BUF_SIZE (4 * 1024)
+#define ESP32_COMM_BAUD_RATE              (921600)
+#define ESP32_RP2040_COMM_TASK_STACK_SIZE (1024 * 10)
+#define BUF_SIZE (10 * 1024)
 
 uint8_t rev_buf[BUF_SIZE]; // 临时接收缓冲区
 
