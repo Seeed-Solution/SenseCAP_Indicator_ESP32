@@ -16,25 +16,25 @@
 extern "C" {
 #endif
 
-// enum  pkt_type {
+enum  pkt_type {
 
-//     PKT_TYPE_CMD_COLLECT_INTERVAL = 0xA0, //uin32_t 
-//     PKT_TYPE_CMD_BEEP_ON  = 0xA1,  //uin32_t  ms: on time 
-//     PKT_TYPE_CMD_BEEP_OFF = 0xA2,
-//     PKT_TYPE_CMD_SHUTDOWN = 0xA3, //uin32_t 
-//     PKT_TYPE_CMD_POWER_ON = 0xA4,
+    // PKT_TYPE_CMD_COLLECT_INTERVAL = 0xA0, //uin32_t 
+    PKT_TYPE_CMD_BEEP_ON  = 0xA1,  //uin32_t  ms: on time 
+    PKT_TYPE_CMD_BEEP_OFF = 0xA2,
+    PKT_TYPE_CMD_SHUTDOWN = 0xA3, //uin32_t 
+    PKT_TYPE_CMD_POWER_ON = 0xA4,
 
-//     PKT_TYPE_SENSOR_SCD41_TEMP  = 0xB0, // float
-//     PKT_TYPE_SENSOR_SCD41_HUMIDITY = 0xB1, // float
-//     PKT_TYPE_SENSOR_SCD41_CO2 = 0xB2, // float
+    // PKT_TYPE_SENSOR_SCD41_TEMP  = 0xB0, // float
+    // PKT_TYPE_SENSOR_SCD41_HUMIDITY = 0xB1, // float
+    // PKT_TYPE_SENSOR_SCD41_CO2 = 0xB2, // float
 
-//     PKT_TYPE_SENSOR_SHT41_TEMP = 0xB3, // float
-//     PKT_TYPE_SENSOR_SHT41_HUMIDITY = 0xB4, // float
+    // PKT_TYPE_SENSOR_SHT41_TEMP = 0xB3, // float
+    // PKT_TYPE_SENSOR_SHT41_HUMIDITY = 0xB4, // float
 
-//     PKT_TYPE_SENSOR_TVOC_INDEX = 0xB5, // float
+    // PKT_TYPE_SENSOR_TVOC_INDEX = 0xB5, // float
 
-//     //todo
-// };
+    //todo
+};
 
 void esp32_rp2040_init(void);
 
