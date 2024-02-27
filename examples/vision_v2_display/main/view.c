@@ -104,6 +104,7 @@ void JsonQueue_processing_task(void *pvParameters)
                 cJSON *img = cJSON_GetObjectItem(receivedJson, "img");
                 if (cJSON_IsString(img) && (img->valuestring != NULL))
                 {
+                    lv_port_sem_take();
                     delete_all_rects();
                     // lv_obj_t *child = lv_obj_get_child(ui_v2_image, 0);
                     // if(child != NULL){
@@ -111,6 +112,7 @@ void JsonQueue_processing_task(void *pvParameters)
                     // }
                     // lv_obj_clean(ui_v2_image);
                     display_one_page(ui_v2_image, (const unsigned char *)img->valuestring);
+                    lv_port_sem_give();
                 }
 
                 cJSON *boxes = cJSON_GetObjectItem(receivedJson, "boxes");
@@ -140,7 +142,9 @@ void JsonQueue_processing_task(void *pvParameters)
                                  boxes_array[box_count].h,
                                  boxes_array[box_count].score,
                                  boxes_array[box_count].target);
+                        lv_port_sem_take();
                         draw_one_rectangle(ui_v2_image, array[0], array[1], array[2], array[3], lv_color_make(113, 235, 52), array[4], array[5]);
+                        lv_port_sem_give();
                         box_count++;
                     }
                 }
@@ -183,7 +187,7 @@ static inline void display_one_page(lv_obj_t *image, const unsigned char *p_data
         img_dsc.data = decoded_str;
         img_dsc.data_size = output_len; // 确保设置了正确的data_size
         lv_img_set_src(image, &img_dsc);
-        // ESP_LOGI(TAG, "displayed successfully.");
+        ESP_LOGI(TAG, "displayed successfully.");
     }
     else if (decode_ret == MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL)
     {
