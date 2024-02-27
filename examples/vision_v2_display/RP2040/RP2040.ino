@@ -80,7 +80,7 @@ void loop() {
             // doc["boxes"]["y"] = box.y;
             // doc["boxes"]["w"] = box.w;
             // doc["boxes"]["h"] = box.h; 
-            int currentBox[6] = {box.target, box.score, box.x, box.y, box.w, box.h}; 
+            int currentBox[6] = {box.x, box.y, box.w, box.h, box.score, box.target}; 
             copyArray(currentBox, doc["boxes"][index++]);
         }
 
@@ -126,7 +126,7 @@ void loop() {
             index++;
         }
         
-        // serializeJsonPretty(doc, pcSerial); // Serialize and print the JSON document
+        serializeJsonPretty(doc, pcSerial); // Serialize and print the JSON document
         #ifdef espSerial
         serializeJson(doc, espSerial); // Serialize and print the JSON document
         #endif
