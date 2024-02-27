@@ -54,17 +54,6 @@ void setup()
   Serial.printf("AI _serialType: %d\n", AI._serialType);
 }
 
-// void setup1()
-// {
-//   #ifdef pcSerial
-//     pcSerial.println("Setting Wire1 for AI_I2C");
-//   #endif
-//     Wire1.setSCL(_SCL);
-//     Wire1.setSDA(_SDA);
-//     AI_I2C.begin();
-//     Serial.printf("AI_I2C _serialType: %d\n", AI_I2C._serialType);
-// }
-
 void loop() {
     if (!AI.invoke(1, false, true))
     {
@@ -143,6 +132,17 @@ void loop() {
         #endif
     }
 }
+
+// void setup1()
+// {
+//   #ifdef pcSerial
+//     pcSerial.println("Setting Wire1 for AI_I2C");
+//   #endif
+//     Wire1.setSCL(_SCL);
+//     Wire1.setSDA(_SDA);
+//     AI_I2C.begin();
+//     Serial.printf("AI_I2C _serialType: %d\n", AI_I2C._serialType);
+// }
 
 // void loop1() { 
 //     if (!AI_I2C.invoke(1, false, true))

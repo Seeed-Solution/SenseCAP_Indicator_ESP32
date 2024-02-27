@@ -24,71 +24,16 @@ static const char *TAG = "esp32_rp2040";
 #define ESP32_RP2040_CTS (UART_PIN_NO_CHANGE)
 
 #define ESP32_COMM_PORT_NUM (2)
-#define ESP32_COMM_BAUD_RATE              (921600)
-#define ESP32_RP2040_COMM_TASK_STACK_SIZE (1024 * 10)
-#define BUF_SIZE (10 * 1024)
+#define ESP32_COMM_BAUD_RATE (921600)
+#define ESP32_RP2040_COMM_TASK_STACK_SIZE (1024 * 15)
 
 uint8_t rev_buf[BUF_SIZE]; // 临时接收缓冲区
-
-#define MAX_JSON_SIZE BUF_SIZE * 2
-static uint8_t json_buffer[MAX_JSON_SIZE];
+static char json_buffer[MAX_JSON_SIZE];
 static json_buffer_len = 0;
 
-static void __commu_event_handler(void *handler_args, esp_event_base_t base, int32_t id, void *event_data);
-__attribute__((weak)) int __sensor_data_parse_handle(uint8_t *p_data, ssize_t len)
-{
-    ESP_LOGI(TAG, "__sensor_data_parse_handle");
-}
-
 #define RP2040_ESP_COMM_DEBUG 0
-extern QueueHandle_t img_Queue;
-void process_json_data(cJSON *json)
-{
-    cJSON *img = cJSON_GetObjectItem(json, "img");
-    cJSON *boxes = cJSON_GetObjectItem(json, "boxes");
 
-    if (cJSON_IsString(img) && (img->valuestring != NULL))
-    {
-        // 动态分配内存来存储事件数据
-        img_event_data_t *event_data = (img_event_data_t *)malloc(sizeof(img_event_data_t));
-        if (event_data != NULL)
-        {
-            event_data->img_base64 = strdup(img->valuestring); // 复制字符串以确保它在事件处理时仍然有效
-            event_data->img_size = strlen(img->valuestring);
-            // ESP_LOGI(TAG, "allocated");
-            if (event_data->img_base64 != NULL)
-            {
-                // ESP_LOGI(TAG, "\nImage data: %s", event_data->img_base64); // 正常
-
-                // esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_IMG, event_data, sizeof(img_event_data_t), portMAX_DELAY);
-                if (xQueueSend(img_Queue, &event_data, portMAX_DELAY) != pdPASS)
-                {
-                    // 处理队列发送失败的情况，例如可以释放data的内存
-                    free(event_data->img_base64);
-                    free(event_data);
-                }
-            }
-            else
-            {
-                // 如果字符串复制失败，则释放之前分配的内存以避免内存泄漏
-                free(event_data);
-            }
-        }
-    }
-
-    if (cJSON_IsObject(boxes))
-    {
-        cJSON *target = cJSON_GetObjectItem(boxes, "target");
-        cJSON *score = cJSON_GetObjectItem(boxes, "score");
-        cJSON *x = cJSON_GetObjectItem(boxes, "x");
-        cJSON *y = cJSON_GetObjectItem(boxes, "y");
-        cJSON *w = cJSON_GetObjectItem(boxes, "w");
-        cJSON *h = cJSON_GetObjectItem(boxes, "h");
-
-        ESP_LOGI(TAG, "\nBoxes data - Target: %d, Score: %d, X: %d, Y: %d, W: %d, H: %d",
-                 target->valueint, score->valueint, x->valueint, y->valueint, w->valueint, h->valueint);
-    }
-}
+extern QueueHandle_t JsonQueue;
 
 static void esp32_rp2040_comm_task(void *arg)
 {
@@ -127,8 +72,38 @@ static void esp32_rp2040_comm_task(void *arg)
                     ESP_LOGI(TAG, "my_json_string\n%s", my_json_string);
                     cJSON_free(my_json_string);
 #endif
-                    process_json_data(json);
-                    cJSON_Delete(json);  // 完成处理后释放cJSON对象
+                    // process_json_data(json);
+                    // cJSON *jsonToSend = json;
+                    // if (xQueueSend(JsonQueue, &jsonToSend, portMAX_DELAY) != pdPASS) {
+                    //     // 队列发送失败，需要释放 cJSON 对象以避免内存泄露
+                    //     cJSON_Delete(json);
+                    //     ESP_LOGI(TAG, "Failed to send JSON object to queue");
+                    // }
+                    // ESP_LOGI(TAG, "JSON object sent to queue %p", &jsonToSend);
+                    char *strToSend = pvPortMalloc(json_buffer_len);
+                    if (strToSend != NULL)
+                    {
+
+                        memset(strToSend, 0, json_buffer_len);
+                        memcpy(strToSend, json_buffer, json_buffer_len);
+                        // if (xQueueSend(JsonQueue, &json_buffer, portMAX_DELAY) != pdPASS) {
+                        //     // 队列发送失败，需要释放 cJSON 对象以避免内存泄露
+                        //     memset(json_buffer, 0, json_buffer_len);
+                        //     ESP_LOGI(TAG, "Failed to send JSON object to queue");
+                        // }
+                        // cJSON_Delete(json);
+                        if (xQueueSend(JsonQueue, &strToSend, portMAX_DELAY) != pdPASS)
+                        {
+                            // 队列发送失败，需要释放 cJSON 对象以避免内存泄露
+                            vPortFree(strToSend);
+                            ESP_LOGI(TAG, "Failed to send JSON object to queue");
+                        }
+                    }
+                    else
+                    {
+                        ESP_LOGE(TAG, "Failed to allocate memory for JSON object");
+                    }
+                    cJSON_Delete(json);
                     json_buffer_len = 0; // 清空缓冲区，准备接收下一个消息
                 }
 #if RP2040_ESP_COMM_DEBUG
@@ -155,5 +130,14 @@ static void esp32_rp2040_comm_task(void *arg)
 
 void esp32_rp2040_init(void)
 {
-    xTaskCreate(esp32_rp2040_comm_task, "esp32_rp2040_comm_task", ESP32_RP2040_COMM_TASK_STACK_SIZE, NULL, 10, NULL);
+    // xTaskCreate(esp32_rp2040_comm_task, "esp32_rp2040_comm_task", ESP32_RP2040_COMM_TASK_STACK_SIZE, NULL, 10, NULL);
+    xTaskCreatePinnedToCore(
+        esp32_rp2040_comm_task,   // 任务函数
+        "esp32_rp2040_comm_task", // 任务名称
+        1024 * 50,                // 堆栈大小
+        NULL,                     // 传递给任务的参数
+        10,                       // 任务优先级
+        NULL,                     // 任务句柄
+        0                         // 任务固定在核心1
+    );
 }

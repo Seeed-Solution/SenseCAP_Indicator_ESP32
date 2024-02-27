@@ -41,9 +41,10 @@ enum {
     VIEW_EVENT_IMG = 0,      
     VIEW_EVENT_ALL,
 };
+#define BUF_SIZE (15 * 1024)
+#define MAX_JSON_SIZE (BUF_SIZE * 2)
 
-#define IMG_QUEUE_SIZE 10
-
+#define JsonQueue_SIZE (30)
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
