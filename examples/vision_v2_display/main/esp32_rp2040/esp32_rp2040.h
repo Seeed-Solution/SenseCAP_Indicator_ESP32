@@ -23,6 +23,7 @@ enum  pkt_type {
     PKT_TYPE_CMD_BEEP_OFF = 0xA2,
     PKT_TYPE_CMD_SHUTDOWN = 0xA3, //uin32_t 
     PKT_TYPE_CMD_POWER_ON = 0xA4,
+    PKT_TYPE_CMD_MODEL_TITLE = 0xA5,
 
     // PKT_TYPE_SENSOR_SCD41_TEMP  = 0xB0, // float
     // PKT_TYPE_SENSOR_SCD41_HUMIDITY = 0xB1, // float

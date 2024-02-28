@@ -79,11 +79,9 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Out of ui_init()");
 
-    app_view_init();
-    
     esp32_rp2040_init();
-
-    // xTaskCreate(&__indicator_image_task, "__indicator_image_task", 1024 * 10, NULL, 50, NULL);
+    
+    app_view_init();
     
     while (1)
     {

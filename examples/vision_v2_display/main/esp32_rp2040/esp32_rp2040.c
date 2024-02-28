@@ -13,9 +13,9 @@
 // #include <stdlib.h>
 #include "../main.h"
 #include "cJSON.h"
+#include "cobs.h"
 #include "driver/uart.h"
 #include "esp32_rp2040.h"
-
 static const char *TAG = "esp32_rp2040";
 
 #define ESP32_RP2040_TXD                  (19)
@@ -31,39 +31,39 @@ static const char *TAG = "esp32_rp2040";
 uint8_t buf[BUF_SIZE];  // recv
 uint8_t data[BUF_SIZE]; // decode
 
-static void               __commu_event_handler(void *handler_args, esp_event_base_t base, int32_t id, void *event_data);
+static void __commu_event_handler(void *handler_args, esp_event_base_t base, int32_t id, void *event_data);
 
-// static int __cmd_send(uint8_t cmd, void *p_data, uint8_t len)
-// {
-//     uint8_t buf[32]  = {0};
-//     uint8_t data[32] = {0};
+static int __cmd_send(uint8_t cmd, void *p_data, uint8_t len)
+{
+    uint8_t buf[32]  = {0};
+    uint8_t data[32] = {0};
 
-//     if (len > 31) {
-//         return -1;
-//     }
+    if (len > 31) {
+        return -1;
+    }
 
-//     uint8_t index = 1;
+    uint8_t index = 1;
 
-//     data[0]       = cmd;
+    data[0]       = cmd;
 
-//     if (len > 0 && p_data != NULL) {
-//         memcpy(&data[1], p_data, len);
-//         index += len;
-//     }
-//     cobs_encode_result ret = cobs_encode(buf, sizeof(buf), data, index);
-// #if 1 // SENSOR_COMM_DEBUG
-//     ESP_LOGI(TAG, "encode status:%d, len:%d", ret.status, ret.out_len);
-//     for (int i = 0; i < ret.out_len; i++) {
-//         printf("0x%x ", buf[i]);
-//     }
-//     printf("\r\n");
-// #endif
+    if (len > 0 && p_data != NULL) {
+        memcpy(&data[1], p_data, len);
+        index += len;
+    }
+    cobs_encode_result ret = cobs_encode(buf, sizeof(buf), data, index);
+#if 0 // SENSOR_COMM_DEBUG
+    ESP_LOGI(TAG, "encode status:%d, len:%d", ret.status, ret.out_len);
+    for (int i = 0; i < ret.out_len; i++) {
+        printf("0x%x ", buf[i]);
+    }
+    printf("\r\n");
+#endif
 
-//     if (ret.status == COBS_ENCODE_OK) {
-//         return uart_write_bytes(ESP32_COMM_PORT_NUM, buf, ret.out_len + 1);
-//     }
-//     return -1;
-// }
+    if (ret.status == COBS_ENCODE_OK) {
+        return uart_write_bytes(ESP32_COMM_PORT_NUM, buf, ret.out_len + 1);
+    }
+    return -1;
+}
 
 
 uint8_t     rev_buf[BUF_SIZE]; // 临时接收缓冲区
@@ -72,7 +72,7 @@ static json_buffer_len = 0;
 
 #define RP2040_ESP_COMM_DEBUG 0
 
-extern QueueHandle_t JsonQueue;
+QueueHandle_t JsonQueue;
 
 static void esp32_rp2040_comm_task(void *arg)
 {
@@ -89,7 +89,9 @@ static void esp32_rp2040_comm_task(void *arg)
     ESP_ERROR_CHECK(uart_driver_install(ESP32_COMM_PORT_NUM, BUF_SIZE * 2, 0, 0, NULL, intr_alloc_flags));
     ESP_ERROR_CHECK(uart_param_config(ESP32_COMM_PORT_NUM, &uart_config));
     ESP_ERROR_CHECK(uart_set_pin(ESP32_COMM_PORT_NUM, ESP32_RP2040_TXD, ESP32_RP2040_RXD, ESP32_RP2040_RTS, ESP32_RP2040_CTS));
-    // __cmd_send(PKT_TYPE_CMD_POWER_ON, NULL, 0);
+    __cmd_send(PKT_TYPE_CMD_BEEP_ON, NULL, 0);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+
     while (1) {
 
         int len = uart_read_bytes(ESP32_COMM_PORT_NUM, rev_buf, (BUF_SIZE - 1), 20 / portTICK_PERIOD_MS);
@@ -143,6 +145,11 @@ static void esp32_rp2040_comm_task(void *arg)
 
 void esp32_rp2040_init(void)
 {
+    JsonQueue = xQueueCreate(JsonQueue_SIZE, sizeof(char *)); // Image Queue
+    if (JsonQueue == NULL) {
+        ESP_LOGE(TAG, "Queue create failed");
+        return;
+    }
     // xTaskCreate(esp32_rp2040_comm_task, "esp32_rp2040_comm_task", ESP32_RP2040_COMM_TASK_STACK_SIZE, NULL, 10, NULL);
     xTaskCreatePinnedToCore(
         esp32_rp2040_comm_task,   // 任务函数
@@ -153,4 +160,5 @@ void esp32_rp2040_init(void)
         NULL,                     // 任务句柄
         0                         // 任务固定在核心1
     );
+    __cmd_send(PKT_TYPE_CMD_MODEL_TITLE, NULL, 0);
 }

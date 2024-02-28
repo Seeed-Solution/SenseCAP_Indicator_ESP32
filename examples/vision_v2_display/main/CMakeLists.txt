@@ -17,7 +17,7 @@ function(collect_sources source_var)
 endfunction()
 
 # Define a list of directories to include
-set(DIRECTORIES_TO_INCLUDE  "./ui" "./esp32_rp2040" "./draw")
+set(DIRECTORIES_TO_INCLUDE  "./ui" "./esp32_rp2040" "./draw" "./util")
 
 # Call the custom function to collect the source files
 collect_sources(COLLECTED_SOURCES ${DIRECTORIES_TO_INCLUDE})

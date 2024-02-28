@@ -46,8 +46,8 @@ extern "C"
     };
 #define BUF_SIZE (15 * 1024)
 #define MAX_JSON_SIZE (BUF_SIZE * 2)
-
 #define JsonQueue_SIZE (30)
+extern QueueHandle_t JsonQueue;
 
     typedef struct
     {
