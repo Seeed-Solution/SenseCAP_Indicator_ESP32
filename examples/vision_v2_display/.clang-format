@@ -1,0 +1,37 @@
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 0
+BreakBeforeBraces: Linux
+AllowShortIfStatementsOnASingleLine: false
+AlignTrailingComments: true
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortBlocksOnASingleLine : true
+AlignConsecutiveDeclarations : true
+AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
+AlignEscapedNewlinesLeft : true
+BraceWrapping:
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterObjCDeclaration: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: true
+# BreakConstructorInitializersBeforeComma : true
+IndentCaseLabels: true
+MaxEmptyLinesToKeep : 2
+# NamespaceIndentation : 3
+SpacesInParentheses: false # 在“()”中插入空格。
+SpacesInSquareBrackets: false # 在“[]”中插入空格。
+SpaceInEmptyBlock: false
+SpacesBeforeTrailingComments: 1  # Adjust the number of spaces as desired
+IndentPPDirectives: BeforeHash # 在预处理指令之前缩进。
