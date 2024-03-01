@@ -33,3 +33,5 @@ dependencies.lock
 
 #tools ignored
 tools/flash_firmware
+
+*.zip
