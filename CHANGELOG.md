@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## 2024-03-01
+### Added
+- Grove Vision V2 demo: To display the stream from it
+
+### Changed
+- serveral sdkconfig(s) for IDF5.1
+
+### Fixed
+- LVGL Highlight turns black
+- Dependency library compiling error (Exclude LoRaWAN component for specific example)
+
 ## 2024-01-05                
 
 ### Added
