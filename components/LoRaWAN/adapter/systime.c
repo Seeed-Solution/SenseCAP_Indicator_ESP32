@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include "systime.h"
 #include "esp_log.h"
+#include <sys/time.h>
 
 #define END_OF_FEBRUARY_LEAP                         60 //31+29
 #define END_OF_JULY_LEAP                            213 //31+29+...

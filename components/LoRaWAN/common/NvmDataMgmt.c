@@ -37,6 +37,7 @@
 #include "NvmDataMgmt.h"
 #include "nvs_flash.h"
 #include "esp_log.h"
+#include <string.h>
 /*!
  * Enables/Disables the context storage management storage.
  * Must be enabled for LoRaWAN 1.0.4 or later.

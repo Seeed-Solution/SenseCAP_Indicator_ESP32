@@ -2,6 +2,7 @@
 #define VIEW_DATA_H
 
 #include "config.h"
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
