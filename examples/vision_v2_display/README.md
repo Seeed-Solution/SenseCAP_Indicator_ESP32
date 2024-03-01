@@ -1,5 +1,8 @@
 # Grove Vision V2 X SenseCAP Indicator
 
+https://github.com/Seeed-Solution/SenseCAP_Indicator_ESP32/assets/45476879/3b1bd2e4-a7dc-461e-93a9-a62926a4f0eb
+
+
 ## Prerequisites
 
 - Get and install ESP-IDF toolchain and its dependencies.
