@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Base64.h>
 #include <PacketSerial.h>
@@ -28,11 +29,11 @@ HardwareSerial atSerial(0);
     #define atSerial Serial2
 #endif
 
-#define _LOG 0 // Disable for high frequency
+#define _LOG 1 // Disable for high frequency
 
 const char compile_date[] = __DATE__ " " __TIME__;
 SSCMA      AI;
-SSCMA      AI_I2C;
+// SSCMA      AI_I2C;
 
 PacketSerial myPacketSerial;
 #define PKT_TYPE_CMD_BEEP_ON     0xA1
