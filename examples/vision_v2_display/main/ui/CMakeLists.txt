@@ -3,6 +3,6 @@ SET(SOURCES screens/ui_Screen1.c
     components/ui_comp_hook.c
     ui_helpers.c
     ui_events.c
-    images/ui_img_1274458812.c)
+    images/ui_img_562603699.c)
 
 add_library(ui ${SOURCES})

@@ -16,26 +16,28 @@
 #include "cobs.h"
 #include "driver/uart.h"
 #include "esp32_rp2040.h"
-static const char *TAG = "esp32_rp2040";
+static const char* TAG = "esp32_rp2040";
 
-#define ESP32_RP2040_TXD                  (19)
-#define ESP32_RP2040_RXD                  (20)
-#define ESP32_RP2040_RTS                  (UART_PIN_NO_CHANGE)
-#define ESP32_RP2040_CTS                  (UART_PIN_NO_CHANGE)
+#define ESP32_RP2040_TXD (19)
+#define ESP32_RP2040_RXD (20)
+#define ESP32_RP2040_RTS (UART_PIN_NO_CHANGE)
+#define ESP32_RP2040_CTS (UART_PIN_NO_CHANGE)
 
-#define ESP32_COMM_PORT_NUM               (2)
-#define ESP32_COMM_BAUD_RATE              (921600)
+#define ESP32_COMM_PORT_NUM (2)
+#define ESP32_COMM_BAUD_RATE (921600)
 #define ESP32_RP2040_COMM_TASK_STACK_SIZE (1024 * 15)
 
+#define UART_BUF_SIZE (10 * 1024)
+#define MAX_JSON_SIZE (UART_BUF_SIZE * 2)
+#define JsonQueue_SIZE (25)
 
-uint8_t buf[BUF_SIZE];  // recv
-uint8_t data[BUF_SIZE]; // decode
+// uint8_t buf[UART_BUF_SIZE];  // recv
+// uint8_t data[UART_BUF_SIZE]; // decode
 
-static void __commu_event_handler(void *handler_args, esp_event_base_t base, int32_t id, void *event_data);
+static void __commu_event_handler(void* handler_args, esp_event_base_t base, int32_t id, void* event_data);
 
-static int __cmd_send(uint8_t cmd, void *p_data, uint8_t len)
-{
-    uint8_t buf[32]  = {0};
+static int __cmd_send(uint8_t cmd, void* p_data, uint8_t len) {
+    uint8_t buf[32] = {0};
     uint8_t data[32] = {0};
 
     if (len > 31) {
@@ -44,7 +46,7 @@ static int __cmd_send(uint8_t cmd, void *p_data, uint8_t len)
 
     uint8_t index = 1;
 
-    data[0]       = cmd;
+    data[0] = cmd;
 
     if (len > 0 && p_data != NULL) {
         memcpy(&data[1], p_data, len);
@@ -65,36 +67,35 @@ static int __cmd_send(uint8_t cmd, void *p_data, uint8_t len)
     return -1;
 }
 
-
-uint8_t     rev_buf[BUF_SIZE]; // 临时接收缓冲区
+uint8_t rev_buf[UART_BUF_SIZE]; // 临时接收缓冲区
 static char json_buffer[MAX_JSON_SIZE];
-static json_buffer_len = 0;
+static int json_buffer_len = 0;
 
 #define RP2040_ESP_COMM_DEBUG 0
 
 QueueHandle_t JsonQueue;
 
-static void esp32_rp2040_comm_task(void *arg)
-{
+static void esp32_rp2040_comm_task(void* arg) {
     uart_config_t uart_config = {
-        .baud_rate  = ESP32_COMM_BAUD_RATE,
-        .data_bits  = UART_DATA_8_BITS,
-        .parity     = UART_PARITY_DISABLE,
-        .stop_bits  = UART_STOP_BITS_1,
-        .flow_ctrl  = UART_HW_FLOWCTRL_DISABLE,
+        .baud_rate = ESP32_COMM_BAUD_RATE,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
         .source_clk = UART_SCLK_DEFAULT,
     };
     int intr_alloc_flags = 0;
 
-    ESP_ERROR_CHECK(uart_driver_install(ESP32_COMM_PORT_NUM, BUF_SIZE * 2, 0, 0, NULL, intr_alloc_flags));
+    ESP_ERROR_CHECK(uart_driver_install(ESP32_COMM_PORT_NUM, UART_BUF_SIZE * 2, 0, 0, NULL, intr_alloc_flags));
     ESP_ERROR_CHECK(uart_param_config(ESP32_COMM_PORT_NUM, &uart_config));
-    ESP_ERROR_CHECK(uart_set_pin(ESP32_COMM_PORT_NUM, ESP32_RP2040_TXD, ESP32_RP2040_RXD, ESP32_RP2040_RTS, ESP32_RP2040_CTS));
+    ESP_ERROR_CHECK(
+        uart_set_pin(ESP32_COMM_PORT_NUM, ESP32_RP2040_TXD, ESP32_RP2040_RXD, ESP32_RP2040_RTS, ESP32_RP2040_CTS));
     __cmd_send(PKT_TYPE_CMD_BEEP_ON, NULL, 0);
     vTaskDelay(200 / portTICK_PERIOD_MS);
 
     while (1) {
 
-        int len = uart_read_bytes(ESP32_COMM_PORT_NUM, rev_buf, (BUF_SIZE - 1), 20 / portTICK_PERIOD_MS);
+        int len = uart_read_bytes(ESP32_COMM_PORT_NUM, rev_buf, (UART_BUF_SIZE - 1), 20 / portTICK_PERIOD_MS);
 
         if (len > 0) {
             // 确保缓冲区不会溢出
@@ -102,19 +103,20 @@ static void esp32_rp2040_comm_task(void *arg)
                 memcpy(json_buffer + json_buffer_len, rev_buf, len);
                 json_buffer_len += len;
 
-                cJSON *json = cJSON_ParseWithLength((const char *)json_buffer, (size_t)json_buffer_len);
+                cJSON* json = cJSON_ParseWithLength((const char*)json_buffer, (size_t)json_buffer_len);
                 if (json != NULL) {
 #if RP2040_ESP_COMM_DEBUG
-                    char *my_json_string = cJSON_Print(json);
-                    ESP_LOGI(TAG, "my_json_string\n%s", my_json_string);
+                    char* my_json_string = cJSON_Print(json);
+                    ESP_LOGI(TAG, "Received JSON:\n %s", my_json_string);
                     cJSON_free(my_json_string);
 #endif
-                    char *strToSend = pvPortMalloc(json_buffer_len);
+                    // char* strToSend = pvPortMalloc(json_buffer_len);
+                    char* strToSend = heap_caps_malloc(json_buffer_len , MALLOC_CAP_SPIRAM);
                     if (strToSend != NULL) {
 
                         memset(strToSend, 0, json_buffer_len);
                         memcpy(strToSend, json_buffer, json_buffer_len);
-                        if (xQueueSend(JsonQueue, &strToSend, portMAX_DELAY) != pdPASS) {
+                        if (xQueueSend(JsonQueue, &strToSend, 0) != pdPASS) {
                             // 队列发送失败，需要释放 cJSON 对象以避免内存泄露
                             vPortFree(strToSend);
                             ESP_LOGI(TAG, "Failed to send JSON object to queue");
@@ -127,7 +129,7 @@ static void esp32_rp2040_comm_task(void *arg)
                 }
 #if RP2040_ESP_COMM_DEBUG
                 else {
-                    const char *error_ptr = cJSON_GetErrorPtr(); // 解析错误处理
+                    const char* error_ptr = cJSON_GetErrorPtr(); // 解析错误处理
                     if (error_ptr != NULL) {
                         ESP_LOGE(stderr, "Error before: %s\n", error_ptr);
                     }
@@ -143,22 +145,24 @@ static void esp32_rp2040_comm_task(void *arg)
     }
 }
 
-void esp32_rp2040_init(void)
-{
-    JsonQueue = xQueueCreate(JsonQueue_SIZE, sizeof(char *)); // Image Queue
+uint8_t JsonQueueBuffer[JsonQueue_SIZE * sizeof(char*)];
+StaticQueue_t JsonQueueBufferStruct;
+
+void esp32_rp2040_init(void) {
+    JsonQueue = xQueueCreateStatic(JsonQueue_SIZE, sizeof(char*), JsonQueueBuffer, &JsonQueueBufferStruct);
+    // JsonQueue = xQueueCreate(JsonQueue_SIZE, sizeof(char *)); // Image Queue
     if (JsonQueue == NULL) {
         ESP_LOGE(TAG, "Queue create failed");
         return;
     }
-    // xTaskCreate(esp32_rp2040_comm_task, "esp32_rp2040_comm_task", ESP32_RP2040_COMM_TASK_STACK_SIZE, NULL, 10, NULL);
-    xTaskCreatePinnedToCore(
-        esp32_rp2040_comm_task,   // 任务函数
-        "esp32_rp2040_comm_task", // 任务名称
-        1024 * 50,                // 堆栈大小
-        NULL,                     // 传递给任务的参数
-        10,                       // 任务优先级
-        NULL,                     // 任务句柄
-        0                         // 任务固定在核心1
+
+    xTaskCreatePinnedToCore(esp32_rp2040_comm_task, // 任务函数
+                            "esp32_task",           // 任务名称
+                            1024 * 50,              // 堆栈大小
+                            NULL,                   // 传递给任务的参数
+                            10,                     // 任务优先级
+                            NULL,                   // 任务句柄
+                            0                       // 任务固定在核心0
     );
     __cmd_send(PKT_TYPE_CMD_MODEL_TITLE, NULL, 0);
 }

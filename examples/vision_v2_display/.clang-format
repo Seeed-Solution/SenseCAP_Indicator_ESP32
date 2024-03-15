@@ -1,37 +1,91 @@
+# ---
+# Language: Cpp
+# BasedOnStyle: LLVM
+# IndentWidth: 4
+# AlignAfterOpenBracket: Align
+# AllowShortBlocksOnASingleLine: false
+# AllowShortCaseLabelsOnASingleLine: false
+# AllowShortFunctionsOnASingleLine: false
+# IndentCaseLabels: true
+# SpacesBeforeTrailingComments: 2
+# PointerAlignment: Left
+# AlignEscapedNewlines: Left
+# ForEachMacros: ['TEST_GROUP', 'TEST']
+# ...
 Language: Cpp
-BasedOnStyle: LLVM
-IndentWidth: 4
-ColumnLimit: 0
-BreakBeforeBraces: Linux
-AllowShortIfStatementsOnASingleLine: false
+BasedOnStyle:  LLVM
+AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Left
+AlignOperands:   true
 AlignTrailingComments: true
-AlignConsecutiveMacros:
-  Enabled: true
-  AcrossEmptyLines: true
-  AcrossComments: true
-AllowShortCaseLabelsOnASingleLine: true
-AllowShortBlocksOnASingleLine : true
-AlignConsecutiveDeclarations : true
-AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
-AlignEscapedNewlinesLeft : true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: true
+BinPackParameters: true
 BraceWrapping:
-  AfterClass: false
+  AfterClass:      false
   AfterControlStatement: false
-  AfterEnum: false
-  AfterFunction: false
-  AfterNamespace: false
+  AfterEnum:       false
+  AfterFunction:   false
+  AfterNamespace:  false
   AfterObjCDeclaration: false
-  AfterStruct: false
-  AfterUnion: false
-  BeforeCatch: false
-  BeforeElse: false
-  IndentBraces: true
-# BreakConstructorInitializersBeforeComma : true
-IndentCaseLabels: true
-MaxEmptyLinesToKeep : 2
-# NamespaceIndentation : 3
-SpacesInParentheses: false # 在“()”中插入空格。
-SpacesInSquareBrackets: false # 在“[]”中插入空格。
-SpaceInEmptyBlock: false
-SpacesBeforeTrailingComments: 1  # Adjust the number of spaces as desired
-IndentPPDirectives: BeforeHash # 在预处理指令之前缩进。
+  AfterStruct:     false
+  AfterUnion:      false
+  AfterExternBlock: false
+  BeforeCatch:     false
+  BeforeElse:      false
+  IndentBraces:    false
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Custom
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializersBeforeComma: false
+ColumnLimit:     120
+CommentPragmas:  '^ IWYU pragma:'
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: true
+DerivePointerAlignment: false
+DisableFormat:   false
+ExperimentalAutoDetectBinPacking: false
+IndentCaseLabels: false
+IndentWidth:     4
+IndentWrappedFunctionNames: false
+KeepEmptyLinesAtTheStartOfBlocks: true
+MaxEmptyLinesToKeep: 1
+NamespaceIndentation: None
+ObjCBlockIndentWidth: 2
+ObjCSpaceAfterProperty: true
+ObjCSpaceBeforeProtocolList: true
+PenaltyBreakBeforeFirstCallParameter: 19
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 60
+PointerAlignment: Left
+ReflowComments:  true
+SortIncludes:    true
+SpaceAfterCStyleCast: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles:  false
+SpacesInContainerLiterals: true
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Standard:        Cpp11
+TabWidth:        8
+UseTab:          Never

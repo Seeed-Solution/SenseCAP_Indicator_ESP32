@@ -23,5 +23,5 @@ set(DIRECTORIES_TO_INCLUDE  "./ui" "./esp32_rp2040" "./draw" "./util")
 collect_sources(COLLECTED_SOURCES ${DIRECTORIES_TO_INCLUDE})
 
 idf_component_register(
-    SRCS "main.c" "lv_port.c" "view.c" ${COLLECTED_SOURCES}
+    SRCS "main.c" "lv_port.c" ${COLLECTED_SOURCES}
     INCLUDE_DIRS "." ${DIRECTORIES_TO_INCLUDE} )
