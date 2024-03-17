@@ -59,15 +59,16 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
+// void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
+lv_res_t lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
         show_error(draw_ctx, coords, "No\ndata");
-        return;
+        return LV_RES_INV; //return;
     }
 
-    if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->opa <= LV_OPA_MIN) return LV_RES_INV; //return;
 
     lv_res_t res;
     if(draw_ctx->draw_img) {
@@ -80,8 +81,10 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
     if(res == LV_RES_INV) {
         LV_LOG_WARN("Image draw error");
         show_error(draw_ctx, coords, "No\ndata");
-        return;
+        return LV_RES_INV;
+        //return;
     }
+    return LV_RES_OK;
 }
 
 /**

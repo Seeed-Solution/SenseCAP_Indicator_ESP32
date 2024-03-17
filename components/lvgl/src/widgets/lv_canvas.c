@@ -630,12 +630,13 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     coords.x2 = x + header.w - 1;
     coords.y2 = y + header.h - 1;
 
-    lv_draw_img(driver.draw_ctx, draw_dsc, &coords, src);
+    // lv_draw_img(driver.draw_ctx, draw_dsc, &coords, src);
+    lv_res_t ret = lv_draw_img(driver.draw_ctx, draw_dsc, &coords, src);
 
     _lv_refr_set_disp_refreshing(refr_ori);
 
     deinit_fake_disp(canvas, &fake_disp);
-
+    if(ret == LV_RES_OK) //
     lv_obj_invalidate(canvas);
 }
 
