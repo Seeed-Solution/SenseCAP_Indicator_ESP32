@@ -36,7 +36,7 @@ static const char* TAG = "esp32_rp2040";
 
 static void __commu_event_handler(void* handler_args, esp_event_base_t base, int32_t id, void* event_data);
 
-static int __cmd_send(uint8_t cmd, void* p_data, uint8_t len) {
+int __cmd_send(uint8_t cmd, void* p_data, uint8_t len) {
     uint8_t buf[32] = {0};
     uint8_t data[32] = {0};
 
@@ -67,7 +67,6 @@ static int __cmd_send(uint8_t cmd, void* p_data, uint8_t len) {
     return -1;
 }
 
-uint8_t rev_buf[UART_BUF_SIZE]; // 临时接收缓冲区
 static char json_buffer[MAX_JSON_SIZE];
 static int json_buffer_len = 0;
 
@@ -90,11 +89,10 @@ static void esp32_rp2040_comm_task(void* arg) {
     ESP_ERROR_CHECK(uart_param_config(ESP32_COMM_PORT_NUM, &uart_config));
     ESP_ERROR_CHECK(
         uart_set_pin(ESP32_COMM_PORT_NUM, ESP32_RP2040_TXD, ESP32_RP2040_RXD, ESP32_RP2040_RTS, ESP32_RP2040_CTS));
+
+    uint8_t rev_buf[UART_BUF_SIZE]; // 临时接收缓冲区
     __cmd_send(PKT_TYPE_CMD_BEEP_ON, NULL, 0);
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-
     while (1) {
-
         int len = uart_read_bytes(ESP32_COMM_PORT_NUM, rev_buf, (UART_BUF_SIZE - 1), 20 / portTICK_PERIOD_MS);
 
         if (len > 0) {
@@ -102,7 +100,6 @@ static void esp32_rp2040_comm_task(void* arg) {
             if ((json_buffer_len + len) <= MAX_JSON_SIZE) {
                 memcpy(json_buffer + json_buffer_len, rev_buf, len);
                 json_buffer_len += len;
-
                 cJSON* json = cJSON_ParseWithLength((const char*)json_buffer, (size_t)json_buffer_len);
                 if (json != NULL) {
 #if RP2040_ESP_COMM_DEBUG
@@ -110,22 +107,19 @@ static void esp32_rp2040_comm_task(void* arg) {
                     ESP_LOGI(TAG, "Received JSON:\n %s", my_json_string);
                     cJSON_free(my_json_string);
 #endif
-                    // char* strToSend = pvPortMalloc(json_buffer_len);
-                    char* strToSend = heap_caps_malloc(json_buffer_len , MALLOC_CAP_SPIRAM);
+                    char* strToSend = cJSON_PrintUnformatted(json);
                     if (strToSend != NULL) {
-
-                        memset(strToSend, 0, json_buffer_len);
-                        memcpy(strToSend, json_buffer, json_buffer_len);
                         if (xQueueSend(JsonQueue, &strToSend, 0) != pdPASS) {
-                            // 队列发送失败，需要释放 cJSON 对象以避免内存泄露
-                            vPortFree(strToSend);
+                            cJSON_free(strToSend);
                             ESP_LOGI(TAG, "Failed to send JSON object to queue");
                         }
+                        // 注意这里不需要再次调用 free(strToSend)，因为如果 xQueueSend 成功，队列接收方负责释放内存
                     } else {
                         ESP_LOGE(TAG, "Failed to allocate memory for JSON object");
                     }
                     cJSON_Delete(json);
                     json_buffer_len = 0; // 清空缓冲区，准备接收下一个消息
+
                 }
 #if RP2040_ESP_COMM_DEBUG
                 else {
@@ -150,7 +144,6 @@ StaticQueue_t JsonQueueBufferStruct;
 
 void esp32_rp2040_init(void) {
     JsonQueue = xQueueCreateStatic(JsonQueue_SIZE, sizeof(char*), JsonQueueBuffer, &JsonQueueBufferStruct);
-    // JsonQueue = xQueueCreate(JsonQueue_SIZE, sizeof(char *)); // Image Queue
     if (JsonQueue == NULL) {
         ESP_LOGE(TAG, "Queue create failed");
         return;

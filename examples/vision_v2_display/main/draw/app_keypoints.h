@@ -50,7 +50,8 @@ void free_keypoints_array(keypoint_t* array);
 void init_keypoints_app();
 bool get_keypoints(cJSON* receivedJson, keypoints_t** keypoints_array, int* keypoints_count);
 void draw_one_point(lv_obj_t *parent, const keypoint_t point, lv_color_t color);
-void draw_keypoints(lv_obj_t* canvas, const keypoints_t* keypoints, size_t count);
+void draw_keypoints(lv_obj_t* canvas, const keypoints_t* keypoints);
+void draw_keypoints_array(lv_obj_t* canvas, const keypoints_t* keypoints, size_t count);
 // typedef struct
 // {
 //     boxes_t box;

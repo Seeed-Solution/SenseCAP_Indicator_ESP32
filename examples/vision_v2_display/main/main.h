@@ -29,17 +29,20 @@
 extern "C" {
 #endif
 
-typedef struct
-{
-    char *img_base64; // 存储Base64编码的图像数据
-    int   img_size;
+typedef struct {
+    char* img_base64; // 存储Base64编码的图像数据
+    int img_size;
 } img_event_data_t;
 
 ESP_EVENT_DECLARE_BASE(VIEW_EVENT_BASE);
 extern esp_event_loop_handle_t view_event_handle;
 
 enum {
-    VIEW_EVENT_IMG = 0,
+    VIEW_EVENT_MODEL_NAME,
+    VIEW_EVENT_IMG,
+    VIEW_EVENT_BOXES,
+    VIEW_EVENT_KEYPOINTS,
+    VIEW_EVENT_PAGE_SWITCH,
     VIEW_EVENT_ALL,
 };
 
@@ -66,8 +69,7 @@ extern QueueHandle_t JsonQueue;
 
 // } boxes_t;
 
-typedef struct
-{
+typedef struct {
     uint8_t target;
     uint8_t score;
 } classes_t;
@@ -87,8 +89,7 @@ typedef struct
 //     std::vector<point_t> points;
 // } keypoints_t;
 
-typedef struct
-{
+typedef struct {
     uint16_t prepocess;
     uint16_t inference;
     uint16_t postprocess;

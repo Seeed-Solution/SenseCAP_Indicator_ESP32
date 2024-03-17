@@ -3,11 +3,18 @@
 #include <cJSON.h>
 static const char* TAG = "app_image";
 
+#define SEE_DECODEDE_LOG 0
+
 #define IMG_WIDTH CANVAS_WIDTH
 #define IMG_HEIGHT CANVAS_HEIGHT
 
-#define SEE_DECODEDE_LOG 0
-#define USING_CANVAS 1
+#if IMG_WIDTH != IMG_HEIGHT
+#error "IMG_WIDTH must be equal to IMG_HEIGHT"
+#elif IMG_WIDTH == 240
+#define DECODED_IMAGE_MAX_SIZE (15 * 1024)
+#elif IMG_WIDTH == 480
+#define DECODED_IMAGE_MAX_SIZE (25 * 1024)
+#endif
 
 static lv_img_dsc_t img_dsc = {
     .header.always_zero = 0,
@@ -17,15 +24,9 @@ static lv_img_dsc_t img_dsc = {
     .header.cf = LV_IMG_CF_TRUE_COLOR,
     .data = NULL,
 };
+
 static lv_draw_img_dsc_t draw_dsc; // 必须 static 或全局变量
 
-#if IMG_WIDTH != IMG_HEIGHT
-#error "IMG_WIDTH must be equal to IMG_HEIGHT"
-#elif IMG_WIDTH == 240
-#define DECODED_IMAGE_MAX_SIZE (15 * 1024)
-#elif IMG_WIDTH == 480
-#define DECODED_IMAGE_MAX_SIZE (25 * 1024)
-#endif
 
 size_t decode_base64_image(const unsigned char* p_data, unsigned char* decoded_str) {
     if (!p_data || !decoded_str)
@@ -58,57 +59,64 @@ size_t decode_base64_image(const unsigned char* p_data, unsigned char* decoded_s
     return output_len;
 }
 
+/**
+ * @brief 更新画布对象的数据
+ *
+ * @param canvas 画布对象
+ * @param image_data 图像数据
+ */
 void update_canvas_with_image(lv_obj_t* canvas, const unsigned char* image_data, size_t image_size) {
     if (!canvas || !image_data || image_size == 0)
         return;
 
     img_dsc.data = image_data;
     img_dsc.data_size = image_size;
-
+    // check if now can update image
+    
     lv_canvas_draw_img(canvas, 0, 0, &img_dsc, &draw_dsc);
 }
 
-void update_jpeg_with_image(lv_obj_t* obj, const unsigned char* image_data, size_t image_size) {
-    if (!obj || !image_data || image_size == 0)
-        return;
-
-    img_dsc.data = image_data;
-    img_dsc.data_size = image_size; // 确保设置了正确的data_size
-    lv_img_set_src(obj, &img_dsc);
-}
-
-// 从JSON解析并显示图像的函数
-void display_image_from_json(cJSON* json, lv_obj_t* canvas) {
-    static unsigned char img_buf[DECODED_IMAGE_MAX_SIZE] = {0};
-    static unsigned char decoded_image[DECODED_IMAGE_MAX_SIZE + 1]; // 静态分配解码后的图片数据缓冲区
-
-    if (!json || !canvas)
-        return;
-
-    cJSON* img = cJSON_GetObjectItem(json, "img");
-    if (!cJSON_IsString(img) || img->valuestring == NULL) {
-        ESP_LOGE(TAG, "Invalid img string");
-        return;
-    }
-
-    lv_port_sem_take();
-    lv_memset_00(img_buf, sizeof(img_buf));
-    strncpy(img_buf, img->valuestring, sizeof(img_buf) - 1);
-
-    // 解码图片数据
-    size_t decoded_image_size = decode_base64_image(img_buf, decoded_image);
-    if (decoded_image_size == 0) {
-        ESP_LOGE(TAG, "Failed to decode image");
-        return;
-    }
-    update_canvas_with_image(canvas, decoded_image, decoded_image_size);
-    lv_port_sem_give();
-}
 
 void init_image(void) {
     lv_draw_img_dsc_init(&draw_dsc);
 }
+
 ////////////////////////
+
+/**
+ * @brief 从JSON解析并显示图像
+ *
+ * @param json JSON对象
+ * @param canvas lvgl画布对象
+ */
+// void display_image_from_json(cJSON* json, lv_obj_t* canvas) {
+//     static unsigned char img_buf[DECODED_IMAGE_MAX_SIZE] = {0};
+//     static unsigned char decoded_image[DECODED_IMAGE_MAX_SIZE + 1]; // 静态分配解码后的图片数据缓冲区
+
+//     if (!json || !canvas)
+//         return;
+
+//     cJSON* img = cJSON_GetObjectItem(json, "img");
+//     if (!cJSON_IsString(img) || img->valuestring == NULL) {
+//         ESP_LOGE(TAG, "Invalid img string");
+//         return;
+//     }
+
+//     lv_port_sem_take();
+//     lv_memset_00(img_buf, sizeof(img_buf));
+//     strncpy(img_buf, img->valuestring, sizeof(img_buf) - 1);
+
+//     // 解码图片数据
+//     size_t decoded_image_size = decode_base64_image(img_buf, decoded_image);
+//     if (decoded_image_size == 0) {
+//         ESP_LOGE(TAG, "Failed to decode image");
+//         return;
+//     }
+//     update_canvas_with_image(canvas, decoded_image, decoded_image_size);
+//     lv_port_sem_give();
+// }
+
+
 
 // cJSON* img = cJSON_GetObjectItem(receivedJson, "img");
 // if (cJSON_IsString(img) && (img->valuestring != NULL)) {

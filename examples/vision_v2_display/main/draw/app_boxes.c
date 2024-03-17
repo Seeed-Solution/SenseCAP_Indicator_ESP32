@@ -14,24 +14,8 @@
 #include "freertos/task.h"
 static const char* TAG = "app_boxes";
 
-// void draw_one_box(lv_obj_t* parent, const boxes_t box, lv_color_t color) {
-//     int w = box.w;
-//     int h = box.h;
-//     int x = box.x - box.w / 2;
-//     int y = box.y - box.h / 2;
-
-//     lv_obj_t* rect = lv_obj_create(parent);
-//     if (rect == NULL) {
-//         ESP_LOGE(TAG, "Failed to create rectangle");
-//         return;
-//     }
-//     lv_obj_set_size(rect, w, h);
-//     lv_obj_set_pos(rect, x, y);
-//     lv_obj_set_style_border_color(rect, color, 0);
-//     lv_obj_set_style_border_width(rect, 3, 0);
-//     lv_obj_set_style_bg_opa(rect, LV_OPA_TRANSP, 0); // Make background transparent
-// }
 static lv_draw_rect_dsc_t rect_dsc;
+
 void init_boxes_app() {
     lv_draw_rect_dsc_init(&rect_dsc);
     rect_dsc.bg_opa = LV_OPA_TRANSP;

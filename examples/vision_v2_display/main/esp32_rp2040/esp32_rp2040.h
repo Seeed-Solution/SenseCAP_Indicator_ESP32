@@ -38,7 +38,7 @@ enum  pkt_type {
 };
 
 void esp32_rp2040_init(void);
-
+int __cmd_send(uint8_t cmd, void* p_data, uint8_t len);
 
 #ifdef __cplusplus
 } /*extern "C"*/
