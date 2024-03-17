@@ -61,18 +61,17 @@ lv_obj_t* canvas_right;
 uint8_t* cbuf_left;
 uint8_t* cbuf_right;
 
-#define BASE64_IMAGE_MAX_SIZE (18 * 1024)
+#define BASE64_IMAGE_MAX_SIZE (15 * 1024)
 static unsigned char imageData[BASE64_IMAGE_MAX_SIZE] = {0};
-#define DECODED_IMAGE_MAX_SIZE (15 * 1024)
+#define DECODED_IMAGE_MAX_SIZE (13 * 1024)
 static unsigned char jpegImage[DECODED_IMAGE_MAX_SIZE + 1]; // 静态分配解码后的图片数据缓冲区
 static void __json_event_handler(void* handler_args, esp_event_base_t base, int32_t id, void* event_data) {
     lv_port_sem_take();
     switch (id) {
     case VIEW_EVENT_IMG: {
-        char* img_data = (char*)event_data;
+        unsigned char* img_data = (unsigned char*)event_data;
         size_t jpegImageSize = decode_base64_image(img_data, jpegImage);
-        if (jpegImageSize) { // !=0
-        } else {
+        if (!jpegImageSize) { // >0
             ESP_LOGE(TAG, "Failed to decode image");
         }
 
@@ -125,10 +124,9 @@ void app_main(void) {
                                                   .task_core_id = tskNO_AFFINITY};
     ESP_ERROR_CHECK(esp_event_loop_create(&view_event_task_args, &view_event_handle));
 
-    lv_port_sem_take();
-    /* (must be 480*800, set LCD_EVB_SCREEN_ROTATION_90 in menuconfig)*/
+    lv_port_sem_take(); // take the semaphore
     ui_init();
-
+    ESP_LOGI(TAG, "Out of ui_init()");
     cbuf_left = (uint8_t*)heap_caps_malloc(LV_IMG_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT), MALLOC_CAP_SPIRAM);
     cbuf_right = (uint8_t*)heap_caps_malloc(LV_IMG_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT), MALLOC_CAP_SPIRAM);
     canvas_left = lv_canvas_create(lv_scr_act());
@@ -147,7 +145,7 @@ void app_main(void) {
     // lv_obj_align(canvas, LV_ALIGN_CENTER, 0, 0);
     lv_obj_align(canvas_left, LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_align(canvas_right, LV_ALIGN_RIGHT_MID, 0, 0);
-    lv_canvas_fill_bg(canvas_left, lv_palette_darken(LV_PALETTE_NONE, 3), LV_OPA_COVER);
+    lv_canvas_fill_bg(canvas_left, lv_palette_main(LV_PALETTE_NONE), LV_OPA_COVER);
     lv_canvas_fill_bg(canvas_right, lv_palette_main(LV_PALETTE_GREY), LV_OPA_COVER);
 
     // lv_draw_label_dsc_t label_dsc;
@@ -157,13 +155,15 @@ void app_main(void) {
     init_image();
     init_keypoints_app();
     init_boxes_app();
-    lv_port_sem_give();
+    lv_port_sem_give(); // release the semaphore
 
-    ESP_LOGI(TAG, "Out of ui_init()");
-
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_IMG,
+                                                             __json_event_handler, NULL, NULL));
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_MODEL_NAME,
                                                              __json_event_handler, NULL, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_IMG,
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_BOXES,
+                                                             __json_event_handler, NULL, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_KEYPOINTS,
                                                              __json_event_handler, NULL, NULL));
 
     esp32_rp2040_init(); // another task to handle the RP2040 Serial data

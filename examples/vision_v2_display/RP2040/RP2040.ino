@@ -176,7 +176,7 @@ void loop1() {
 static inline void AI_func(SSCMA& instance) {
   if (!mutex_enter_timeout_ms(&myMutex, 1000)) return;
 
-  JsonDocument doc_info;  // Adjust size as needed
+  JsonDocument doc_info;   // Adjust size as needed
   JsonDocument doc_image;  // Adjust size as needed
   if (!instance.invoke(1, false, true)) {
 
@@ -223,26 +223,27 @@ static inline void AI_func(SSCMA& instance) {
       }
       index++;
     }
-
     /* Last image*/
     auto lastImage = instance.last_image();
     if (lastImage.length()) {
       doc_image["img"] = lastImage;
+#ifdef espSerial
+      serializeJson(doc_image, espSerial);  // Serialize and print the JSON document
+#endif
     }
 
 #ifdef espSerial
-    serializeJson(doc_image, espSerial);  // Serialize and print the JSON document
     serializeJson(doc_info, espSerial);  // Serialize and print the JSON document
-    // espSerial.println();
 #endif
+
 #if _LOG
-    // serializeJsonPretty(doc, pcSerial); // Serialize and print the JSON document
+    serializeJson(doc_info, pcSerial);   // Serialize and print the JSON document
     serializeJson(doc_image, pcSerial);  // Serialize and print the JSON document
-    serializeJson(doc_info, pcSerial);  // Serialize and print the JSON document
-    // pcSerial.println();
+    // serializeJsonPretty
+    pcSerial.println();
 #endif
   }
-  mutex_exit(&myMutex); 
+  mutex_exit(&myMutex);
 }
 
 static inline void send_model_title(SSCMA& instance) {
@@ -254,7 +255,7 @@ static inline void send_model_title(SSCMA& instance) {
   if (!fetchSuccess) {
     base64String = instance.info();
   }
-  mutex_exit(&myMutex); 
+  mutex_exit(&myMutex);
 
   if (!fetchSuccess) {
     int inputStringLength = base64String.length() + 1;
@@ -284,48 +285,3 @@ static inline void send_model_title(SSCMA& instance) {
 #endif
   }
 }
-
-
-// static inline void send_model_title(SSCMA& instance) {
-// #if _LOG
-//   pcSerial.println("Recieved get title event");
-// #endif
-//   if (!instance.fetch_info()) {
-//     // base64 解码成 JSON
-//     String base64String = instance.info();
-//     // pcSerial.printf("instance.info(): %s \n", base64String.c_str());
-
-//     int inputStringLength = base64String.length() + 1;
-//     char inputString[inputStringLength];
-//     base64String.toCharArray(inputString, inputStringLength);
-
-//     int decodedLength = Base64.decodedLength(inputString, inputStringLength - 1);  // 计算解码长度
-//     char decodedString[decodedLength + 1];                                         // 分配额外的空间用于空终止符
-
-//     Base64.decode(decodedString, inputString, inputStringLength - 1);  // 解码Base64字符串
-//     decodedString[decodedLength] = '\0';                               // 手动添加空终止符确保字符串正确终止
-
-//     // pcSerial.print("Decoded string is:\t");
-//     // pcSerial.println(decodedString);
-
-//     JsonDocument doc;                                                  // 创建一个足够大的JsonDocument
-//     DeserializationError error = deserializeJson(doc, decodedString);  // 将解码后的字符串反序列化到JSON文档
-
-//     if (error) {  // 检查反序列化是否成功
-//       // pcSerial.print("deserializeJson() failed: ");
-//       // pcSerial.println(error.c_str());
-//       return;
-//     }
-//     // 获取JSON的info 信息
-//     JsonDocument send_doc;
-//     send_doc["name"] = doc["name"];
-// #ifdef espSerial
-//     serializeJson(send_doc, espSerial);  // Serialize and print the JSON document
-//     espSerial.println();
-// #endif
-// #if _LOG
-//     serializeJson(send_doc, pcSerial);
-//     pcSerial.println();
-// #endif
-//   }
-// }

@@ -27,7 +27,6 @@ static lv_img_dsc_t img_dsc = {
 
 static lv_draw_img_dsc_t draw_dsc; // 必须 static 或全局变量
 
-
 size_t decode_base64_image(const unsigned char* p_data, unsigned char* decoded_str) {
     if (!p_data || !decoded_str)
         return 0;
@@ -49,15 +48,18 @@ size_t decode_base64_image(const unsigned char* p_data, unsigned char* decoded_s
 
     // 实际解码操作
     decode_ret = mbedtls_base64_decode(decoded_str, DECODED_IMAGE_MAX_SIZE, &output_len, p_data, str_len);
-    if (decode_ret) { // !=0
+    if (decode_ret != 0) {
         ESP_LOGE(TAG, "Failed to decode Base64 string, error: %d", decode_ret);
         return 0;
     }
+
 #if SEE_DECODEDE_LOG
     ESP_LOGI(TAG, "str_len: %d, output_len: %d", str_len, output_len);
 #endif
     return output_len;
 }
+
+
 
 /**
  * @brief 更新画布对象的数据
@@ -72,10 +74,9 @@ void update_canvas_with_image(lv_obj_t* canvas, const unsigned char* image_data,
     img_dsc.data = image_data;
     img_dsc.data_size = image_size;
     // check if now can update image
-    
+
     lv_canvas_draw_img(canvas, 0, 0, &img_dsc, &draw_dsc);
 }
-
 
 void init_image(void) {
     lv_draw_img_dsc_init(&draw_dsc);
@@ -115,8 +116,6 @@ void init_image(void) {
 //     update_canvas_with_image(canvas, decoded_image, decoded_image_size);
 //     lv_port_sem_give();
 // }
-
-
 
 // cJSON* img = cJSON_GetObjectItem(receivedJson, "img");
 // if (cJSON_IsString(img) && (img->valuestring != NULL)) {
