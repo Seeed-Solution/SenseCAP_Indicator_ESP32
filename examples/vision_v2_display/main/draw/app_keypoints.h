@@ -23,14 +23,18 @@ typedef union {
     struct {
         uint16_t x;
         uint16_t y;
+        uint16_t score;
+        // uint16_t target;
     };
-    uint16_t position[2];
+    uint16_t point[3];
+    // uint16_t point[4];
+    // uint16_t point[2];
 } keypoint_t;
 
 typedef struct {
     boxes_t box; // Assuming two points: top-left and bottom-right for the box
-    keypoint_t* points; // Array of points
     size_t points_count; // Number of points
+    keypoint_t* points; // Array of points
 } keypoints_t;
 
 keypoint_t* create_keypoints_array(size_t count);
@@ -48,7 +52,7 @@ void free_keypoints_array(keypoint_t* array);
  * }
  */
 void init_keypoints_app();
-bool get_keypoints(cJSON* receivedJson, keypoints_t** keypoints_array, int* keypoints_count);
+bool ParseJsonKeypoints(cJSON* receivedJson, keypoints_t** keypoints_array, int* keypoints_count);
 void draw_one_point(lv_obj_t *parent, const keypoint_t point, lv_color_t color);
 void draw_keypoints(lv_obj_t* canvas, const keypoints_t* keypoints);
 void draw_keypoints_array(lv_obj_t* canvas, const keypoints_t* keypoints, size_t count);

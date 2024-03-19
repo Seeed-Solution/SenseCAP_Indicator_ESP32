@@ -60,11 +60,19 @@ lv_obj_t* canvas_right;
 
 uint8_t* cbuf_left;
 uint8_t* cbuf_right;
-
+bool is_name_geted = false;
 #define BASE64_IMAGE_MAX_SIZE (15 * 1024)
 static unsigned char imageData[BASE64_IMAGE_MAX_SIZE] = {0};
 #define DECODED_IMAGE_MAX_SIZE (13 * 1024)
 static unsigned char jpegImage[DECODED_IMAGE_MAX_SIZE + 1]; // 静态分配解码后的图片数据缓冲区
+
+static bool is_right_canva_drawn = false;
+
+typedef struct {
+    keypoints_t* keypoints_array;
+    int keypoints_count;
+} keypoints_array_t;
+
 static void __json_event_handler(void* handler_args, esp_event_base_t base, int32_t id, void* event_data) {
     lv_port_sem_take();
     switch (id) {
@@ -74,12 +82,12 @@ static void __json_event_handler(void* handler_args, esp_event_base_t base, int3
         if (!jpegImageSize) { // >0
             ESP_LOGE(TAG, "Failed to decode image");
         }
-
+        lv_canvas_fill_bg(canvas_right, lv_palette_main(LV_PALETTE_NONE), LV_OPA_COVER);
         update_canvas_with_image(canvas_left, jpegImage, jpegImageSize);
         break;
     }
     case VIEW_EVENT_MODEL_NAME: {
-        char* p_data = ((char*)event_data); // Only one time, don't need to care about the memory mutex
+        char* p_data = ((char*)event_data);
         lv_label_set_text(ui_Model_Name, p_data);
         break;
     }
@@ -89,18 +97,27 @@ static void __json_event_handler(void* handler_args, esp_event_base_t base, int3
         break;
     }
     case VIEW_EVENT_KEYPOINTS: {
-        keypoints_t* keypoints_array = (keypoints_t*)event_data;
+        keypoints_array_t* keypoints_array = (keypoints_array_t*)event_data;
+        keypoints_t* keypoints = keypoints_array->keypoints_array;
 
-        lv_canvas_fill_bg(canvas_right, lv_palette_main(LV_PALETTE_NONE), LV_OPA_COVER);
+        int keypoints_count = keypoints_array->keypoints_count;
+        // print_keypoints(keypoints, keypoints_count);
 
-        draw_keypoints(canvas_left, keypoints_array);  // boxes and keypoints
-        draw_keypoints(canvas_right, keypoints_array); // boxes and keypoints
+        for (int i = 0; i < keypoints_count; i++) {
+            draw_keypoints(canvas_left, &keypoints[i]);  // boxes and keypoints
+            draw_keypoints(canvas_right, &keypoints[i]); // boxes and keypoints
+        }
 
-        draw_one_box(canvas_left, keypoints_array->box, lv_color_make(113, 235, 52));
+        // esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_BOXES, &keypoints->box,
+        // sizeof(keypoints->box),
+        //                   portMAX_DELAY);
 
-        esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_BOXES, &keypoints_array->box,
-                          sizeof(keypoints_array->box), portMAX_DELAY);
-
+        for (int i = 0; i < keypoints_count; i++) {
+            if (keypoints[i].points != NULL) {
+                free_keypoints_array(keypoints[i].points);
+            }
+        }
+        free(keypoints);
         break;
     }
     default:
@@ -117,7 +134,7 @@ void app_main(void) {
     ESP_ERROR_CHECK(bsp_board_init());
     lv_port_init();
     indicator_btn_init();
-    esp_event_loop_args_t view_event_task_args = {.queue_size = 10, // json_event_task_args
+    esp_event_loop_args_t view_event_task_args = {.queue_size = 20, // json_event_task_args
                                                   .task_name = "view_event_task",
                                                   .task_priority = uxTaskPriorityGet(NULL),
                                                   .task_stack_size = 1024 * 5,
@@ -141,17 +158,12 @@ void app_main(void) {
     } else {
         ESP_LOGI(TAG, "Memory for canvas buffer allocated");
     }
-    // lv_obj_center(canvas);
-    // lv_obj_align(canvas, LV_ALIGN_CENTER, 0, 0);
+
     lv_obj_align(canvas_left, LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_align(canvas_right, LV_ALIGN_RIGHT_MID, 0, 0);
     lv_canvas_fill_bg(canvas_left, lv_palette_main(LV_PALETTE_NONE), LV_OPA_COVER);
     lv_canvas_fill_bg(canvas_right, lv_palette_main(LV_PALETTE_GREY), LV_OPA_COVER);
 
-    // lv_draw_label_dsc_t label_dsc;
-    // lv_draw_label_dsc_init(&label_dsc);
-    // label_dsc.color = lv_palette_main(LV_PALETTE_ORANGE);
-    // lv_canvas_draw_text(canvas, 40, 20, 100, &label_dsc, "Some text on text canvas");
     init_image();
     init_keypoints_app();
     init_boxes_app();
@@ -168,29 +180,12 @@ void app_main(void) {
 
     esp32_rp2040_init(); // another task to handle the RP2040 Serial data
     ESP_LOGI(TAG, "RP2040 init success");
-    xTaskCreatePinnedToCore(JsonQueue_processing_task, // 任务函数
-                            "JsonQueueTask",           // 任务名称
-                            1024 * 8,                  // 堆栈大小
-                            NULL,                      // 传递给任务的参数
-                            5,                         // 任务优先级
-                            NULL,                      // 任务句柄
-                            1                          // 任务固定在核心1
-    );
-    ESP_LOGI(TAG, "Queue create success");
-    // while (1) {
-    //     vTaskDelay(pdMS_TO_TICKS(10000));
-    // }
-}
 
-bool is_name_geted = false;
-
-void JsonQueue_processing_task(void* pvParameters) {
     char* receivedStr = NULL;
     static char modelTitle[64] = {0};
 
     for (;;) {
         if (xQueueReceive(JsonQueue, &receivedStr, portMAX_DELAY) == pdPASS && receivedStr != NULL) {
-
             cJSON* receivedJson = cJSON_Parse(receivedStr);
             if (receivedJson != NULL) { // 负责解析，并发送给对应的 event 处理
 
@@ -198,8 +193,7 @@ void JsonQueue_processing_task(void* pvParameters) {
                 if (!is_name_geted) {
                     cJSON* model_name = cJSON_GetObjectItem(receivedJson, "name");
                     if (cJSON_IsString(model_name) && model_name->valuestring) {
-                        // ESP_LOGI(TAG, "Model name: %s", model_name->valuestring);
-                        strncpy(modelTitle, model_name->valuestring, sizeof(modelTitle) - 1);
+                        memcpy(modelTitle, model_name->valuestring, strlen(model_name->valuestring));
                         esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_MODEL_NAME, &modelTitle[0],
                                           sizeof(modelTitle), portMAX_DELAY);
                         is_name_geted = true;
@@ -210,11 +204,10 @@ void JsonQueue_processing_task(void* pvParameters) {
                 cJSON* jsonImage = cJSON_GetObjectItem(receivedJson, "img");
                 if (cJSON_IsString(jsonImage) && jsonImage->valuestring) {
                     lv_memset_00(imageData, sizeof(imageData));
+                    memcpy(imageData, jsonImage->valuestring, strlen(jsonImage->valuestring));
                     strncpy(imageData, jsonImage->valuestring, sizeof(imageData) - 1);
                     esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_IMG, &imageData[0],
                                       sizeof(imageData), portMAX_DELAY);
-                } else {
-                    ESP_LOGE(TAG, "Invalid img string");
                 }
 
                 // ///// 画框的函数调用
@@ -235,32 +228,27 @@ void JsonQueue_processing_task(void* pvParameters) {
                 /// Keypoints 的处理
                 cJSON* jsonKeypoints = cJSON_GetObjectItem(receivedJson, "keypoints");
                 if (cJSON_IsArray(jsonKeypoints)) {
-                    keypoints_t* keypoints_array;
-                    int keypoints_count;
-                    if (get_keypoints(jsonKeypoints, &keypoints_array, &keypoints_count)) {
-
-                        if (keypoints_array == NULL) {
+                    keypoints_array_t keypoints_array; 
+                    if (ParseJsonKeypoints(jsonKeypoints, &keypoints_array.keypoints_array,
+                                           &keypoints_array.keypoints_count)) {
+                        if (keypoints_array.keypoints_array == NULL) {
                             ESP_LOGE(TAG, "keypoints_array is NULL");
                             continue;
                         }
-                        for (int i = 0; i < keypoints_count; i++) {
-                            esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_KEYPOINTS,
-                                              (void*)&keypoints_array[i], sizeof(keypoints_array[i]), portMAX_DELAY);
-                        }
-
-                        for (int i = 0; i < keypoints_count; i++) {
-                            free_keypoints_array(keypoints_array[i].points);
-                        }
-                        free(keypoints_array);
+                        int keypoints_count = keypoints_array.keypoints_count;
+                        esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_KEYPOINTS, &keypoints_array,
+                                          sizeof(keypoints_array_t), portMAX_DELAY);
                     }
                 }
-
                 cJSON_Delete(receivedJson);
             }
-            // free(receivedStr); // Free the received string after processing.
-            cJSON_free(receivedStr); // Free the received string after processing.
-            vTaskDelay(1);
-            // receivedStr = NULL;
+            /* end of if */
+            else {
+                ESP_LOGE(TAG, "Invalid JSON string: %s", receivedStr);
+                vTaskDelay(1);
+            }
         }
+        /* end of for*/
     }
+    /* out of for */
 }

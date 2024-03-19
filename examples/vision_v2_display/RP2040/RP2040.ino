@@ -1,10 +1,10 @@
+#include "pico/sync.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Base64.h>
 #include <PacketSerial.h>
 #include <Seeed_Arduino_SSCMA.h>
 #include <Wire.h>
-#include "pico/sync.h"
 
 #define pcSerial_ENABLE 0
 #if pcSerial_ENABLE
@@ -48,7 +48,6 @@ HardwareSerial atSerial(0);
 #define atSerial Serial2
 #endif
 
-
 static inline void AI_func(SSCMA& instance);
 static inline void send_model_title(SSCMA& instance);
 
@@ -65,9 +64,9 @@ static bool shutdown_flag = false;
 // static bool get_title = false;
 
 void onPacketReceived(const uint8_t* buffer, size_t size) {
-  if (size < 1) {
+  if (size < 1)
     return;
-  }
+
   switch (buffer[0]) {
     case PKT_TYPE_CMD_SHUTDOWN:
       {
@@ -133,7 +132,6 @@ void setup() {
 #endif
 }
 
-
 void setup1() {
 #ifdef pcSerial
   pcSerial.begin(ESP32_COMM_BAUD_RATE);
@@ -165,7 +163,8 @@ void loop1() {
   if (myPacketSerial.overflow()) {
   }
 }
-
+JsonDocument doc_info;  // Adjust size as needed
+JsonDocument doc_image;  // Adjust size as needed
 /**
  * @brief
  *
@@ -174,18 +173,23 @@ void loop1() {
  * {"keypoints":[{"box":[0,95,120,120,239,240],"points":[[127,77],[153,62],[98,59],[182,91],[61,88],[222,209],[10,198],[241,249],[0,234],[193,220],[25,183],[179,293],[61,285],[135,256],[72,220],[116,271],[197,216]]}]}
  */
 static inline void AI_func(SSCMA& instance) {
-  if (!mutex_enter_timeout_ms(&myMutex, 1000)) return;
+  if (!mutex_enter_timeout_ms(&myMutex, 1000))
+    return;
 
-  JsonDocument doc_info;   // Adjust size as needed
-  JsonDocument doc_image;  // Adjust size as needed
   if (!instance.invoke(1, false, true)) {
 
     /* Performance metrics */
-    auto& perf = instance.perf();
-    doc_info["pre"] = perf.prepocess;
-    doc_info["inf"] = perf.inference;
-    doc_info["post"] = perf.postprocess;
+    // JsonDocument doc_fet;   // Adjust size as needed
+    // auto& perf = instance.perf();
+    // doc_fet["pre"] = perf.prepocess;
+    // doc_fet["inf"] = perf.inference;
+    // doc_fet["post"] = perf.postprocess;
 
+    // serializeJson(doc_fet, espSerial);
+    // espSerial.println();
+    // serializeJson(doc_fet, pcSerial);  // Serialize and print the JSON document
+    // pcSerial.println();
+    doc_info.clear();
     /* Boxes */
     auto& boxes = instance.boxes();
     int index = 0;
@@ -218,7 +222,9 @@ static inline void AI_func(SSCMA& instance) {
       copyArray(currentKeypoint, doc_info["keypoints"][index]["box"]);
       int j = 0;
       for (auto& point : keypoint.points) {
-        int arrayKeypoints[2] = { point.x, point.y };
+        // int arrayKeypoints[] = { point.x, point.y, point.score, point.target};
+        int arrayKeypoints[] = { point.x, point.y, point.score};
+        // int arrayKeypoints[] = { point.x, point.y};
         copyArray(arrayKeypoints, doc_info["keypoints"][index]["points"][j++]);
       }
       index++;
@@ -226,28 +232,29 @@ static inline void AI_func(SSCMA& instance) {
     /* Last image*/
     auto lastImage = instance.last_image();
     if (lastImage.length()) {
+      doc_image.clear();
       doc_image["img"] = lastImage;
-#ifdef espSerial
-      serializeJson(doc_image, espSerial);  // Serialize and print the JSON document
+      serializeJson(doc_image, espSerial);
+      espSerial.println();
+#if _LOG
+      // serializeJson(doc_image, pcSerial);  // Serialize and print the JSON document
+      // pcSerial.println();
 #endif
     }
-
-#ifdef espSerial
-    serializeJson(doc_info, espSerial);  // Serialize and print the JSON document
-#endif
-
+    // delay(1);
+    if (!doc_info.isNull()) {
+      serializeJson(doc_info, espSerial);
+      espSerial.println();
 #if _LOG
-    serializeJson(doc_info, pcSerial);   // Serialize and print the JSON document
-    serializeJson(doc_image, pcSerial);  // Serialize and print the JSON document
-    // serializeJsonPretty
-    pcSerial.println();
+      serializeJson(doc_info, pcSerial);  // Serialize and print the JSON document
+      pcSerial.println();
 #endif
+    }
   }
   mutex_exit(&myMutex);
 }
 
 static inline void send_model_title(SSCMA& instance) {
-  // 仅在需要访问共享资源时加锁
   mutex_enter_blocking(&myMutex);
 
   bool fetchSuccess = instance.fetch_info();
@@ -277,7 +284,7 @@ static inline void send_model_title(SSCMA& instance) {
     send_doc["name"] = doc["name"];
 #ifdef espSerial
     serializeJson(send_doc, espSerial);
-    // espSerial.println();
+    espSerial.println();
 #endif
 #if _LOG
     serializeJson(send_doc, pcSerial);
