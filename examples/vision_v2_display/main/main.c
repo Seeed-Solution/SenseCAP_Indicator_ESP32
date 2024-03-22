@@ -73,8 +73,10 @@ typedef struct {
     int keypoints_count;
 } keypoints_array_t;
 
+int right_canvs_delay = 0;
+bool is_right_canvas_cleaned = 0;
 static void __json_event_handler(void* handler_args, esp_event_base_t base, int32_t id, void* event_data) {
-    lv_port_sem_take();
+
     switch (id) {
     case VIEW_EVENT_IMG: {
         unsigned char* img_data = (unsigned char*)event_data;
@@ -82,18 +84,27 @@ static void __json_event_handler(void* handler_args, esp_event_base_t base, int3
         if (!jpegImageSize) { // >0
             ESP_LOGE(TAG, "Failed to decode image");
         }
-        lv_canvas_fill_bg(canvas_right, lv_palette_main(LV_PALETTE_NONE), LV_OPA_COVER);
+        lv_port_sem_take();
+        if (!is_right_canvas_cleaned && ++right_canvs_delay >= 2) {
+            is_right_canvas_cleaned = true;
+            lv_canvas_fill_bg(canvas_right, lv_palette_main(LV_PALETTE_NONE), LV_OPA_COVER);
+        }
         update_canvas_with_image(canvas_left, jpegImage, jpegImageSize);
+        lv_port_sem_give();
         break;
     }
     case VIEW_EVENT_MODEL_NAME: {
         char* p_data = ((char*)event_data);
+        lv_port_sem_take();
         lv_label_set_text(ui_Model_Name, p_data);
+        lv_port_sem_give();
         break;
     }
     case VIEW_EVENT_BOXES: {
         boxes_t* box = (boxes_t*)event_data;
+        lv_port_sem_take();
         draw_one_box(canvas_left, *box, lv_color_make(113, 235, 52));
+        lv_port_sem_give();
         break;
     }
     case VIEW_EVENT_KEYPOINTS: {
@@ -102,12 +113,15 @@ static void __json_event_handler(void* handler_args, esp_event_base_t base, int3
 
         int keypoints_count = keypoints_array->keypoints_count;
         // print_keypoints(keypoints, keypoints_count);
-
+        right_canvs_delay = 0; // indicate the right canvas is drawn
+        is_right_canvas_cleaned = false;
+        lv_port_sem_take();
+        lv_canvas_fill_bg(canvas_right, lv_palette_main(LV_PALETTE_NONE), LV_OPA_COVER);
         for (int i = 0; i < keypoints_count; i++) {
             draw_keypoints(canvas_left, &keypoints[i]);  // boxes and keypoints
             draw_keypoints(canvas_right, &keypoints[i]); // boxes and keypoints
         }
-
+        lv_port_sem_give();
         // esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_BOXES, &keypoints->box,
         // sizeof(keypoints->box),
         //                   portMAX_DELAY);
@@ -123,7 +137,6 @@ static void __json_event_handler(void* handler_args, esp_event_base_t base, int3
     default:
         break;
     }
-    lv_port_sem_give();
 }
 
 void app_main(void) {
@@ -228,7 +241,7 @@ void app_main(void) {
                 /// Keypoints 的处理
                 cJSON* jsonKeypoints = cJSON_GetObjectItem(receivedJson, "keypoints");
                 if (cJSON_IsArray(jsonKeypoints)) {
-                    keypoints_array_t keypoints_array; 
+                    keypoints_array_t keypoints_array;
                     if (ParseJsonKeypoints(jsonKeypoints, &keypoints_array.keypoints_array,
                                            &keypoints_array.keypoints_count)) {
                         if (keypoints_array.keypoints_array == NULL) {
