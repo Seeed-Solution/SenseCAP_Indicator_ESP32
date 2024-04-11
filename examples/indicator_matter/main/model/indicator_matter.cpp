@@ -96,6 +96,10 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
             st.rssi = -50;
             st.is_connected = true;
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_WIFI_ST, &st, sizeof(struct view_data_wifi_st ), portMAX_DELAY);
+
+            __g_matter_connected_flag_set(true);
+            uint8_t screen = SCREEN_DASHBOARD;
+            ESP_ERROR_CHECK(esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_SCREEN_START, &screen, sizeof(screen), portMAX_DELAY));
         }
         break;
     case chip::DeviceLayer::DeviceEventType::kCommissioningComplete: {
