@@ -54,7 +54,7 @@ static instance_mqtt_t instance_ptr = &mqtt_ha_instance;
 
 static void ha_entites_init(void)
 {
-    // snesor entites init
+    // sensor entites init
     ha_sensor_entites[0].index       = 0;
     ha_sensor_entites[0].key         = CONFIG_SENSOR1_VALUE_KEY;
     ha_sensor_entites[0].topic       = CONFIG_SENSOR1_TOPIC_DATA;
@@ -184,7 +184,7 @@ static int mqtt_msg_handler(const char *p_topic, int topic_len, const char *p_da
 
     for (int i = 0; i < CONFIG_HA_SENSOR_ENTITY_NUM; i++) {
         cjson_item = cJSON_GetObjectItem(root, ha_sensor_entites[i].key);
-        if (cjson_item != NULL && cjson_item->valuestring != NULL && 0 == strncmp(p_topic, ha_sensor_entites->topic, topic_len)) {
+        if (cjson_item != NULL && cjson_item->valuestring != NULL && 0 == strncmp(p_topic, ha_sensor_entites[i].topic, topic_len)) {
             sensor_data.index = i;
             strncpy(sensor_data.value, cjson_item->valuestring, sizeof(sensor_data.value) - 1);
             esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_HA_SENSOR, &sensor_data, sizeof(sensor_data), portMAX_DELAY);
