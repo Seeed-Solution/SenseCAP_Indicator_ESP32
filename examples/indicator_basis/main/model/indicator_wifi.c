@@ -154,8 +154,8 @@ static int __wifi_scan(wifi_ap_record_t *p_ap_info, uint16_t number)
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
     ESP_ERROR_CHECK(esp_wifi_start());
     esp_wifi_scan_start(NULL, true);
-    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, p_ap_info));
     ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&ap_count));
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, p_ap_info));
     ESP_LOGI(TAG, " scan ap cont: %d", ap_count);
     
     for (int i = 0; (i < number) && (i < ap_count); i++) {
