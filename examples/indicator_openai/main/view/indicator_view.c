@@ -1200,7 +1200,7 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
                 case 3: p_wday_str="Wednesday";break;
                 case 4: p_wday_str="Thursday";break;
                 case 5: p_wday_str="Friday";break;
-                case 6: p_wday_str="Sunday";break;
+                case 6: p_wday_str="Saturday";break;
                 default: p_wday_str="";break;
             }
             char buf1[32];
