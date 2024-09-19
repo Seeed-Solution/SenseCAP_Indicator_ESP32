@@ -188,6 +188,27 @@ static temperature_sensor_handle_t temp_sensor = NULL;
 /* -------------------------------------------------------------------------- */
 /* --- FUNCTIONS DECLARATION ---------------------------------------- */
 
+static int lorahub_log_display(uint8_t level, const char *fmt, ...)
+{
+    int                         n;
+    struct view_data_lorahub_log log = {0};
+
+    va_list args;
+    va_start(args, fmt);
+    n = vsnprintf(log.data, sizeof(log.data), fmt, args);
+    if (n > (int)sizeof(log.data)) {
+        n = sizeof(log.data);
+    }
+    va_end(args);
+
+    log.level = level;
+
+    printf("%s", log.data);
+    esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_LORAHUB_MONITOR, (void *)&log, sizeof(log), portMAX_DELAY);
+
+    return n;
+}
+
 int wifi_get_mac_address( uint8_t mac_address[6] )
 {
     esp_err_t err;
@@ -603,6 +624,7 @@ void thread_up( void )
     {
         ESP_LOGE( TAG_UP, "ERROR: [up] setsockopt returned %s\n", strerror( errno ) );
         wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] setsockopt returned %s\n", strerror( errno ) );
     }
 
     /* pre-fill the data buffer with fixed fields */
@@ -623,6 +645,7 @@ void thread_up( void )
         {
             ESP_LOGE( TAG_UP, "ERROR: [up] failed packet fetch, exiting\n" );
             wait_on_error( LRHB_ERROR_HAL, __LINE__ );
+            lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] failed packet fetch, exiting\n" );
         }
 
         /* check if there are status report to send */
@@ -741,6 +764,7 @@ void thread_up( void )
             {
                 ESP_LOGE( TAG_UP, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
                 wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
             }
 
             /* RAW timestamp, 8-17 useful chars */
@@ -753,6 +777,7 @@ void thread_up( void )
             {
                 ESP_LOGE( TAG_UP, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
                 wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
             }
 
             /* Packet concentrator channel, RF chain & RX frequency, 34-36 useful chars */
@@ -767,6 +792,7 @@ void thread_up( void )
             {
                 ESP_LOGE( TAG_UP, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
                 wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
             }
 
             /* Packet status, 9-10 useful chars */
@@ -789,6 +815,7 @@ void thread_up( void )
                 memcpy( ( void* ) ( buff_up + buff_index ), ( void* ) ",\"stat\":?", 9 );
                 buff_index += 9;
                 wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] received packet with unknown status 0x%02X\n", p->status );
             }
 
             /* Packet modulation, 13-14 useful chars */
@@ -837,6 +864,7 @@ void thread_up( void )
                     memcpy( ( void* ) ( buff_up + buff_index ), ( void* ) ",\"datr\":\"SF?", 12 );
                     buff_index += 12;
                     wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                    lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] lora packet with unknown datarate 0x%02lX\n", p->datarate );
                 }
                 switch( p->bandwidth )
                 {
@@ -857,6 +885,7 @@ void thread_up( void )
                     memcpy( ( void* ) ( buff_up + buff_index ), ( void* ) "BW?\"", 4 );
                     buff_index += 4;
                     wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                    lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] lora packet with unknown bandwidth 0x%02X\n", p->bandwidth );
                 }
 
                 /* Packet ECC coding rate, 11-13 useful chars */
@@ -887,6 +916,7 @@ void thread_up( void )
                     memcpy( ( void* ) ( buff_up + buff_index ), ( void* ) ",\"codr\":\"?\"", 11 );
                     buff_index += 11;
                     wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                    lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] lora packet with unknown coderate 0x%02X\n", p->coderate );
                 }
 
                 /* Lora SNR */
@@ -899,6 +929,7 @@ void thread_up( void )
                 {
                     ESP_LOGE( TAG_UP, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
                     wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                    lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
                 }
             }
             else if( p->modulation == MOD_FSK )
@@ -917,12 +948,14 @@ void thread_up( void )
                 {
                     ESP_LOGE( TAG_UP, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
                     wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                    lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
                 }
             }
             else
             {
                 ESP_LOGE( TAG_UP, "ERROR: [up] received packet with unknown modulation 0x%02X\n", p->modulation );
                 wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] received packet with unknown modulation 0x%02X\n", p->modulation );
             }
 
             /* Channel RSSI, payload size, 18-23 useful chars */
@@ -936,6 +969,7 @@ void thread_up( void )
             {
                 ESP_LOGE( TAG_UP, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
                 wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 4 ) );
             }
 
             /* Packet base64-encoded payload, 14-350 useful chars */
@@ -951,6 +985,7 @@ void thread_up( void )
             {
                 ESP_LOGE( TAG_UP, "ERROR: [up] bin_to_b64 failed line %u\n", ( __LINE__ - 4 ) );
                 wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] bin_to_b64 failed line %u\n", ( __LINE__ - 4 ) );
             }
             buff_up[buff_index] = '"';
             ++buff_index;
@@ -1003,6 +1038,7 @@ void thread_up( void )
             {
                 ESP_LOGE( TAG_UP, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 5 ) );
                 wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+                lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] snprintf failed line %u\n", ( __LINE__ - 5 ) );
             }
         }
 
@@ -1012,6 +1048,7 @@ void thread_up( void )
         buff_up[buff_index] = 0; /* add string terminator, for safety */
 
         printf( "\nJSON up: %s\n", ( char* ) ( buff_up + 12 ) ); /* DEBUG: display JSON payload */
+        lorahub_log_display(LORAHUB_LOG_LEVEL_INFO, "\nJSON up: %s\n", ( char* ) ( buff_up + 12 ) );
 
         /* send datagram to server */
         j = send( sock_up, ( void* ) buff_up, buff_index, 0 );
@@ -1125,6 +1162,7 @@ void thread_down( void )
     {
         ESP_LOGE( TAG_DOWN, "ERROR: [down] setsockopt returned %s\n", strerror( errno ) );
         wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [down] setsockopt returned %s\n", strerror( errno ) );
     }
 
     /* pre-fill the pull request buffer with fixed fields */
@@ -1163,6 +1201,7 @@ void thread_down( void )
         if( i < 0 )
         {
             ESP_LOGE( TAG_DOWN, "ERROR: [down] failed to send PULL_DATA to server - %s\n", strerror( errno ) );
+            lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [down] failed to send PULL_DATA to server - %s\n", strerror( errno ));
         }
         clock_gettime( CLOCK_MONOTONIC, &send_time );
         pthread_mutex_lock( &mx_meas_dw );
@@ -1227,6 +1266,7 @@ void thread_down( void )
             ESP_LOGI( TAG_DOWN, "INFO: [down] PULL_RESP received  - token[%d:%d] :)", buff_down[1],
                       buff_down[2] );                                   /* very verbose */
             printf( "\nJSON down: %s\n", ( char* ) ( buff_down + 4 ) ); /* DEBUG: display JSON payload */
+            lorahub_log_display(LORAHUB_LOG_LEVEL_INFO, "\nJSON down: %s\n", ( char* ) ( buff_down + 4 ) );
 
             /* initialize TX struct and try to parse JSON */
             memset( &txpkt, 0, sizeof txpkt );
@@ -1830,6 +1870,7 @@ void thread_pktfwd( void )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: failed to parse radio configuration\n" );
         wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: failed to parse radio configuration\n");
     }
 
     /* Configure gateway parameters */
@@ -1838,6 +1879,7 @@ void thread_pktfwd( void )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: failed to parse gateway configuration\n" );
         wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: failed to parse gateway configuration\n");
     }
     /* Update display with connection info */
     // TODO
@@ -1859,6 +1901,8 @@ void thread_pktfwd( void )
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [up] getaddrinfo on address %s (PORT %s) returned %d\n", serv_addr, serv_port_up,
                   i );
         wait_on_error( LRHB_ERROR_LNS, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] getaddrinfo on address %s (PORT %s) returned %d\n", serv_addr, serv_port_up,
+                  i);
     }
     /* try to open socket for upstream traffic */
     sock_up = socket( result->ai_family, result->ai_socktype, result->ai_protocol );
@@ -1866,6 +1910,7 @@ void thread_pktfwd( void )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [up] failed to open socket for uplink\n" );
         wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] failed to open socket for uplink\n");
     }
     /* connect so we can send/receive packet with the server only */
     i = connect( sock_up, result->ai_addr, result->ai_addrlen );
@@ -1873,6 +1918,7 @@ void thread_pktfwd( void )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [up] connect returned %s\n", strerror( errno ) );
         wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] connect returned %s\n", strerror( errno ) );
     }
     freeaddrinfo( result );
     /* look for server address w/ downstream port */
@@ -1882,6 +1928,8 @@ void thread_pktfwd( void )
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [up] getaddrinfo on address %s (PORT %s) returned %d\n", serv_addr,
                   serv_port_down, i );
         wait_on_error( LRHB_ERROR_LNS, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [up] getaddrinfo on address %s (PORT %s) returned %d\n", serv_addr,
+                  serv_port_down, i);
     }
 
     /* try to open socket for downstream traffic */
@@ -1890,6 +1938,7 @@ void thread_pktfwd( void )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [down] failed to open socket for downlink\n" );
         wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [down] failed to open socket for downlink\n");
     }
     /* connect so we can send/receive packet with the server only */
     i = connect( sock_down, result->ai_addr, result->ai_addrlen );
@@ -1897,6 +1946,7 @@ void thread_pktfwd( void )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [down] connect returned %s\n", strerror( errno ) );
         wait_on_error( LRHB_ERROR_UNKNOWN, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [down] connect returned %s\n", strerror( errno ) );
     }
     freeaddrinfo( result );
     /* starting the hub */
@@ -1904,11 +1954,13 @@ void thread_pktfwd( void )
     if( i == LGW_HAL_SUCCESS )
     {
         ESP_LOGI( TAG_PKT_FWD, "INFO: [main] LoRaHub started, packet can now be received" );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_INFO, "INFO: [main] LoRaHub started, packet can now be received" );
     }
     else
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [main] failed to start the concentrator\n" );
         wait_on_error( LRHB_ERROR_HAL, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [main] failed to start the concentrator\n" );
     }
     /* spawn threads to manage upstream and downstream */
     i = pthread_create( &thrid_up, NULL, ( void* ( * ) ( void* ) ) thread_up, NULL );
@@ -1916,18 +1968,21 @@ void thread_pktfwd( void )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [main] impossible to create upstream thread\n" );
         wait_on_error( LRHB_ERROR_OS, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [main] impossible to create upstream thread\n" );
     }
     i = pthread_create( &thrid_down, NULL, ( void* ( * ) ( void* ) ) thread_down, NULL );
     if( i != 0 )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [main] impossible to create downstream thread\n" );
         wait_on_error( LRHB_ERROR_OS, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [main] impossible to create downstream thread\n" );
     }
     i = pthread_create( &thrid_jit, NULL, ( void* ( * ) ( void* ) ) thread_jit, NULL );
     if( i != 0 )
     {
         ESP_LOGE( TAG_PKT_FWD, "ERROR: [main] impossible to create JIT thread\n" );
         wait_on_error( LRHB_ERROR_OS, __LINE__ );
+        lorahub_log_display(LORAHUB_LOG_LEVEL_ERROR, "ERROR: [main] impossible to create JIT thread\n" );
     }
 
     /* Update status for display */

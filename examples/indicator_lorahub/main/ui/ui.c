@@ -438,7 +438,7 @@ void ui_event_BtnLoRa3(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
-        // check_if_lorawan_connected(e);
+        _ui_screen_change(&ui_ScreenMonitor, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_ScreenMonitor_screen_init);
     }
 }
 void ui_event_ScreenSetting(lv_event_t * e)

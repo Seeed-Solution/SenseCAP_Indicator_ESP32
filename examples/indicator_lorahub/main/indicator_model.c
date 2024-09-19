@@ -43,4 +43,9 @@ int indicator_model_init(void)
 #ifdef indicator_lorahub_H
     indicator_lorahub_init();
 #endif
+
+#ifdef INDICATOR_TERMINAL_H
+    indicator_terminal_init();
+#endif
+
 }

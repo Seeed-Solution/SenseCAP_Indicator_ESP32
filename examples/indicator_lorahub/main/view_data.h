@@ -152,11 +152,11 @@ struct view_data_lorawan_network_info{
     uint8_t nwks_key[16];
 };
 
-#define LORAWAN_LOG_LEVEL_INFO   0
-#define LORAWAN_LOG_LEVEL_WARN   1
-#define LORAWAN_LOG_LEVEL_ERROR  2
+#define LORAHUB_LOG_LEVEL_INFO   0
+#define LORAHUB_LOG_LEVEL_WARN   1
+#define LORAHUB_LOG_LEVEL_ERROR  2
 
-struct view_data_lorawa_log {
+struct view_data_lorahub_log {
     uint8_t level; // 0: info ,  1: warn , 2: error 
     uint8_t data[128];
 };
@@ -197,6 +197,7 @@ enum {
 
     VIEW_EVENT_LORAHUB_CONFIGURE,
     VIEW_EVENT_LORAHUB_REBOOT,
+    VIEW_EVENT_LORAHUB_MONITOR,
 
     VIEW_EVENT_LORAHUB_DATA_UPDATE,
 

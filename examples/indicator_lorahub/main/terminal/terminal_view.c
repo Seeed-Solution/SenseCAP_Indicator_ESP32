@@ -177,31 +177,31 @@ static void createNewLine(lv_obj_t *container, const char *logLine, const lv_col
 
 static void __view_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
-    // if (event_id == VIEW_EVENT_LORAWAN_LOG) {
-    //     struct view_data_lorawa_log *log_info = (struct view_data_lorawa_log *)event_data;
-    //     lv_color_t                   color    = lv_color_white();
+    if (event_id == VIEW_EVENT_LORAHUB_MONITOR) {
+        struct view_data_lorahub_log *log_info = (struct view_data_lorahub_log *)event_data;
+        lv_color_t                   color    = lv_color_white();
 
-    //     char log_line[128];
-    //     memset(log_line, 0, sizeof(log_line));
-    //     strcpy(log_line, log_info->data);
-    //     switch (log_info->level) {
-    //         case LORAWAN_LOG_LEVEL_INFO:
-    //             color = lv_color_hex(COLOR_INFO);
-    //             break;
-    //         case LORAWAN_LOG_LEVEL_WARN:
-    //             color = lv_color_hex(COLOR_WARN);
-    //             break;
-    //         case LORAWAN_LOG_LEVEL_ERROR:
-    //             color = lv_color_hex(COLOR_ERROR);
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    //     ESP_LOGI(TAG, "log_info->data %s", log_line);
-    //     lv_port_sem_take();
-    //     __g_terminal.addLogLine(&__g_terminal, log_line, color);
-    //     lv_port_sem_give();
-    // }
+        char log_line[128];
+        memset(log_line, 0, sizeof(log_line));
+        strcpy(log_line, log_info->data);
+        switch (log_info->level) {
+            case LORAHUB_LOG_LEVEL_INFO:
+                color = lv_color_hex(COLOR_INFO);
+                break;
+            case LORAHUB_LOG_LEVEL_WARN:
+                color = lv_color_hex(COLOR_WARN);
+                break;
+            case LORAHUB_LOG_LEVEL_ERROR:
+                color = lv_color_hex(COLOR_ERROR);
+                break;
+            default:
+                break;
+        }
+        // ESP_LOGI(TAG, "log_info->data %s", log_line);
+        lv_port_sem_take();
+        __g_terminal.addLogLine(&__g_terminal, log_line, color);
+        lv_port_sem_give();
+    }
 }
 
 
@@ -229,7 +229,7 @@ void indicator_terminal_init(void)
 {
     __init_terminal(&__g_terminal, Panel_Container);
 
-    // ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
-    //                                                          VIEW_EVENT_BASE, VIEW_EVENT_LORAWAN_LOG,
-    //                                                          __view_event_handler, NULL, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                             VIEW_EVENT_BASE, VIEW_EVENT_LORAHUB_MONITOR,
+                                                             __view_event_handler, NULL, NULL));
 }
