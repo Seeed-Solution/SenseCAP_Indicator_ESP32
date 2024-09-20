@@ -32,7 +32,7 @@ static void __view_event_handler(void *arg, esp_event_base_t event_base, int32_t
 {
     lv_port_sem_take();
     switch (event_id) {      
-        case VIEW_EVENT_LORAHUB_DATA_UPDATE:
+        case VIEW_EVENT_LORAHUB_DATA_UPDATE:{
             ESP_LOGI(TAG, "VIEW_EVENT_LORAHUB_DATA_UPDATE");
             struct lorahub *lorahub_st = (struct lorahub *)event_data;
             int datarate = atoi(lorahub_st->web_cfg_chan_datarate_str);
@@ -55,6 +55,16 @@ static void __view_event_handler(void *arg, esp_event_base_t event_base, int32_t
             lv_textarea_set_text(objects.sntptext, lorahub_st->web_cfg_sntp_address);
 
             break;
+        }
+
+        case VIEW_EVENT_LORAHUB_MAC:{
+            ESP_LOGI(TAG, "VIEW_EVENT_LORAHUB_MAC");
+           char *lorahub_mac = (char *)event_data;
+
+            lv_label_set_text(objects.mactext, lorahub_mac);
+
+            break;
+        }
 
         default:
             break;
@@ -68,6 +78,11 @@ void view_lorawan_init(void)
 {
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
                                                              VIEW_EVENT_BASE, VIEW_EVENT_LORAHUB_DATA_UPDATE,
+                                                             __view_event_handler,
+                                                             NULL, NULL));
+
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                             VIEW_EVENT_BASE, VIEW_EVENT_LORAHUB_MAC,
                                                              __view_event_handler,
                                                              NULL, NULL));
 }

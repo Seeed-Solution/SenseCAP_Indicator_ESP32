@@ -163,6 +163,8 @@ static esp_err_t lorahub_cfg_get(void)
     wifi_get_mac_address( web_inf_mac_addr );
     snprintf( web_inf_mac_addr_str, sizeof web_inf_mac_addr_str, "%02x:%02x:%02x:%02x:%02x:%02x", web_inf_mac_addr[0],
               web_inf_mac_addr[1], web_inf_mac_addr[2], web_inf_mac_addr[3], web_inf_mac_addr[4], web_inf_mac_addr[5] );
+    
+    esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_LORAHUB_MAC, web_inf_mac_addr_str, sizeof(web_inf_mac_addr_str), portMAX_DELAY);
 
     /* Get default values from menuconfig (used if never set to NVS) */
     snprintf( __g_lorahub.web_cfg_chan_freq_mhz_str, sizeof __g_lorahub.web_cfg_chan_freq_mhz_str, "%.6f",
