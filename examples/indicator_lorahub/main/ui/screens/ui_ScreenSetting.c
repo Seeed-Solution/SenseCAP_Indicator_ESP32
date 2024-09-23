@@ -61,9 +61,9 @@ void ui_ScreenSetting_screen_init(void)
     lv_obj_set_width(ui_LblTitleLoraWAN1, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LblTitleLoraWAN1, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_LblTitleLoraWAN1, 0);
-    lv_obj_set_y(ui_LblTitleLoraWAN1, 25);
+    lv_obj_set_y(ui_LblTitleLoraWAN1, 30);
     lv_obj_set_align(ui_LblTitleLoraWAN1, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LblTitleLoraWAN1, "LoRaHub");
+    lv_label_set_text(ui_LblTitleLoraWAN1, "   LoRa \nGateway");
     lv_obj_set_style_text_font(ui_LblTitleLoraWAN1, &ui_font_ItemTitle, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BtnUsrWifi1 = lv_btn_create(ui_ScreenSetting);

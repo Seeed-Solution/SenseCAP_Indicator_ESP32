@@ -66,7 +66,7 @@ void ui_sing_channel_gw_init() {
                         lv_obj_set_pos(obj, 0, 0);
                         lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                         lv_obj_set_align(obj, LV_ALIGN_CENTER);
-                        lv_label_set_text(obj, "LoRaHub");
+                        lv_label_set_text(obj, "LoRa Gateway");
                     }
                 }
                 {
@@ -116,7 +116,7 @@ void ui_sing_channel_gw_init() {
                             lv_obj_t *obj = lv_label_create(parent_obj);
                             lv_obj_set_pos(obj, -3, -10);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                            lv_label_set_text(obj, "LoRaHUB info");
+                            lv_label_set_text(obj, "LoRa Gateway info");
                             lv_obj_set_style_text_color(obj, lv_color_hex(0xff00afaa), LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_set_style_align(obj, LV_ALIGN_TOP_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
                         }
