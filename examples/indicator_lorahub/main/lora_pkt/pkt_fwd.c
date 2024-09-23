@@ -394,6 +394,7 @@ static int parse_gateway_configuration( void )
     ESP_LOGI( TAG_PKT_FWD, "Gateway ID is set to CUSTOM (%s)", CONFIG_GATEWAY_ID_CUSTOM );
 #endif
     ESP_LOGI( TAG_PKT_FWD, "Gateway ID: 0x%08llX", lgwm );
+    lorahub_log_display(LORAHUB_LOG_LEVEL_INFO, "Gateway ID: 0x%08llX", lgwm );
 
     autoquit_threshold = 10; /* TODO: get from menuconfig or web interface */
     ESP_LOGI( TAG_PKT_FWD, "INFO: Auto-quit after %lu non-acknowledged PULL_DATA\n", autoquit_threshold );
@@ -739,6 +740,7 @@ void thread_up( void )
             meas_up_payload_byte += p->size;
             pthread_mutex_unlock( &mx_meas_up );
             printf( "\nINFO: Received pkt from mote: %08lX (fcnt=%u)", mote_addr, mote_fcnt );
+            lorahub_log_display(LORAHUB_LOG_LEVEL_WARN, "\nINFO: Received pkt from mote: %08lX (fcnt=%u)", mote_addr, mote_fcnt );
 
             /* Start of packet, add inter-packet separator if necessary */
             if( pkt_in_dgram == 0 )
