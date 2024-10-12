@@ -39,6 +39,7 @@ The project includes various examples that demonstrate how to effectively use ES
 - `indicator_basis`  This is a comprehensive demo,mainly implements time, sensor data display, and some configuration functions.
 - `indicator_openai` This is a comprehensive demo,mainly based on the indicator_basis demo with added chartGPT and DALL•E functions.
 - `indicator_lora`  Demonstrates how to communicate using lora in SenseCAP Indicator.
+- `indicator_lorahub`  Demonstrates how to implement a single channel LoRaWAN "gateway" in SenseCAP Indicator.
 - `lvgl_demos` Demonstrated some demos of lvgl.
 - `photo_demo` Demonstrates how to display a photo of yourself.
 - `squareline_demo` Demonstrates how to display the UI file exported by the squareline project.
