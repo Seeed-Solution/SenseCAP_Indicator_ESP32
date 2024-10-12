@@ -1,0 +1,129 @@
+menu "LoRaWAN 1-CH HUB Configuration"
+        
+menu "Hardware Configuration"
+    
+    choice GATEWAY_HW_BOARD
+        prompt "Board type"
+        default HELTEC_WIFI_LORA_32_V3
+        help
+            Select the hardware board on which the LoRaHub is run (Semtech DevKit, Heltec WiFi LoRa 32 v3, ...).
+        config SEMTECH_DEVKIT
+            bool "Semtech DevKit"
+            help
+                Select Semtech DevKit.
+        config HELTEC_WIFI_LORA_32_V3
+            bool "Heltec WiFi LoRa 32 v3"
+            help
+                Select Heltec WiFi LoRa 32 v3.
+    endchoice
+
+	choice RADIO_TYPE
+		prompt "LoRa radio type"
+		default RADIO_TYPE_SX1262 if HELTEC_WIFI_LORA_32_V3
+		help
+			Select the radio type used by the LoRaHub (sx1261, sx1262, sx1268, llcc68, lr1121).
+
+		config RADIO_TYPE_SX1261
+			bool "sx1261"
+			help
+				Select sx1261 radio.
+
+		config RADIO_TYPE_SX1262
+			bool "sx1262"
+			help
+				Select sx1262 radio.
+
+		config RADIO_TYPE_SX1268
+			bool "sx1268"
+			help
+				Select sx1268 radio.
+
+		config RADIO_TYPE_LLCC68
+			bool "llcc68"
+			help
+				Select llcc68 radio.
+
+		config RADIO_TYPE_LR1121
+			bool "lr1121"
+			help
+				Select lr1121 radio.
+	endchoice
+
+    config GATEWAY_DISPLAY
+        bool "OLED Display"
+        default y
+        help
+            Is there an OLED display connected ?
+
+endmenu # Hardware Configuration
+
+menu "Packet Forwarder Configuration"
+
+    config GATEWAY_ID_AUTO
+        bool "Gateway_ID AUTO"
+        default y
+        help
+            Gateway ID automatically set based on MAC address.
+
+    if !GATEWAY_ID_AUTO
+        config GATEWAY_ID_CUSTOM
+            string "User defined Gateway ID"
+            help
+                Set Gateway ID. Hex string, 8 bytes.
+    endif # GATEWAY_ID_AUTO
+
+    config GET_CFG_FROM_FLASH
+        bool "Get config from flash in priority"
+        default y
+        help
+            Get gateway configuration from NVS flash for existing fields.
+
+    config CHANNEL_FREQ_HZ
+        int "Channel frequency in Hertz"
+        default 868100000
+        range 400000000 1000000000
+        help
+            Set frequency to use[Hz].
+
+    config CHANNEL_LORA_DATARATE
+        int "Channel LoRa datarate (SF)"
+        default 7
+        range 5 12
+        help
+            Set LoRa channel datarate (SF).
+
+    config CHANNEL_LORA_BANDWIDTH
+        int "Channel LoRa bandwidth in kHz"
+        default 125
+        range 125 500
+        help
+            Set LoRa channel bandwidth (125, 250, 500) kHz.
+
+    config NETWORK_SERVER_ADDRESS
+        string "LoRaWAN network server URL or IP address"
+        default "eu1.cloud.thethings.network"
+        help
+            Set the LoRaWAN network server address URL or IP.
+
+    config NETWORK_SERVER_PORT
+        int "LoRaWAN network server port"
+        default 1700
+        help
+            Set the LoRaWAN network server port.
+
+    config SNTP_SERVER_ADDRESS
+        string "URL or IP address of the SNTP server"
+        default "pool.ntp.org"
+        help
+            Set the SNTP server address URL or IP.
+
+    config WIFI_PROV_DELAY_S
+        int  "WiFi provisioning delay (s)"
+        default 5
+        range 0 255
+        help
+            Waiting period for the user to activate WiFi provisioning mode (in seconds).
+
+endmenu # Packet Forwarder Configuration
+
+endmenu # LoRa 1-CH HUB Configuration
