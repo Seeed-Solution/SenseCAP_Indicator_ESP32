@@ -6,6 +6,10 @@ bin
 sdkconfig
 sdkconfig.old
 dependencies.lock
+
+# Generated during build process
+managed_components
+
 # emacs
 .dir-locals.el
 
