@@ -74,7 +74,7 @@ void ui_sing_channel_gw_init() {
                     lv_obj_t *obj = lv_obj_create(parent_obj);
                     objects.infopanel = obj;
                     lv_obj_set_pos(obj, 1, -183);
-                    lv_obj_set_size(obj, 400, 64);
+                    lv_obj_set_size(obj, 400, 75);
                     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
                     lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
                     lv_obj_set_style_bg_opa(obj, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -85,7 +85,7 @@ void ui_sing_channel_gw_init() {
                         lv_obj_t *parent_obj = obj;
                         {
                             lv_obj_t *obj = lv_obj_create(parent_obj);
-                            lv_obj_set_pos(obj, -22, 9);
+                            lv_obj_set_pos(obj, -22, 5);
                             lv_obj_set_size(obj, 305, 34);
                             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
                             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
@@ -109,6 +109,35 @@ void ui_sing_channel_gw_init() {
                                     lv_obj_set_pos(obj, 125, -9);
                                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                                     lv_label_set_text(obj, "74:4d:bd:96:d7:fc");
+                                }
+                            }
+                        }
+                        {
+                            lv_obj_t *obj = lv_obj_create(parent_obj);
+                            lv_obj_set_pos(obj, -22, 25);
+                            lv_obj_set_size(obj, 305, 34);
+                            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+                            lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_OFF);
+                            lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_border_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_layout(obj, LV_LAYOUT_FLEX, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_flex_flow(obj, LV_FLEX_FLOW_ROW, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_flex_track_place(obj, LV_FLEX_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            {
+                                lv_obj_t *parent_obj = obj;
+                                {
+                                    lv_obj_t *obj = lv_label_create(parent_obj);
+                                    lv_obj_set_pos(obj, -8, -7);
+                                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                                    lv_label_set_text(obj, "Gateway EUI :");
+                                }
+                                {
+                                    // euitext
+                                    lv_obj_t *obj = lv_label_create(parent_obj);
+                                    objects.euitext = obj;
+                                    lv_obj_set_pos(obj, 125, -9);
+                                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                                    lv_label_set_text(obj, "66:66:66:66:66:66");
                                 }
                             }
                         }

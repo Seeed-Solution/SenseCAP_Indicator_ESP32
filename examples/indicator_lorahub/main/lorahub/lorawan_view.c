@@ -59,9 +59,18 @@ static void __view_event_handler(void *arg, esp_event_base_t event_base, int32_t
 
         case VIEW_EVENT_LORAHUB_MAC:{
             ESP_LOGI(TAG, "VIEW_EVENT_LORAHUB_MAC");
-           char *lorahub_mac = (char *)event_data;
+            char *lorahub_mac = (char *)event_data;
 
             lv_label_set_text(objects.mactext, lorahub_mac);
+
+            break;
+        }
+
+        case VIEW_EVENT_LORAHUB_EUI:{
+            ESP_LOGI(TAG, "VIEW_EVENT_LORAHUB_EUI");
+            char *lorahub_eui = (char *)event_data;
+
+            lv_label_set_text(objects.euitext, lorahub_eui);
 
             break;
         }
@@ -83,6 +92,11 @@ void view_lorawan_init(void)
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
                                                              VIEW_EVENT_BASE, VIEW_EVENT_LORAHUB_MAC,
+                                                             __view_event_handler,
+                                                             NULL, NULL));
+                                                        
+    ESP_ERROR_CHECK(esp_event_handler_instance_register_with(view_event_handle,
+                                                             VIEW_EVENT_BASE, VIEW_EVENT_LORAHUB_EUI,
                                                              __view_event_handler,
                                                              NULL, NULL));
 }

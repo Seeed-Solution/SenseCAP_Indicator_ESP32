@@ -371,6 +371,7 @@ static int parse_radio_configuration( void )
 
 static int parse_gateway_configuration( void )
 {
+    char gateway_eui_str[18] = "unknown";
     /* Gateway IF configuration (AUTO or CUSTOM) */
 #ifdef CONFIG_GATEWAY_ID_AUTO
     /* format Gateway ID from MAC address for UDP protocol to LNS */
@@ -380,6 +381,7 @@ static int parse_gateway_configuration( void )
     lgwm |= ( ( uint64_t )( 0xFE ) << 24 ) | ( ( uint64_t )( wifi_mac_addr[3] ) << 16 ) |
             ( ( uint64_t )( wifi_mac_addr[4] ) << 8 ) | ( ( uint64_t )( wifi_mac_addr[5] ) << 0 );
     ESP_LOGI( TAG_PKT_FWD, "Gateway ID is set to AUTO" );
+    lorahub_log_display(LORAHUB_LOG_LEVEL_INFO, "Gateway ID is set to AUTO");
 #else
     size_t len;
     if( ( len = strlen( CONFIG_GATEWAY_ID_CUSTOM ) ) != 16 )
@@ -394,6 +396,10 @@ static int parse_gateway_configuration( void )
 #endif
     ESP_LOGI( TAG_PKT_FWD, "Gateway ID: 0x%08llX", lgwm );
     lorahub_log_display(LORAHUB_LOG_LEVEL_INFO, "Gateway ID: 0x%08llX", lgwm );
+
+    snprintf(gateway_eui_str, sizeof(gateway_eui_str), "%016" PRIx64, lgwm);
+    esp_event_post_to(view_event_handle, VIEW_EVENT_BASE, VIEW_EVENT_LORAHUB_EUI, gateway_eui_str, sizeof(gateway_eui_str), portMAX_DELAY);
+
 
     ESP_LOGI( TAG_PKT_FWD, "INFO: Auto-quit after %lu non-acknowledged PULL_DATA\n", autoquit_threshold );
 
