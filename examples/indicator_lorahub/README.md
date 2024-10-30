@@ -5,7 +5,7 @@ This project demonstrates how to implement a single channel LoRa gateway (LoRaHu
 using SenseCAP Indicator.
 
 This project contains the following components:
-* `bin`: contains precompiled binaries for all supported platforms.
+* `firmware`: contains precompiled binaries for all supported platforms.
 * `components/liblorahub`: the Hardware Abstraction Layer (HAL) on top of the radio driver.
 * `components/radio_drivers`: the sx126x, llcc68, lr11xx radio drivers and associated hardware abstraction layer.
 * `components/smtc_ral`: the radio abstraction layer and board/shields definitions.
@@ -89,7 +89,7 @@ radio usage.
 # 3. Usage
 
 This project comes with precompiled binaries that can be flashed on the
-supported platforms listed above. The files are located in the `bin` directory
+supported platforms listed above. The files are located in the `firmware` directory
 of this project.
 
 For flashing without the ESP-IDF installed, skip directly to the "flash with
@@ -112,6 +112,43 @@ Please note that the following instructions are for a linux setup. It may
 slightly differ with a Windows setup.
 
 ## 3.2. Build
+Get the radio drivers:
+
+```console
+cd ~/this_project_directory/components/radio_drivers
+```
+
+* sx126x driver (sx1261, sx1262, sx1268):
+
+```console
+git clone -b v2.3.2 https://github.com/Lora-net/sx126x_driver.git sx126x_driver
+```
+
+* llcc68 driver:
+
+```console
+git clone -b v2.3.2 https://github.com/Lora-net/llcc68_driver.git llcc68_driver
+```
+
+* lr11xx driver (lr1121):
+
+```console
+git clone -b v2.4.1 https://github.com/Lora-net/SWDR001.git lr11xx_driver
+```
+
+Enter the lorahub directory.
+
+```console
+cd ~/this_project_directory/lorahub
+```
+
+Prepare your Linux terminal for building with ESP-IDF from the command line.
+This step can be skipped on Windows as the installed 'ESP-IDF x.x CMD' tool will
+prepare the environment automatically.
+
+```console
+. ~/esp/esp-idf/export.sh
+```
 
 Configure the ESP32 target to build for.
 
@@ -132,6 +169,7 @@ idf.py all
 ```
 
 ## 3.3. Flash
+### 3.3.1 with esp-idf
 Identify the serial device associated to the LoRaHub to be flashed, here we
 suppose it is `/dev/ttyUSB0`.
 
@@ -158,6 +196,23 @@ Launch the monitor console to see logs (optional).
 
 ```console
 idf.py -p /dev/ttyUSB0 monitor
+```
+
+### 3.3.2 with esptool
+
+If not using the complete ESP-IDF environment, it is also possible to flash the
+provided binary files using the `esptool` utility.
+
+https://docs.espressif.com/projects/esptool/en/latest/esp32/
+
+```console
+esptool.py --chip esp32s3 -p /dev/ttyUSB0 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB 0x0 bootloader.bin 0x10000 lorahub.bin 0x8000 partition-table.bin
+```
+
+On a Windows setup the esptool command for flashing would be:
+
+```console
+py -m esptool --chip esp32s3 -p COM14 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB 0x0 bootloader.bin 0x10000 lorahub.bin 0x8000 partition-table.bin
 ```
 
 # 4. Known limitations
