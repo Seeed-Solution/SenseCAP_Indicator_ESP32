@@ -33,7 +33,8 @@ void Back2PreScreen(lv_event_t *e)
         target_scr = &ui_ScreenBulb;
         anim = LV_SCR_LOAD_ANIM_MOVE_TOP;
     } else if (lv_scr_act() == ui_ScreenMonitor) {
-        target_scr = &ui_ScreenLoRaWAN;
+        // target_scr = &ui_ScreenLoRaWAN;
+        target_scr = &ui_ScreenSetting;
     }
 
     _ui_screen_change(target_scr, anim, speed, delay, NULL);

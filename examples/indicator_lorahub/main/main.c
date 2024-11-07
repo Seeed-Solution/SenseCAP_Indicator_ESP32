@@ -20,7 +20,6 @@
 #include "bsp_board.h"
 #include "lv_port.h"
 #include "ui/ui.h"
-#include "esp_intr_types.h"
 
 #define VERSION      "v1.0.0"
 #define LOG_MEM_INFO 1

@@ -30,13 +30,13 @@ int indicator_model_init(void)
 #endif
 
 #ifdef ESP32_RP2040_H
-    esp32_rp2040_init();
     #ifdef SENSOR_H
     indicator_sensor_init();
         #ifdef SENSOR_CHARTS_H &&TIME_MODEL_H
     sensor_charts_init();
         #endif
     #endif
+    esp32_rp2040_init();
 #endif
 
 
