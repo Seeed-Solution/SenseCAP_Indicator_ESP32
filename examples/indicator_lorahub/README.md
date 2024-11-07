@@ -5,7 +5,6 @@ This project demonstrates how to implement a single channel LoRa gateway (LoRaHu
 using SenseCAP Indicator.
 
 This project contains the following components:
-* `firmware`: contains precompiled binaries for all supported platforms.
 * `components/liblorahub`: the Hardware Abstraction Layer (HAL) on top of the radio driver.
 * `components/radio_drivers`: the sx126x, llcc68, lr11xx radio drivers and associated hardware abstraction layer.
 * `components/smtc_ral`: the radio abstraction layer and board/shields definitions.
@@ -89,17 +88,13 @@ radio usage.
 # 3. Usage
 
 This project comes with precompiled binaries that can be flashed on the
-supported platforms listed above. The files are located in the `firmware` directory
-of this project.
+supported platforms listed above.
 
 For flashing without the ESP-IDF installed, skip directly to the "flash with
 esptool" section below.
 
 For each supported platform/radio, the following binary files are provided:
-* `xxx_bootloader.bin`: esp32 bootloader
-* `xxx_partition-table.bin`: esp32 flash partition table
-* `xxx_lorahub.bin`: the LoRaHub firmware
-
+* `Indicator_Lorahub_v1.0.0.bin`: indicator_lorahub firmware
 
 ## 3.1. Install environment
 
@@ -206,13 +201,13 @@ provided binary files using the `esptool` utility.
 https://docs.espressif.com/projects/esptool/en/latest/esp32/
 
 ```console
-esptool.py --chip esp32s3 -p /dev/ttyUSB0 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB 0x0 bootloader.bin 0x10000 lorahub.bin 0x8000 partition-table.bin
+esptool.py --chip esp32s3 -p /dev/ttyUSB0 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB 0x0 Indicator_Lorahub_v1.0.0.bin
 ```
 
 On a Windows setup the esptool command for flashing would be:
 
 ```console
-py -m esptool --chip esp32s3 -p COM14 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB 0x0 bootloader.bin 0x10000 lorahub.bin 0x8000 partition-table.bin
+py -m esptool --chip esp32s3 -p COM14 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB 0x0 Indicator_Lorahub_v1.0.0.bin
 ```
 
 # 4. Known limitations
