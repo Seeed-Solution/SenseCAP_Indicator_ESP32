@@ -3,7 +3,6 @@ set(srcs
     "radio.c"
     "sx126x.c"
     "timer.c"
-    "sx126x_lorahub.c"
     )
 
 idf_component_register(SRCS "${srcs}"

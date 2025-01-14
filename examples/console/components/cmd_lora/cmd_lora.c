@@ -52,6 +52,10 @@ static void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr 
     }
     printf("\n");
 }
+static void OnRxError()
+{
+    printf("OnRxError \n");
+}
 
 
 static void register_lora_tx_test();
@@ -74,6 +78,7 @@ void register_lora(void)
 
     RadioEvents.TxDone = OnTxDone;
     RadioEvents.RxDone = OnRxDone;
+    RadioEvents.RxError = OnRxError;
     Radio.Init( &RadioEvents );
 
     Radio.SetChannel( 868000000 );

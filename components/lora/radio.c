@@ -1058,16 +1058,20 @@ void RadioSleep( void )
     DelayMs( 2 );
 }
 
+extern bool g_have_tcxo;
 void RadioStandby( void )
 {
-    SX126xSetStandby( STDBY_XOSC ); //todo
-
-    // set PF
-    //uint8_t xt_config= 25;
-    uint8_t xt_config= 16;   // hw verion 1.3 or above
-    //printf("xt_config:%d\r\n", xt_config);
-    SX126xWriteRegister(REG_XTA_TRIM, xt_config);
-    SX126xWriteRegister(REG_XTB_TRIM, xt_config);
+    if(g_have_tcxo) {
+         SX126xSetStandby( STDBY_RC );
+    } else {
+        SX126xSetStandby( STDBY_XOSC ); //todo
+        // set PF
+        //uint8_t xt_config= 25;
+        uint8_t xt_config= 16;   // hw verion 1.3 or above
+        //printf("xt_config:%d\r\n", xt_config);
+        SX126xWriteRegister(REG_XTA_TRIM, xt_config);
+        SX126xWriteRegister(REG_XTB_TRIM, xt_config);
+    }
 }
 
 void RadioRx( uint32_t timeout )

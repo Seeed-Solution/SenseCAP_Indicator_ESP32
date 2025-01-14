@@ -27,7 +27,7 @@ License: Revised BSD License, see LICENSE.TXT file include in the project
 #include "radio_context.h"
 #include "ral.h"
 
-#include "sx126x_lorahub.h"
+#include "bsp_sx126x.h"
 
 #define INDICATOR_LORAHUB 1
 
@@ -89,7 +89,6 @@ static struct lgw_conf_rxif_s rxif_conf = {
     .bandwidth = BW_UNDEFINED, .coderate = CR_UNDEFINED, .datarate = DR_UNDEFINED, .modulation = MOD_UNDEFINED
 };
 
-static spi_host_device_t spi_host_id = SPI2_HOST;
 
 static radio_context_t radio_context = { 0 };
 #define RADIO_CONTEXT ( ( void* ) &radio_context )
@@ -112,9 +111,6 @@ const ral_t lgw_ral = RAL_LR11XX_INSTANTIATE( RADIO_CONTEXT );
 
 int lgw_connect( void )
 {
-#if (INDICATOR_LORAHUB)
-    sx126x_init();
-#endif
     esp_err_t ret;
 
 #if defined( CONFIG_RADIO_TYPE_SX1261 ) || defined( CONFIG_RADIO_TYPE_SX1262 ) || defined( CONFIG_RADIO_TYPE_SX1268 )
@@ -208,35 +204,9 @@ int lgw_connect( void )
     {
         ESP_LOGI( TAG_HAL, "LED_TX_GPIO not set" );
     }
-
-    /* SPI configuration */
-    spi_bus_config_t spi_bus_config = { .mosi_io_num   = radio_context.spi_mosi,
-                                        .miso_io_num   = radio_context.spi_miso,
-                                        .sclk_io_num   = radio_context.spi_sclk,
-                                        .quadwp_io_num = -1,
-                                        .quadhd_io_num = -1 };
-
-    ret = spi_bus_initialize( spi_host_id, &spi_bus_config, SPI_DMA_CH_AUTO );
-    if( ret != ESP_OK )
-    {
-        ESP_LOGE( TAG_HAL, "ERROR: spi_bus_initialize failed with %d", ret );
-        return -1;
-    }
-
-    spi_device_interface_config_t devcfg;
-    memset( &devcfg, 0, sizeof( spi_device_interface_config_t ) );
-    devcfg.clock_speed_hz = SPI_SPEED;
-    devcfg.spics_io_num   = -1;
-    devcfg.queue_size     = 7;
-    devcfg.mode           = 0;
-    devcfg.flags          = SPI_DEVICE_NO_DUMMY;
-
-    ret = spi_bus_add_device( spi_host_id, &devcfg, &( radio_context.spi_handle ) );
-    if( ret != ESP_OK )
-    {
-        ESP_LOGE( TAG_HAL, "ERROR: spi_bus_add_device failed with %d", ret );
-        return -1;
-    }
+    
+    // SPI has been initialized in file sensecap_indicator_board.c
+    radio_context.spi_handle =  bsp_sx126x_spi_handle_get();
 
     return 0;
 }
