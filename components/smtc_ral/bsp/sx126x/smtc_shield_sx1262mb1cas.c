@@ -348,7 +348,7 @@ const smtc_shield_sx126x_pa_pwr_cfg_t smtc_shield_sx1262mb1cas_pa_pwr_cfg_table[
  */
 smtc_shield_sx126x_xosc_cfg_t smtc_shield_sx1262mb1cas_xosc_cfg = {
     .tcxo_is_radio_controlled = false,
-    .supply_voltage           = SX126X_TCXO_CTRL_1_8V,
+    .supply_voltage           = SX126X_TCXO_CTRL_VOLTAGE,
     .startup_time_in_tick     = 300,
 };
 

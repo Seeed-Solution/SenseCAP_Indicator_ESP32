@@ -119,7 +119,7 @@ static int lora_cw_test(int argc, char **argv)
     ESP_LOGI(TAG,  "Start Tx Continuous Wave");
 
     Radio.SetChannel( freq );
-    Radio.SetTxContinuousWave( freq, freq, -1 );
+    Radio.SetTxContinuousWave( freq, power, -1 );
     return 0;
 }
 
@@ -276,6 +276,19 @@ static int lora_tx_test(int argc, char **argv)
             break;
         }
     }
+    
+    //wait last tx done
+    while(__g_tx_done_flag == false) {
+        vTaskDelay(20 / portTICK_PERIOD_MS);
+        recv_len = uart_read_bytes(0, &quit, 1,  1 / portTICK_PERIOD_MS);
+        if( recv_len > 0) {
+            if( quit==0x3) { //Ctrl+C
+                break;
+            }
+        }
+    };
+    vTaskDelay( 1000 / portTICK_PERIOD_MS);
+
     Radio.Standby();
     ESP_LOGI(TAG, "End of send!");
     return 0;

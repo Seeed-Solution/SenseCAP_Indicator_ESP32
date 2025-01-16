@@ -156,7 +156,7 @@ void SX126xIoInit( void )
     } else {
         g_have_tcxo = false;
     }
-    printf("TCXO:%d\r\n", g_have_tcxo );
+    printf("TCXO:%d,VOLTAGE:%d\r\n", g_have_tcxo, SX126X_TCXO_CTRL_VOLTAGE);
 }
 
 
@@ -232,7 +232,7 @@ void SX126xIoIrqInit( DioIrqHandler dioIrq )
     io_conf.pull_up_en = 1;
     gpio_config(&io_conf);
     gpio_evt_queue = xQueueCreate(10, sizeof(TimerTime_t));
-    xTaskCreate(expander_io_int, "expander_io_int", GPIO_QUEUE_STACK, NULL, 0, NULL);
+    xTaskCreate(expander_io_int, "expander_io_int", GPIO_QUEUE_STACK, NULL, 10, NULL);
 
     gpio_install_isr_service(0);
     gpio_isr_handler_add(ESP32_EXPANDER_IO_INT, gpio_isr_handler, (void*)ESP32_EXPANDER_IO_INT);
@@ -249,7 +249,7 @@ void SX126xIoDbgInit( void )
 void SX126xIoTcxoInit( void )
 {
     if( g_have_tcxo ) {
-        SX126xSetDio3AsTcxoCtrl(TCXO_CTRL_1_8V,  SX126xGetBoardTcxoWakeupTime()<<6);
+        SX126xSetDio3AsTcxoCtrl(SX126X_TCXO_CTRL_VOLTAGE,  SX126xGetBoardTcxoWakeupTime()<<6);
     }
 
     CalibrationParams_t calibParam;

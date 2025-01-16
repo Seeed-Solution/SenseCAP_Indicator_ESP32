@@ -1,6 +1,8 @@
 #pragma once
 
 #include "bsp_board.h"
+#include "sx126x.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +17,8 @@ extern "C" {
 #define ESP32_RADIO_MISO        GPIO_NUM_47
 #define ESP32_RADIO_SCLK        GPIO_NUM_41
 #define ESP32_EXPANDER_IO_INT   GPIO_NUM_42
+
+#define SX126X_TCXO_CTRL_VOLTAGE   TCXO_CTRL_2_4V
 
 extern io_expander_ops_t *indicator_io_expander;
 
