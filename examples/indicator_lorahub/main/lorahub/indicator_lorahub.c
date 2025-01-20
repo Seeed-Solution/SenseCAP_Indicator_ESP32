@@ -12,7 +12,7 @@
 // #include "http_server.h"
 #include "pkt_fwd.h"
 #include "config_nvs.h"
-#include "sx126x_lorahub.h"
+#include "bsp_sx126x.h"
 
 #include "indicator_storage_spiffs.h"
 #include "indicator_sensor.h"

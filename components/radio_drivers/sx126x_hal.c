@@ -48,7 +48,7 @@
 #include "sx126x_hal.h"
 #include "radio_context.h"
 
-#include "sx126x_lorahub.h"
+#include "bsp_sx126x.h"
 
 /*
  * -----------------------------------------------------------------------------

@@ -41,7 +41,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "smtc_shield_sx126x_types.h"
-#include "sx126x_lorahub.h"
+#include "bsp_sx126x.h"
 /*
  * -----------------------------------------------------------------------------
  * --- PRIVATE MACROS-----------------------------------------------------------
@@ -346,9 +346,9 @@ const smtc_shield_sx126x_pa_pwr_cfg_t smtc_shield_sx1262mb1cas_pa_pwr_cfg_table[
 /**
  * @brief XOSC configuration
  */
-const smtc_shield_sx126x_xosc_cfg_t smtc_shield_sx1262mb1cas_xosc_cfg = {
+smtc_shield_sx126x_xosc_cfg_t smtc_shield_sx1262mb1cas_xosc_cfg = {
     .tcxo_is_radio_controlled = false,
-    .supply_voltage           = SX126X_TCXO_CTRL_3_0V,
+    .supply_voltage           = SX126X_TCXO_CTRL_VOLTAGE,
     .startup_time_in_tick     = 300,
 };
 
@@ -430,8 +430,12 @@ sx126x_reg_mod_t smtc_shield_sx1262mb1cas_get_reg_mode( void )
     return SX126X_REG_MODE_LDO;
 }
 
+extern bool g_have_tcxo;
 const smtc_shield_sx126x_xosc_cfg_t* smtc_shield_sx1262mb1cas_get_xosc_cfg( void )
 {
+    if( g_have_tcxo ) {
+        smtc_shield_sx1262mb1cas_xosc_cfg.tcxo_is_radio_controlled = true;
+    }
     return &smtc_shield_sx1262mb1cas_xosc_cfg;
 }
 
