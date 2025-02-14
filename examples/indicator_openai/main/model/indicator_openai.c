@@ -253,7 +253,7 @@ exit:
 static char *p_recv_buf;
 static size_t recv_buf_max_len;
 
-static char openai_api_key[52];
+static char openai_api_key[165];
 static bool have_key = false;
 
 static int __chat_json_prase(const char *p_str, char *p_answer, char *p_err)

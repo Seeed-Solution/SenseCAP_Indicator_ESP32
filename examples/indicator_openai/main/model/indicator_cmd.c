@@ -26,12 +26,12 @@ static int openai_api_key_set(int argc, char **argv)
         arg_print_errors(stderr, openai_api_key_args.end, argv[0]);
         return 1;
     }
-    char key_buf[52] = {0,};
+    char key_buf[165] = {0,};
     int len = 0;
     if (openai_api_key_args.key->count) {
         int len = strlen(openai_api_key_args.key->sval[0]);
         if( len > sizeof(key_buf)) {
-            ESP_LOGE(TAG,  "out of 52 bytes :%s", openai_api_key_args.key->sval[0]);
+            ESP_LOGE(TAG,  "out of 165 bytes :%s", openai_api_key_args.key->sval[0]);
             return -1;
         }
         strncpy( key_buf, openai_api_key_args.key->sval[0], len );
@@ -55,7 +55,7 @@ static int openai_api_key_set(int argc, char **argv)
 //openai_api -k sk-xxxx
 static void register_openai_api_key(void)
 {
-    openai_api_key_args.key =  arg_str0("k", NULL, "<k>", "set key, eg: sk-xxxx..., 51 bytes"); 
+    openai_api_key_args.key =  arg_str0("k", NULL, "<k>", "set key, eg: sk-xxxx..., 164 bytes"); 
     openai_api_key_args.end = arg_end(1);
 
     const esp_console_cmd_t cmd = {
