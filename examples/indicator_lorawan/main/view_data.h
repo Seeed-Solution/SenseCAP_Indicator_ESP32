@@ -106,8 +106,8 @@ struct sensor_data_minmax
 enum sensor_data_type{
     SENSOR_DATA_CO2,
     SENSOR_DATA_TVOC,
-    SENSOR_DATA_TEMP,
     SENSOR_DATA_HUMIDITY,
+    SENSOR_DATA_TEMP,
 };
 
 struct view_data_sensor_data
