@@ -52,88 +52,131 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 instance_mqtt          mqtt_ha_instance; // global entrance
 static instance_mqtt_t instance_ptr = &mqtt_ha_instance;
 
+static void get_mac_address(char *mac_str) 
+{
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_WIFI_STA);
+    sprintf(mac_str, "%02X%02X%02X%02X%02X%02X/", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+}
+
+static char* _add_mac_prefix(const char* mac_str, const char* original_str) 
+{
+    char* new_str = malloc(strlen(mac_str) + strlen(original_str) + 1);
+    if (new_str) {
+        sprintf(new_str, "%s%s", mac_str, original_str);
+    }
+    return new_str;
+}
+char *p_sensor_topic = NULL;
+char *p_switch_topic_set = NULL;
+char *p_switch_topic_state = NULL;
+
 static void ha_entites_init(void)
 {
+    char mac_str[13] = {0};
+    get_mac_address(mac_str);
+
+    p_sensor_topic = _add_mac_prefix(mac_str, CONFIG_TOPIC_SENSOR_DATA);
+    p_switch_topic_set = _add_mac_prefix(mac_str, CONFIG_TOPIC_SWITCH_SET);
+    p_switch_topic_state = _add_mac_prefix(mac_str, CONFIG_TOPIC_SWITCH_STATE);
+    
+    ESP_LOGI(TAG, "sensor_topic:%s", p_sensor_topic);
+    ESP_LOGI(TAG, "switch_topic_set:%s", p_switch_topic_set);
+    ESP_LOGI(TAG, "switch_topic_state:%s", p_switch_topic_state);
+
     // sensor entites init
     ha_sensor_entites[0].index       = 0;
     ha_sensor_entites[0].key         = CONFIG_SENSOR1_VALUE_KEY;
-    ha_sensor_entites[0].topic       = CONFIG_SENSOR1_TOPIC_DATA;
+    ha_sensor_entites[0].topic       = p_sensor_topic;
     ha_sensor_entites[0].qos         = CONFIG_TOPIC_SENSOR_DATA_QOS;
 
     ha_sensor_entites[1].index       = 1;
     ha_sensor_entites[1].key         = CONFIG_SENSOR2_VALUE_KEY;
-    ha_sensor_entites[1].topic       = CONFIG_SENSOR2_TOPIC_DATA;
+    ha_sensor_entites[1].topic       = p_sensor_topic;
     ha_sensor_entites[1].qos         = CONFIG_TOPIC_SENSOR_DATA_QOS;
 
     ha_sensor_entites[2].index       = 2;
     ha_sensor_entites[2].key         = CONFIG_SENSOR3_VALUE_KEY;
-    ha_sensor_entites[2].topic       = CONFIG_SENSOR3_TOPIC_DATA;
+    ha_sensor_entites[2].topic       = p_sensor_topic;
     ha_sensor_entites[2].qos         = CONFIG_TOPIC_SENSOR_DATA_QOS;
 
     ha_sensor_entites[3].index       = 3;
     ha_sensor_entites[3].key         = CONFIG_SENSOR4_VALUE_KEY;
-    ha_sensor_entites[3].topic       = CONFIG_SENSOR4_TOPIC_DATA;
+    ha_sensor_entites[3].topic       = p_sensor_topic;
     ha_sensor_entites[3].qos         = CONFIG_TOPIC_SENSOR_DATA_QOS;
 
     ha_sensor_entites[4].index       = 4;
     ha_sensor_entites[4].key         = CONFIG_SENSOR5_VALUE_KEY;
-    ha_sensor_entites[4].topic       = CONFIG_SENSOR5_TOPIC_DATA;
+    ha_sensor_entites[4].topic       = p_sensor_topic;
     ha_sensor_entites[4].qos         = CONFIG_TOPIC_SENSOR_DATA_QOS;
 
     ha_sensor_entites[5].index       = 5;
     ha_sensor_entites[5].key         = CONFIG_SENSOR6_VALUE_KEY;
-    ha_sensor_entites[5].topic       = CONFIG_SENSOR6_TOPIC_DATA;
+    ha_sensor_entites[5].topic       = p_sensor_topic;
     ha_sensor_entites[5].qos         = CONFIG_TOPIC_SENSOR_DATA_QOS;
 
     // switch entites init
     ha_switch_entites[0].index       = 0;
     ha_switch_entites[0].key         = CONFIG_SWITCH1_VALUE_KEY;
-    ha_switch_entites[0].topic_set   = CONFIG_SWITCH1_TOPIC_SET;
-    ha_switch_entites[0].topic_state = CONFIG_SWITCH1_TOPIC_STATE;
+    ha_switch_entites[0].topic_set   = p_switch_topic_set;
+    ha_switch_entites[0].topic_state = p_switch_topic_state;
     ha_switch_entites[0].qos         = CONFIG_TOPIC_SWITCH_QOS;
 
     ha_switch_entites[1].index       = 1;
     ha_switch_entites[1].key         = CONFIG_SWITCH2_VALUE_KEY;
-    ha_switch_entites[1].topic_set   = CONFIG_SWITCH2_TOPIC_SET;
-    ha_switch_entites[1].topic_state = CONFIG_SWITCH2_TOPIC_STATE;
+    ha_switch_entites[1].topic_set   = p_switch_topic_set;
+    ha_switch_entites[1].topic_state = p_switch_topic_state;
     ha_switch_entites[1].qos         = CONFIG_TOPIC_SWITCH_QOS;
 
     ha_switch_entites[2].index       = 2;
     ha_switch_entites[2].key         = CONFIG_SWITCH3_VALUE_KEY;
-    ha_switch_entites[2].topic_set   = CONFIG_SWITCH3_TOPIC_SET;
-    ha_switch_entites[2].topic_state = CONFIG_SWITCH3_TOPIC_STATE;
+    ha_switch_entites[2].topic_set   = p_switch_topic_set;
+    ha_switch_entites[2].topic_state = p_switch_topic_state;
     ha_switch_entites[2].qos         = CONFIG_TOPIC_SWITCH_QOS;
 
     ha_switch_entites[3].index       = 3;
     ha_switch_entites[3].key         = CONFIG_SWITCH4_VALUE_KEY;
-    ha_switch_entites[3].topic_set   = CONFIG_SWITCH4_TOPIC_SET;
-    ha_switch_entites[3].topic_state = CONFIG_SWITCH4_TOPIC_STATE;
+    ha_switch_entites[3].topic_set   = p_switch_topic_set;
+    ha_switch_entites[3].topic_state = p_switch_topic_state;
     ha_switch_entites[3].qos         = CONFIG_TOPIC_SWITCH_QOS;
 
     ha_switch_entites[4].index       = 4;
     ha_switch_entites[4].key         = CONFIG_SWITCH5_VALUE_KEY;
-    ha_switch_entites[4].topic_set   = CONFIG_SWITCH5_TOPIC_SET;
-    ha_switch_entites[4].topic_state = CONFIG_SWITCH5_TOPIC_STATE;
+    ha_switch_entites[4].topic_set   = p_switch_topic_set;
+    ha_switch_entites[4].topic_state = p_switch_topic_state;
     ha_switch_entites[4].qos         = CONFIG_TOPIC_SWITCH_QOS;
 
     ha_switch_entites[5].index       = 6;
     ha_switch_entites[5].key         = CONFIG_SWITCH6_VALUE_KEY;
-    ha_switch_entites[5].topic_set   = CONFIG_SWITCH6_TOPIC_SET;
-    ha_switch_entites[5].topic_state = CONFIG_SWITCH6_TOPIC_STATE;
+    ha_switch_entites[5].topic_set   = p_switch_topic_set;
+    ha_switch_entites[5].topic_state = p_switch_topic_state;
     ha_switch_entites[5].qos         = CONFIG_TOPIC_SWITCH_QOS;
 
     ha_switch_entites[6].index       = 6;
     ha_switch_entites[6].key         = CONFIG_SWITCH7_VALUE_KEY;
-    ha_switch_entites[6].topic_set   = CONFIG_SWITCH7_TOPIC_SET;
-    ha_switch_entites[6].topic_state = CONFIG_SWITCH7_TOPIC_STATE;
+    ha_switch_entites[6].topic_set   = p_switch_topic_set;
+    ha_switch_entites[6].topic_state = p_switch_topic_state;
     ha_switch_entites[6].qos         = CONFIG_TOPIC_SWITCH_QOS;
 
     ha_switch_entites[7].index       = 7;
     ha_switch_entites[7].key         = CONFIG_SWITCH8_VALUE_KEY;
-    ha_switch_entites[7].topic_set   = CONFIG_SWITCH8_TOPIC_SET;
-    ha_switch_entites[7].topic_state = CONFIG_SWITCH8_TOPIC_STATE;
+    ha_switch_entites[7].topic_set   = p_switch_topic_set;
+    ha_switch_entites[7].topic_state = p_switch_topic_state;
     ha_switch_entites[7].qos         = CONFIG_TOPIC_SWITCH_QOS;
 }
+
+static void ha_entites_deinit(void)
+{
+    for(int i = 0; i < CONFIG_HA_SENSOR_ENTITY_NUM; i++) {
+        free(ha_sensor_entites[i].topic);
+    }
+    
+    for(int i = 0; i < CONFIG_HA_SWITCH_ENTITY_NUM; i++) {
+        free(ha_switch_entites[i].topic_set);
+        free(ha_switch_entites[i].topic_state);
+    }
+}
+
 
 int switch_state[CONFIG_HA_SWITCH_ENTITY_NUM];
 
@@ -303,22 +346,22 @@ static void __view_event_handler(void *handler_args, esp_event_base_t base, int3
             switch (p_data->sensor_type) {
                 case SENSOR_DATA_CO2: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\":\"%d\"}", CONFIG_SENSOR_BUILDIN_CO2_VALUE_KEY, (int)p_data->vaule);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SENSOR_BUILDIN_TOPIC_DATA, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_sensor_topic, data_buf, len, 0, 0);
                     break;
                 }
                 case SENSOR_DATA_TVOC: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\":\"%d\"}", CONFIG_SENSOR_BUILDIN_TVOC_VALUE_KEY, (int)p_data->vaule);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SENSOR_BUILDIN_TOPIC_DATA, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_sensor_topic, data_buf, len, 0, 0);
                     break;
                 }
                 case SENSOR_DATA_TEMP: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\":\"%.1f\"}", CONFIG_SENSOR_BUILDIN_TEMP_VALUE_KEY, p_data->vaule);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SENSOR_BUILDIN_TOPIC_DATA, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_sensor_topic, data_buf, len, 0, 0);
                     break;
                 }
                 case SENSOR_DATA_HUMIDITY: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\":\"%d\"}", CONFIG_SENSOR_BUILDIN_HUMIDITY_VALUE_KEY, (int)p_data->vaule);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SENSOR_BUILDIN_TOPIC_DATA, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_sensor_topic, data_buf, len, 0, 0);
                     break;
                 }
                 default:
@@ -341,42 +384,42 @@ static void __view_event_handler(void *handler_args, esp_event_base_t base, int3
             switch (p_data->index) {
                 case 0: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\": %d}", CONFIG_SWITCH1_VALUE_KEY, (int)p_data->value);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SWITCH1_TOPIC_STATE, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_switch_topic_state, data_buf, len, 0, 0);
                     break;
                 }
                 case 1: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\": %d}", CONFIG_SWITCH2_VALUE_KEY, (int)p_data->value);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SWITCH2_TOPIC_STATE, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_switch_topic_state, data_buf, len, 0, 0);
                     break;
                 }
                 case 2: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\": %d}", CONFIG_SWITCH3_VALUE_KEY, (int)p_data->value);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SWITCH3_TOPIC_STATE, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_switch_topic_state, data_buf, len, 0, 0);
                     break;
                 }
                 case 3: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\": %d}", CONFIG_SWITCH4_VALUE_KEY, (int)p_data->value);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SWITCH4_TOPIC_STATE, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_switch_topic_state, data_buf, len, 0, 0);
                     break;
                 }
                 case 4: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\": %d}", CONFIG_SWITCH5_VALUE_KEY, (int)p_data->value);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SWITCH5_TOPIC_STATE, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_switch_topic_state, data_buf, len, 0, 0);
                     break;
                 }
                 case 5: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\": %d}", CONFIG_SWITCH6_VALUE_KEY, (int)p_data->value);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SWITCH6_TOPIC_STATE, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_switch_topic_state, data_buf, len, 0, 0);
                     break;
                 }
                 case 6: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\": %d}", CONFIG_SWITCH7_VALUE_KEY, (int)p_data->value);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SWITCH7_TOPIC_STATE, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_switch_topic_state, data_buf, len, 0, 0);
                     break;
                 }
                 case 7: {
                     len = snprintf(data_buf, sizeof(data_buf), "{\"%s\": %d}", CONFIG_SWITCH8_VALUE_KEY, (int)p_data->value);
-                    esp_mqtt_client_publish(instance_ptr->mqtt_client, CONFIG_SWITCH7_TOPIC_STATE, data_buf, len, 0, 0);
+                    esp_mqtt_client_publish(instance_ptr->mqtt_client, p_switch_topic_state, data_buf, len, 0, 0);
                     break;
                 }
                 default:
