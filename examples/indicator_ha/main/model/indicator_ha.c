@@ -426,7 +426,7 @@ static void __view_event_handler(void *handler_args, esp_event_base_t base, int3
                     break;
             }
 
-            if (p_data->value < CONFIG_HA_SWITCH_ENTITY_NUM) {
+            if (p_data->index < CONFIG_HA_SWITCH_ENTITY_NUM) {
                 switch_state[p_data->index] = p_data->value;
             }
             ha_ctrl_cfg_save(); // save switch state to flash
