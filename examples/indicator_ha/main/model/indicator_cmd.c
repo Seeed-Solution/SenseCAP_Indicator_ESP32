@@ -148,6 +148,30 @@ static void register_mqtt_config(void)
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
 
+/** 'read mac' command restarts the program */
+static int read_mac(int argc, char **argv)
+{
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_WIFI_STA);
+    printf("wifi_sta_mac: " MACSTR "\n", MAC2STR(mac));
+    esp_read_mac(mac, ESP_MAC_WIFI_SOFTAP);
+    printf("wifi_softap_mac: " MACSTR "\n", MAC2STR(mac));
+    esp_read_mac(mac, ESP_MAC_BT);
+    printf("bt_mac: " MACSTR "\n", MAC2STR(mac));
+    return 0;
+}
+
+static void register_read_mac(void)
+{
+    const esp_console_cmd_t cmd = {
+        .command = "read_mac",
+        .help = "Read mac address",
+        .hint = NULL,
+        .func = &read_mac,
+    };
+    ESP_ERROR_CHECK( esp_console_cmd_register(&cmd) );
+}
+
 int indicator_cmd_init(void)
 {
     esp_console_repl_t       *repl            = NULL;
@@ -172,7 +196,8 @@ int indicator_cmd_init(void)
     // register_set_broker_url();
     // register_mqtt_credentials();
     register_mqtt_config();
-
+    register_read_mac();
+    
     esp_console_dev_uart_config_t hw_config = ESP_CONSOLE_DEV_UART_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_console_new_repl_uart(&hw_config, &repl_config, &repl));
     ESP_ERROR_CHECK(esp_console_start_repl(repl));

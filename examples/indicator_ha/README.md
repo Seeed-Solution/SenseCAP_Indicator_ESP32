@@ -34,36 +34,41 @@ Here are some simple steps to use.
 
 
 Add the following to your "configuration.yaml" file
+
+Note: You need to replace {sta_mac} with the STA MAC address of the current device;Remove the colon from the MAC address and capitalize it.
+For example, for the device `cc:ba:97:00:df:30`, the state_topic of the sensor is `CCBA9700DF3C/indicator/switch/state`
+You can obtain the STA MAC address using the `read_mac` command.  
+
 ```
 # Example configuration.yaml entry
 mqtt:
   sensor:
     - unique_id: indicator_temperature
       name: "Indicator Temperature"
-      state_topic: "indicator/sensor"
+      state_topic: "{sta_mac}/indicator/sensor"
       suggested_display_precision: 1
       unit_of_measurement: "°C"
       value_template: "{{ value_json.temp }}"
     - unique_id: indicator_humidity
       name: "Indicator Humidity"
-      state_topic: "indicator/sensor"
+      state_topic: "{sta_mac}/indicator/sensor"
       unit_of_measurement: "%"
       value_template: "{{ value_json.humidity }}"
     - unique_id: indicator_co2
       name: "Indicator CO2"
-      state_topic: "indicator/sensor"
+      state_topic: "{sta_mac}/indicator/sensor"
       unit_of_measurement: "ppm"
       value_template: "{{ value_json.co2 }}"
     - unique_id: indicator_tvoc
       name: "Indicator tVOC"
-      state_topic: "indicator/sensor"
+      state_topic: "{sta_mac}/indicator/sensor"
       unit_of_measurement: ""
       value_template: "{{ value_json.tvoc }}"
   switch:
     - unique_id: indicator_switch1
       name: "Indicator Switch1"
-      state_topic: "indicator/switch/state"
-      command_topic: "indicator/switch/set"
+      state_topic: "{sta_mac}/indicator/switch/state"
+      command_topic: "{sta_mac}/indicator/switch/set"
       value_template: "{{ value_json.switch1 }}"
       payload_on: '{"switch1":1}'
       payload_off: '{"switch1":0}'
@@ -71,8 +76,8 @@ mqtt:
       state_off: 0
     - unique_id: indicator_switch2
       name: "Indicator Switch2"
-      state_topic: "indicator/switch/state"
-      command_topic: "indicator/switch/set"
+      state_topic: "{sta_mac}/indicator/switch/state"
+      command_topic: "{sta_mac}/indicator/switch/set"
       value_template: "{{ value_json.switch2 }}"
       payload_on: '{"switch2":1}'
       payload_off: '{"switch2":0}'
@@ -80,8 +85,8 @@ mqtt:
       state_off: 0
     - unique_id: indicator_switch3
       name: "Indicator Switch3"
-      state_topic: "indicator/switch/state"
-      command_topic: "indicator/switch/set"
+      state_topic: "{sta_mac}/indicator/switch/state"
+      command_topic: "{sta_mac}/indicator/switch/set"
       value_template: "{{ value_json.switch3 }}"
       payload_on: '{"switch3":1}'
       payload_off: '{"switch3":0}'
@@ -89,8 +94,8 @@ mqtt:
       state_off: 0
     - unique_id: indicator_switch4
       name: "Indicator Switch4"
-      state_topic: "indicator/switch/state"
-      command_topic: "indicator/switch/set"
+      state_topic: "{sta_mac}/indicator/switch/state"
+      command_topic: "{sta_mac}/indicator/switch/set"
       value_template: "{{ value_json.switch4 }}"
       payload_on: '{"switch4":1}'
       payload_off: '{"switch4":0}'
@@ -98,8 +103,8 @@ mqtt:
       state_off: 0
     - unique_id: indicator_switch6
       name: "Indicator Switch6"
-      state_topic: "indicator/switch/state"
-      command_topic: "indicator/switch/set"
+      state_topic: "{sta_mac}/indicator/switch/state"
+      command_topic: "{sta_mac}/indicator/switch/set"
       value_template: "{{ value_json.switch6 }}"
       payload_on: '{"switch6":1}'
       payload_off: '{"switch6":0}'
@@ -107,8 +112,8 @@ mqtt:
       state_off: 0
     - unique_id: indicator_switch7
       name: "Indicator Switch7"
-      state_topic: "indicator/switch/state"
-      command_topic: "indicator/switch/set"
+      state_topic: "{sta_mac}/indicator/switch/state"
+      command_topic: "{sta_mac}/indicator/switch/set"
       value_template: "{{ value_json.switch7 }}"
       payload_on: '{"switch7":1}'
       payload_off: '{"switch7":0}'
@@ -117,14 +122,14 @@ mqtt:
   number:
     - unique_id: indicator_switch5
       name: "Indicator Switch5"
-      state_topic: "indicator/switch/state"
-      command_topic: "indicator/switch/set"
+      state_topic: "{sta_mac}/indicator/switch/state"
+      command_topic: "{sta_mac}/indicator/switch/set"
       command_template: '{"switch5": {{ value }} }'
       value_template: "{{ value_json.switch5 }}"
     - unique_id: indicator_switch8
       name: "Indicator Switch8"
-      state_topic: "indicator/switch/state"
-      command_topic: "indicator/switch/set"
+      state_topic: "{sta_mac}/indicator/switch/state"
+      command_topic: "{sta_mac}/indicator/switch/set"
       command_template: '{"switch8": {{ value }} }'
       value_template: "{{ value_json.switch8 }}"
 ```
