@@ -25,6 +25,9 @@ This project is built on the ESP32 IoT Development Framework (IDF) and utilizes 
   <a href="https://docs.espressif.com/projects/esp-idf/en/release-v5.1/esp32/">
     <img src="https://img.shields.io/badge/esp--idf-v5.1-00b202" alt="repo-size">
   </a>
+  <a href="https://deepwiki.com/Seeed-Solution/SenseCAP_Indicator_ESP32">
+    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+  </a>
 </p>
 
 > Relevant: [SenseCAP Indicator RP2040](https://github.com/Seeed-Solution/SenseCAP_Indicator_RP2040) | [Share Your Projects HERE](https://github.com/Seeed-Solution/SenseCAP_Indicator_ESP32/discussions/33)
