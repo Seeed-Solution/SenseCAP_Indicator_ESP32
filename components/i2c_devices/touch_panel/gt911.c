@@ -391,7 +391,7 @@ int gt911_pos_read(uint16_t *xpos, uint16_t *ypos)
 {
     u8 key_value = 0;
     struct goodix_point_t points[GTP_MAX_TOUCH_ID];
-    u8 finger_state = gtp_get_points(&g_ts_data, &points, &key_value);
+    u8 finger_state = gtp_get_points(&g_ts_data, points, &key_value);
 
     if (finger_state & 0x0f) {
         *xpos = points[0].x;

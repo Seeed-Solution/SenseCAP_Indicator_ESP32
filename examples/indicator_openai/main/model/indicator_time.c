@@ -4,6 +4,13 @@
 #include<stdlib.h>
 #include "nvs.h"
 #include "esp_timer.h"
+#include "indicator_storage.h"   // for indicator_storage_read/write
+#include "esp_event.h"          // for esp_event_post_to & friends
+#include "esp_sntp.h"           // for sntp_stop()
+#include <time.h>               // for time_t, struct tm, etc.
+#include "esp_sntp.h"          // <— NEW
+
+
 
 #define TIME_CFG_STORAGE  "time-cfg"
 
@@ -76,7 +83,7 @@ static void __time_sync_enable(void)
 
 static void __time_sync_stop(void)
 {
-    sntp_stop();
+    esp_sntp_stop();
 }
 
 static void __time_zone_set(struct view_data_time_cfg *p_cfg)
@@ -143,7 +150,7 @@ static void __time_view_update_callback(void* arg)
     }
 }
 
-static __time_view_update_init(void)
+static void __time_view_update_init(void)
 {
     const esp_timer_create_args_t timer_args = {
             .callback = &__time_view_update_callback,

@@ -3,7 +3,7 @@
 #include "esp_http_client.h"
 #include "esp_tls.h"
 #include "freertos/semphr.h"
-
+#include "indicator_storage.h"   // gives us indicator_storage_read()
 #include "lwip/dns.h"
 #include "lwip/err.h"
 #include "lwip/netdb.h"
@@ -446,7 +446,7 @@ static void url_prase(char *p_url, char *p_host, char *p_path)
     strncpy(p_path, pos2, strlen(pos2) + 1);
 }
 
-static image_download_progress = 40;
+static int image_download_progress = 40;
 static void image_progress_update_cb(uint8_t *p_data, int len)
 {
     image_download_progress++;

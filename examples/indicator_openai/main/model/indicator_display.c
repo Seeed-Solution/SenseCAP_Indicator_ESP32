@@ -1,6 +1,7 @@
 #include "indicator_display.h"
 #include "freertos/semphr.h"
-
+#include "esp_event.h"          /* <- new */
+#include "indicator_storage.h"  
 #include "driver/ledc.h"
 #include "esp_timer.h"
 #include "nvs.h"
