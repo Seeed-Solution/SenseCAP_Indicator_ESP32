@@ -15,10 +15,13 @@
 
 #include "indicator_display.h"
 
+/* ---------- Forward declarations ---------- */
+static bool lv_port_flush_ready(void);   // <— NEW LINE
+
+/* ---------- Wrapper so IDF5 signature matches ---------- */
 static bool lv_port_flush_ready_cb(void *unused)
 {
-    (void) unused;               // avoid unused-param warning
-    return lv_port_flush_ready(); // call the original function
+    return lv_port_flush_ready();   // call the original function
 }
 
 

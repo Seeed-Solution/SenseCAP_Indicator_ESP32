@@ -5,6 +5,9 @@
 #include "indicator_time.h"
 #include "indicator_btn.h"
 #include "indicator_city.h"
+#include "indicator_sensor.h"
+#include "indicator_openai.h"
+#include "indicator_cmd.h"
 
 int indicator_model_init(void)
 {
