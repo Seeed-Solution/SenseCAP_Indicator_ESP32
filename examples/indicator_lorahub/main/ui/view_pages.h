@@ -14,6 +14,7 @@ typedef struct _objects_t {
     lv_obj_t *lorahubcontainer;
     lv_obj_t *infopanel;
     lv_obj_t *mactext;
+    lv_obj_t *euitext;
     lv_obj_t *networkserverpanel;
     lv_obj_t *adresstext;
     lv_obj_t *porttext;

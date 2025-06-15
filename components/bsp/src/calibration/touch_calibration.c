@@ -20,6 +20,16 @@
 #include "bsp_lcd.h"
 #include "basic_painter/basic_painter.h"
 
+static void lcd_draw_bitmap(int x, int y, int w, int h, void *data);
+
+
+static esp_err_t lcd_draw_bitmap_err(int x1, int y1, int x2, int y2,
+                                     const void *color)
+{
+    lcd_draw_bitmap(x1, y1, x2, y2, color);   // existing helper
+    return ESP_OK;
+}
+
 static const char* TAG = "Touch calibration";
 
 #define CALIBRATION_CHECK(a, str, ret)  if(!(a)) {                                   \
@@ -221,7 +231,7 @@ esp_err_t touch_calibration_run(int (*func_is_pressed)(void),
     g_touch_is_pressed = func_is_pressed;
     g_touch_read_rawdata = func_read_rawdata;
     painter_config_t config = {
-        .draw_bitmap = lcd_draw_bitmap,
+        .draw_bitmap = lcd_draw_bitmap_err,
         .info.height = TOUCH_HEIGHT,
         .info.width = TOUCH_WIDTH,
     };

@@ -338,7 +338,7 @@ void ui_event_ScreenSensor(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_ScreenBulb, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_ScreenBulb_screen_init);
+        _ui_screen_change(&ui_ScreenSetting, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_ScreenSetting_screen_init);
     }
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
@@ -451,7 +451,7 @@ void ui_event_ScreenSetting(lv_event_t * e)
     }
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_ScreenBulb, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_ScreenBulb_screen_init);
+        _ui_screen_change(&ui_ScreenSensor, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_ScreenSensor_screen_init);
     }
     if(event_code == LV_EVENT_SCREEN_LOAD_START) {
         fn_save_pre_screen(e);

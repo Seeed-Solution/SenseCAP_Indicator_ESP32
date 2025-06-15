@@ -39,7 +39,7 @@ static void lcd_task(void *args);
 
 #if CONFIG_LCD_LVGL_DIRECT_MODE
 static bool (*lvgl_flush_is_end)(void) = NULL;
-static bool (*lvgl_direct_mode_buf_copy)(void) = NULL;
+static void (*lvgl_direct_mode_buf_copy)(void) = NULL;
 #endif
 
 static void *p_user_data = NULL;
@@ -80,7 +80,7 @@ static esp_err_t screen_clear(uint16_t color)
 
 IRAM_ATTR static bool on_vsync_event(
     esp_lcd_panel_handle_t panel,
-    esp_lcd_rgb_panel_event_data_t *edata,
+    const esp_lcd_rgb_panel_event_data_t *edata,
     void *user_ctx
 )
 {
@@ -271,7 +271,7 @@ esp_err_t bsp_lcd_init(void)
 #endif
 
 #if CONFIG_LCD_AVOID_TEAR
-        esp_lcd_rgb_panel_get_frame_buffer(panel_handle, 2, &lcd_buf0, &lcd_buf1);
+        esp_lcd_rgb_panel_get_frame_buffer(panel_handle, 2,(void **)&lcd_buf0, (void **)&lcd_buf1);
         trans_ready = xSemaphoreCreateBinary();
         assert(trans_ready);
         xSemaphoreGive(trans_ready);

@@ -213,7 +213,7 @@ void sx126x_hal_wait_on_busy( const void* context )
     uint16_t pin_val;
     do
     {
-        esp_err_t ret = indicator_io_expander->read_input_pins(&pin_val);
+        esp_err_t ret = indicator_io_expander->read_input_pins((uint8_t *)&pin_val);
         WAIT_US( 1 );
     } while( (pin_val & (0x01 << EXPANDER_IO_RADIO_BUSY)) == 1 );
 #else

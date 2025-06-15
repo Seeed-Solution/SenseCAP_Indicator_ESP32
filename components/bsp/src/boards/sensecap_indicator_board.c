@@ -43,12 +43,20 @@ static const board_button_t g_btns[] = {
     {BOARD_BTN_ID_USER, 0,      GPIO_NUM_38,    0},
 };
 
+/* ===== Shim: adapt uint16_t* → uint8_t* =============================== */
+static esp_err_t tca9535_read_input_pins_u8(uint8_t *val8)
+{
+    /* Cast and call the real driver */
+    return tca9535_read_input_pins((uint16_t *)val8);
+}
+
+
 static const io_expander_ops_t g_board_lcd_evb_io_expander_ops = {
     .init = tca9535_init,
     .set_direction = tca9535_set_direction,
     .set_level = tca9535_set_level,
     .read_output_pins = NULL,
-    .read_input_pins = tca9535_read_input_pins,
+    .read_input_pins = tca9535_read_input_pins_u8,
     .multi_write_start = tca9535_multi_write_start,
     .multi_write_new_level = tca9535_multi_write_new_level,
     .multi_write_end = tca9535_multi_write_end,

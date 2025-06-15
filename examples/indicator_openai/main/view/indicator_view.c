@@ -1,4 +1,5 @@
 #include "indicator_view.h"
+#include "lv_port.h"
 #include "indicator_wifi.h"
 
 #include "ui.h"
@@ -6,6 +7,7 @@
 #include "indicator_util.h"
 
 #include "esp_wifi.h"
+#include <math.h>          // ← add this line
 #include <time.h>
 
 
@@ -809,7 +811,11 @@ static state_t openai_run_state = {
 
 void openai_show_msgbox(const char *message)
 {
-    lv_obj_t* openai_msg_tip = lv_msgbox_create(lv_scr_act(), "Error", message, "close", true);
+ /* button list: one label + NULL terminator */
+ static const char *btn_close[] = { "Close", NULL };
+ lv_obj_t *openai_msg_tip =
+     lv_msgbox_create(lv_scr_act(), "Error", message, btn_close, true);
+
     lv_obj_set_size(openai_msg_tip, 360, 200);
     lv_obj_center(openai_msg_tip);
 
@@ -1294,7 +1300,8 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             ESP_LOGI(TAG, "event: VIEW_EVENT_WIFI_ST");
             struct view_data_wifi_st *p_st = ( struct view_data_wifi_st *)event_data;
             
-            uint8_t *p_src =NULL;
+        const lv_img_dsc_t *p_src = NULL;
+
             //todo is_network
             if ( p_st->is_connected ) {
                 switch (wifi_rssi_level_get( p_st->rssi )) {
@@ -1352,16 +1359,16 @@ static void __view_event_handler(void* handler_args, esp_event_base_t base, int3
             bool have_password = true;
         
             if( p_list->is_connect) {
-                create_wifi_item(ui_wifi_list,  p_list->connect.ssid, p_list->connect.auth_mode, p_list->connect.ssid, true);
+create_wifi_item(ui_wifi_list,  p_list->connect.ssid, p_list->connect.auth_mode, p_list->connect.rssi, true);
             }
             for( int i = 0; i < p_list->cnt; i++ ) {
                 ESP_LOGI(TAG, "ssid:%s, rssi:%d, auth mode:%d", p_list->aps[i].ssid, p_list->aps[i].rssi, p_list->aps[i].auth_mode);
                 if( p_list->is_connect ) {
                     if( strcmp(p_list->aps[i].ssid, p_list->connect.ssid)  != 0) {
-                        create_wifi_item(ui_wifi_list, p_list->aps[i].ssid, p_list->aps[i].auth_mode, p_list->aps[i].rssi, false);
+create_wifi_item(ui_wifi_list, p_list->aps[i].ssid, p_list->aps[i].auth_mode, p_list->aps[i].rssi, false);
                     }
                 } else {
-                    create_wifi_item(ui_wifi_list, p_list->aps[i].ssid, p_list->aps[i].auth_mode, p_list->aps[i].rssi, false);
+create_wifi_item(ui_wifi_list, p_list->aps[i].ssid, p_list->aps[i].auth_mode, p_list->aps[i].rssi, false);
                 }
             }
             break;

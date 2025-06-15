@@ -201,7 +201,7 @@ void bsp_sx126x_init(void)
 
 void SX126xIoIrqInit( DioIrqHandler dioIrq )
 {
-    g_dioIrq = (uint32_t *)dioIrq;
+    g_dioIrq = (void (*)(void *))dioIrq;
 
     static bool Ioirq_init_flag = false;
     if( Ioirq_init_flag ){
@@ -269,7 +269,7 @@ void SX126xReset( void )
 
 void SX126xWaitOnBusy( void )
 {
-    uint16_t pin_val;
+    uint8_t pin_val;
     while(1) {
         esp_err_t ret = p_io_expander->read_input_pins(&pin_val);
         if( ret == ESP_OK ) {
@@ -449,7 +449,7 @@ bool SX126xCheckRfFrequency( uint32_t frequency )
 
 uint32_t SX126xGetDio1PinState( void )
 {
-    uint16_t pin_val;
+    uint8_t pin_val;
     esp_err_t ret = p_io_expander->read_input_pins(&pin_val);
     if( ret == ESP_OK ) {
         if( (pin_val & (0x01 << EXPANDER_IO_RADIO_DIO_1)) ) {

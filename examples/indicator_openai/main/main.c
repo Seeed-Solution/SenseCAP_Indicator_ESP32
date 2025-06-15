@@ -5,7 +5,7 @@
 #include "lv_port.h"
 #include "esp_event.h"
 #include "esp_event_base.h"
-
+#include "controller/indicator_controller.h"
 #include "indicator_model.h"
 #include "indicator_view.h"
 //#include "indicator_controller.h"

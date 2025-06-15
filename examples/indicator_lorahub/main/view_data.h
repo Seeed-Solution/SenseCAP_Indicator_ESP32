@@ -105,8 +105,8 @@ struct sensor_data_minmax
 enum sensor_data_type{
     SENSOR_DATA_CO2,
     SENSOR_DATA_TVOC,
-    SENSOR_DATA_TEMP,
     SENSOR_DATA_HUMIDITY,
+    SENSOR_DATA_TEMP,
 };
 
 struct view_data_sensor_data
@@ -179,6 +179,7 @@ enum {
 
     VIEW_EVENT_LORAHUB_DATA_UPDATE,
     VIEW_EVENT_LORAHUB_MAC,
+    VIEW_EVENT_LORAHUB_EUI,
 
     VIEW_EVENT_SHUTDOWN,      //NULL
     VIEW_EVENT_FACTORY_RESET, //NULL

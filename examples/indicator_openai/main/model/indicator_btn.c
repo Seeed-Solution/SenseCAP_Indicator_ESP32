@@ -2,6 +2,8 @@
 #include "indicator_display.h"
 #include "bsp_btn.h"
 #include "esp_timer.h"
+#include "nvs_flash.h"     // nvs_flash_erase()
+#include "esp_event.h"     // esp_event_post_to()
 
 static uint32_t hold_cnt=0;
 static bool sleep_flag=false;

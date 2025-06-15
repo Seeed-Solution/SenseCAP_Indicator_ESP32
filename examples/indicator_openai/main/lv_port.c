@@ -15,6 +15,16 @@
 
 #include "indicator_display.h"
 
+/* ---------- Forward declarations ---------- */
+static bool lv_port_flush_ready(void);   // <— NEW LINE
+
+/* ---------- Wrapper so IDF5 signature matches ---------- */
+static bool lv_port_flush_ready_cb(void *unused)
+{
+    return lv_port_flush_ready();   // call the original function
+}
+
+
 #define LV_PORT_BUFFER_HEIGHT           (brd->LCD_HEIGHT)
 #define LV_PORT_BUFFER_MALLOC           (MALLOC_CAP_SPIRAM)
 // #define LV_PORT_BUFFER_HEIGHT           (100)
@@ -204,8 +214,13 @@ static void lv_port_disp_init(void)
     disp_drv.direct_mode = 1;
 #endif
 
+/* -----------------------------------------------------------------
+ * Wrapper: adapts lv_port_flush_ready() to the (void *) signature
+ * expected by bsp_lcd_set_cb()
+ * -----------------------------------------------------------------*/
+
     /* Use lcd_trans_done_cb to inform the graphics library that flush already done */
-    bsp_lcd_set_cb(lv_port_flush_ready, NULL);
+    bsp_lcd_set_cb(lv_port_flush_ready_cb, NULL);
 
 #if CONFIG_LCD_LVGL_DIRECT_MODE
     bsp_lcd_flush_is_last_register(lv_port_flush_is_last);

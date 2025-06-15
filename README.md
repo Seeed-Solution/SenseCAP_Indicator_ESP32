@@ -27,6 +27,42 @@ This project is built on the ESP32 IoT Development Framework (IDF) and utilizes 
   </a>
 </p>
 
+# SenseCAP Indicator – **idf5-port** (OpenAI demo)
+
+This branch back-ports Seeed’s original **SenseCAP Indicator** firmware to  
+**ESP-IDF 5.4** and enables the new OpenAI demo app on the ESP32-S3.
+
+| Feature | Status |
+|---------|--------|
+| ESP-IDF 5.4 tool-chain | ✔️ |
+| OpenAI chat / sensor overlay | ✔️ |
+| Wi-Fi WPA3 + BT classic/LE | ✔️ |
+| New IDF HAL / driver layer | ✔️ |
+| LoRa disabled* | 🔧 _(can be re-enabled later)_
+
+\* The original LoRa driver doesn’t compile on IDF 5.x; a stubbed-out component
+(`components/lora_disabled`) lets the build succeed.  
+
+---
+
+## Quick start
+
+```bash
+# clone and switch to the ported branch
+git clone https://github.com/pb-ancestor/SenseCAP_Indicator_ESP32.git
+cd SenseCAP_Indicator_ESP32
+git checkout idf5-port
+
+# set up the ESP-IDF 5.4 environment
+. $HOME/esp/esp-idf/export.sh          # adjust path if different
+
+# build & flash (replace PORT with your USB serial port)
+cd examples/indicator_openai
+idf.py set-target esp32s3
+idf.py build
+idf.py -p /dev/cu.usbserial-110 flash monitor
+
+
 > Relevant: [SenseCAP Indicator RP2040](https://github.com/Seeed-Solution/SenseCAP_Indicator_RP2040) | [Share Your Projects HERE](https://github.com/Seeed-Solution/SenseCAP_Indicator_ESP32/discussions/33)
 
 The project includes various examples that demonstrate how to effectively use ESP32 functions. To test the examples, the firmware is programmed onto the ESP32 microcontroller unit (MCU).

@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include "argtable3/argtable3.h"
+#include "esp_event.h"     // esp_event_post_to()
 
 static const char *TAG = "cmd";
 

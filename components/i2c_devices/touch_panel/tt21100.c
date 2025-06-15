@@ -55,7 +55,7 @@ esp_err_t tt21100_tp_init(void)
 
     uint16_t reg_val = 0;
     do {
-        tt21100_read(&reg_val, sizeof(reg_val));
+        tt21100_read((uint8_t *)&reg_val, sizeof(reg_val));
         vTaskDelay(pdMS_TO_TICKS(20));
     } while (0x0002 != reg_val);
 
@@ -115,7 +115,7 @@ esp_err_t tt21100_tp_read(void)
     esp_err_t ret_val = ESP_OK;
 
     /* Get report data length */
-    ret_val |= tt21100_read(&data_len, sizeof(data_len));
+    ret_val |= tt21100_read((uint8_t *)&data_len, sizeof(data_len));
     ESP_LOGD(TAG, "Data len : %u", data_len);
 
     /* Read report data if length */

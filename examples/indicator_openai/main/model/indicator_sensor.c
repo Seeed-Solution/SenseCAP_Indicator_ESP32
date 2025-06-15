@@ -5,6 +5,8 @@
 #include "nvs.h"
 #include<stdlib.h>
 #include "time.h"
+#include "esp_event.h"          // ← add
+#include "indicator_storage.h"  // ← add
 
 #define SENSOR_HISTORY_DATA_DEBUG  0
 #define SENSOR_COMM_DEBUG    0
@@ -524,7 +526,7 @@ static void __sensor_history_data_update_callback(void* arg)
     }
 }
 
-static __sensor_history_data_update_init(void)
+static void __sensor_history_data_update_init(void)
 {
     const esp_timer_create_args_t timer_args = {
             .callback = &__sensor_history_data_update_callback,
