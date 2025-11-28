@@ -62,6 +62,7 @@ static int mbedtls_send_then_recv(char *p_server, char *p_port, char *p_tx,
     memset(&conf,0, sizeof(conf) );
     memset(&server_fd,0, sizeof(server_fd) );
     
+    mbedtls_net_init(&server_fd);
     mbedtls_ssl_init(&ssl);
     mbedtls_x509_crt_init(&cacert);
     mbedtls_ctr_drbg_init(&ctr_drbg);
@@ -108,10 +109,10 @@ static int mbedtls_send_then_recv(char *p_server, char *p_port, char *p_tx,
 #endif
 
 #ifdef CONFIG_MBEDTLS_SSL_PROTO_TLS1_3
-    mbedtls_ssl_conf_min_version(&conf, MBEDTLS_SSL_MAJOR_VERSION_3,
-                                 MBEDTLS_SSL_MINOR_VERSION_4);
-    mbedtls_ssl_conf_max_version(&conf, MBEDTLS_SSL_MAJOR_VERSION_3,
-                                 MBEDTLS_SSL_MINOR_VERSION_4);
+    // mbedtls_ssl_conf_min_version(&conf, MBEDTLS_SSL_MAJOR_VERSION_3,
+    //                              MBEDTLS_SSL_MINOR_VERSION_4);
+    // mbedtls_ssl_conf_max_version(&conf, MBEDTLS_SSL_MAJOR_VERSION_3,
+    //                              MBEDTLS_SSL_MINOR_VERSION_4);
 #endif
 
     if ((ret = mbedtls_ssl_setup(&ssl, &conf)) != 0)
@@ -119,8 +120,6 @@ static int mbedtls_send_then_recv(char *p_server, char *p_port, char *p_tx,
         ESP_LOGE(TAG, "mbedtls_ssl_setup returned -0x%x\n\n", -ret);
         goto exit;
     }
-
-    mbedtls_net_init(&server_fd);
 
     ESP_LOGI(TAG, "Connecting to %s:%s...", p_server, p_port);
 
@@ -232,14 +231,16 @@ static int mbedtls_send_then_recv(char *p_server, char *p_port, char *p_tx,
 
     ESP_LOGI(TAG, "recv total: %d bytes ", recv_len);
 
-    mbedtls_ssl_close_notify(&ssl);
 exit:
-    mbedtls_ssl_session_reset(&ssl);
+    mbedtls_ssl_close_notify(&ssl);
     mbedtls_net_free(&server_fd);
+    mbedtls_x509_crt_free(&cacert);
+    mbedtls_ssl_config_free(&conf);
+    mbedtls_ctr_drbg_free(&ctr_drbg);
+    mbedtls_entropy_free(&entropy);
+    mbedtls_ssl_free(&ssl);
 
-    if (ret != 0)
-    {
-        mbedtls_strerror(ret, buf, 100);
+    if (ret != 0) {
         ESP_LOGE(TAG, "Last error was: -0x%x - %s", -ret, buf);
         return -1;
     }
@@ -726,5 +727,5 @@ int indicator_openai_init(void)
     ESP_ERROR_CHECK(esp_event_handler_instance_register_with( view_event_handle, 
                                                             VIEW_EVENT_BASE, VIEW_EVENT_OPENAI_API_KEY_READ, 
                                                             __view_event_handler, NULL, NULL));
-    xTaskCreate(&__indicator_openai_task, "__indicator_openai_task", 1024 * 10, NULL, 10, NULL);
+    xTaskCreate(&__indicator_openai_task, "__indicator_openai_task", 1024 * 20, NULL, 10, NULL);
 }
